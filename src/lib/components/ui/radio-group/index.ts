@@ -8,3 +8,4 @@ export {
 	Root as RadioGroup,
 	Item as RadioGroupItem,
 };
+export type { RadioGroupItemProps } from "./radio-group-item.svelte";

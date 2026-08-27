@@ -4,3 +4,4 @@ export {
 	//
 	Root as Checkbox,
 };
+export type { CheckboxProps } from "./checkbox.svelte";
