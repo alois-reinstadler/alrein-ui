@@ -82,12 +82,20 @@ card     7 files — card.svelte + card-{header,title,description,content,footer
 `ghost` already exists upstream on both Button and Badge, so §3.4's `ghost ●` for those two needs
 no new prop — only the mutual-exclusion typing against `gradient`/`glow`.
 
-## Open collisions between the spec and the real upstream
+## Collisions between the spec and the real upstream — RESOLVED 2026-08-27
 
 1. **Control scale vs upstream heights.** §2 defines `--ctrl-h-sm/md/lg = 32/40/48`. Upstream is
    `sm h-8 (32)`, `default h-9 (36)`, `lg h-10 (40)`; Input is also `h-9`. Applying the vuesax
    scale to the upstream `size` enum silently resizes every existing call site, which §1 forbids.
-   Needs a decision — see the plan.
+   **Decision (maintainer, 2026-08-27): sizing stays close to shadcn.** The upstream `size` enum
+   keeps `h-8 / h-9 / h-10` byte-identical. `--ctrl-h/r/fs/px-*` govern **only** components that
+   have no upstream equivalent (Chip, Steps, Spinner, Rating, Timeline, UploadArea, ColorPicker,
+   Code/CodeWindow). Accepted cost: two size rhythms — 32/36/40 for shadcn-inherited controls,
+   32/40/48 for new ones.
+
+   **General rule from the same decision: props follow shadcn conventions.** Anything that
+   resolves to Tailwind classes is a `tv` variant — not a bespoke prop, not a CSS custom property,
+   not a BEM modifier. This is the direct fix for failure `F3`.
 2. **Card `overflow-hidden` vs glow.** Upstream Card Root is `overflow-hidden`; §3.5 says glow
    bleeds outside the box and must not sit inside a tight `overflow: hidden`. Removing
    `overflow-hidden` would change upstream visuals (it is what rounds the corners of a

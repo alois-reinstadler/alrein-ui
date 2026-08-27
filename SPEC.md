@@ -510,3 +510,31 @@ Format: **`ID` — pattern · blast radius · why it's wrong here.**
 17. No `!important`; `will-change` set and cleared around the animation only. (`F17`)
 18. One logical unit per commit; tests assert tokens/computed styles/`data-*`, not pixels of a
     moving effect. (`F18`)
+
+---
+
+## 9. Amendments (post-audit, 2026-08-27)
+
+Resolved against the live upstream API. These override anything above that contradicts them.
+Full reasoning in `SUBSTRATE.md`.
+
+- **A1 — Sizing follows shadcn, not vuesax.** The upstream `size` enum keeps `h-8 / h-9 / h-10`
+  (and `h-9` for Input) byte-identical. `--ctrl-*` applies **only** to components with no upstream
+  equivalent: Chip, Steps, Spinner, Rating, Timeline, UploadArea, ColorPicker, Code, CodeWindow.
+- **A2 — Props follow shadcn conventions.** Anything resolving to Tailwind classes is a `tv`
+  variant. Not a bespoke prop, not a CSS custom property, not a BEM modifier. (Fixes `F3`.)
+- **A3 — `index.ts` uses named re-exports**, matching upstream (`export { Root, Root as Card, … }`,
+  consumed as `import * as Card from …`). `export * as` does not exist upstream; §1 was wrong.
+- **A4 — Transition primitives still ship in both forms**, but `data-[state]` CSS is the default
+  (no `forceMount`, no snippet boilerplate) and the Svelte transition form is reserved for motion
+  needing measured values (`collapse`, `crossfade`, `MorphIndicator`). bits-ui v2 *does* support
+  Svelte transitions via `forceMount` + the `child` snippet; §4's stated reason was wrong.
+- **A5 — `--fx-tint` holds a full colour, not an RGB triplet.** Default `var(--primary)`; alpha via
+  `color-mix(in oklab, var(--fx-tint) N%, transparent)`. One OKLCH colour system, inherits consumer
+  theming. (Avoids `F15`.)
+- **A6 — Card keeps `overflow-hidden`.** Its glow is an inner radial layer clipped to the card's
+  rounded box. Outer bleed remains Button-only.
+- **A7 — Attachments never read `$state`/`$derived` directly.** Options are `T | (() => T)`,
+  evaluated inside the pointer engine loop, or attachments tear down on every `data-fx` change.
+- **A8 — Registry is served from the GitHub repo** (GitHub Pages). Phase 0 additionally proves
+  `shadcn-svelte add` end-to-end against a local static server.
