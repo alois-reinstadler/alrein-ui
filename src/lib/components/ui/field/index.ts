@@ -32,3 +32,6 @@ export {
 	Error as FieldError,
 };
 export type { FieldState } from "./field.svelte";
+export { default as Floating } from "./field-floating.svelte";
+export { default as FieldFloating } from "./field-floating.svelte";
+export type { FieldFloatingProps } from "./field-floating.svelte";
