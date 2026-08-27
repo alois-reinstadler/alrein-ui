@@ -65,6 +65,11 @@ jobs:
       - name: Supersets not reverted to upstream
         run: pnpm supersets:check
 
+      # registry.json is generated from registry.config.mjs; this fails if the
+      # committed file is stale rather than silently regenerating it.
+      - name: Registry declaration up to date
+        run: pnpm registry:gen --check
+
       - name: Build registry
         run: pnpm registry:build
 

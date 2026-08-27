@@ -14,23 +14,26 @@
 			"name": "theme",
 			"type": "registry:theme",
 			"title": "alrein-ui Theme",
-			"description": "Motion scale and effect tokens for alrein-ui. Adds the --transition-duration-*, --ease-fx-* and --fx-* values plus the `sq` squircle utility on top of the shadcn-svelte token set, and wires the stylesheet into your app.css. Every other alrein-ui item depends on this.",
+			"description": "Motion scale and effect tokens for alrein-ui. Adds the --transition-duration-*, --ease-fx-*, --fx-* and semantic state values on top of the shadcn-svelte token set, plus the `sq` squircle utility, and wires the stylesheet into your app.css. Every other alrein-ui item depends on this.",
+			"css": {
+				"@import \"./lib/styles/alrein/index.css\"": {}
+			},
 			"registryDependencies": [],
 			"files": [
+				{
+					"path": "src/lib/styles/alrein/fx.css",
+					"type": "registry:file",
+					"target": "~/src/lib/styles/alrein/fx.css"
+				},
 				{
 					"path": "src/lib/styles/alrein/index.css",
 					"type": "registry:file",
 					"target": "~/src/lib/styles/alrein/index.css"
 				},
 				{
-					"path": "src/lib/styles/alrein/tokens.css",
+					"path": "src/lib/styles/alrein/motion.css",
 					"type": "registry:file",
-					"target": "~/src/lib/styles/alrein/tokens.css"
-				},
-				{
-					"path": "src/lib/styles/alrein/fx.css",
-					"type": "registry:file",
-					"target": "~/src/lib/styles/alrein/fx.css"
+					"target": "~/src/lib/styles/alrein/motion.css"
 				},
 				{
 					"path": "src/lib/styles/alrein/press.css",
@@ -38,20 +41,17 @@
 					"target": "~/src/lib/styles/alrein/press.css"
 				},
 				{
-					"path": "src/lib/styles/alrein/motion.css",
+					"path": "src/lib/styles/alrein/tokens.css",
 					"type": "registry:file",
-					"target": "~/src/lib/styles/alrein/motion.css"
+					"target": "~/src/lib/styles/alrein/tokens.css"
 				}
-			],
-			"css": {
-				"@import \"./lib/styles/alrein/index.css\"": {}
-			}
+			]
 		},
 		{
 			"name": "fx",
 			"type": "registry:lib",
 			"title": "alrein-ui Effect System",
-			"description": "The singleton pointer engine, the five effect attachments, the capability matrix from SPEC.md §3.4 and the FxContext/FxScope policy layer that implements the §3.2 resolution order. One requestAnimationFrame and one pointermove listener serve the whole page.",
+			"description": "The singleton pointer engine, the five effect attachments, the capability matrix from SPEC.md §3.4 and the FxContext/FxScope policy layer implementing the §3.2 resolution order. One requestAnimationFrame and one pointermove listener serve the whole page.",
 			"registryDependencies": [
 				"local:theme"
 			],
@@ -62,19 +62,14 @@
 					"target": "~/src/lib/fx/capabilities.ts"
 				},
 				{
-					"path": "src/lib/fx/resolution.ts",
-					"type": "registry:file",
-					"target": "~/src/lib/fx/resolution.ts"
-				},
-				{
 					"path": "src/lib/fx/context.svelte.ts",
 					"type": "registry:file",
 					"target": "~/src/lib/fx/context.svelte.ts"
 				},
 				{
-					"path": "src/lib/fx/pointer.svelte.ts",
+					"path": "src/lib/fx/fx-scope.svelte",
 					"type": "registry:file",
-					"target": "~/src/lib/fx/pointer.svelte.ts"
+					"target": "~/src/lib/fx/fx-scope.svelte"
 				},
 				{
 					"path": "src/lib/fx/glow.ts",
@@ -82,9 +77,9 @@
 					"target": "~/src/lib/fx/glow.ts"
 				},
 				{
-					"path": "src/lib/fx/tilt.ts",
+					"path": "src/lib/fx/index.ts",
 					"type": "registry:file",
-					"target": "~/src/lib/fx/tilt.ts"
+					"target": "~/src/lib/fx/index.ts"
 				},
 				{
 					"path": "src/lib/fx/magnet.ts",
@@ -92,9 +87,19 @@
 					"target": "~/src/lib/fx/magnet.ts"
 				},
 				{
+					"path": "src/lib/fx/pointer.svelte.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/pointer.svelte.ts"
+				},
+				{
 					"path": "src/lib/fx/press.ts",
 					"type": "registry:file",
 					"target": "~/src/lib/fx/press.ts"
+				},
+				{
+					"path": "src/lib/fx/resolution.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/resolution.ts"
 				},
 				{
 					"path": "src/lib/fx/shimmer.ts",
@@ -102,14 +107,9 @@
 					"target": "~/src/lib/fx/shimmer.ts"
 				},
 				{
-					"path": "src/lib/fx/index.ts",
+					"path": "src/lib/fx/tilt.ts",
 					"type": "registry:file",
-					"target": "~/src/lib/fx/index.ts"
-				},
-				{
-					"path": "src/lib/fx/fx-scope.svelte",
-					"type": "registry:file",
-					"target": "~/src/lib/fx/fx-scope.svelte"
+					"target": "~/src/lib/fx/tilt.ts"
 				}
 			]
 		},
@@ -128,14 +128,14 @@
 					"target": "~/src/lib/motion/easing.ts"
 				},
 				{
-					"path": "src/lib/motion/transitions.ts",
-					"type": "registry:file",
-					"target": "~/src/lib/motion/transitions.ts"
-				},
-				{
 					"path": "src/lib/motion/morph-indicator.svelte",
 					"type": "registry:file",
 					"target": "~/src/lib/motion/morph-indicator.svelte"
+				},
+				{
+					"path": "src/lib/motion/transitions.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/motion/transitions.ts"
 				}
 			]
 		},
@@ -168,7 +168,7 @@
 			"name": "badge",
 			"type": "registry:ui",
 			"title": "alrein-ui Badge",
-			"description": "A strict superset of the shadcn-svelte Badge. All six upstream variants unchanged; adds gradient, glow (status-critical only) and a triggered shimmer. Overwrites the upstream file in place.",
+			"description": "A strict superset of the shadcn-svelte Badge. All six upstream variants unchanged; adds gradient, glow (status-critical only) and a triggered shimmer.",
 			"dependencies": [
 				"tailwind-variants"
 			],
@@ -193,7 +193,7 @@
 			"name": "card",
 			"type": "registry:ui",
 			"title": "alrein-ui Card",
-			"description": "A strict superset of the shadcn-svelte Card. All seven sub-components are untouched; the root adds variant=hero, interactive, gradient, glow and tilt. Keeps overflow-hidden and uses an inner clipped glow so a first-child image still gets rounded corners.",
+			"description": "A strict superset of the shadcn-svelte Card. All seven sub-components untouched; the root adds variant=hero, interactive, gradient, glow and tilt. Keeps overflow-hidden and uses an inner clipped glow so a first-child image still gets rounded corners.",
 			"dependencies": [
 				"tailwind-variants"
 			],
@@ -203,6 +203,36 @@
 			],
 			"files": [
 				{
+					"path": "src/lib/components/ui/card/card-action.svelte",
+					"type": "registry:ui",
+					"target": "card/card-action.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/card-content.svelte",
+					"type": "registry:ui",
+					"target": "card/card-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/card-description.svelte",
+					"type": "registry:ui",
+					"target": "card/card-description.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/card-footer.svelte",
+					"type": "registry:ui",
+					"target": "card/card-footer.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/card-header.svelte",
+					"type": "registry:ui",
+					"target": "card/card-header.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/card-title.svelte",
+					"type": "registry:ui",
+					"target": "card/card-title.svelte"
+				},
+				{
 					"path": "src/lib/components/ui/card/card.svelte",
 					"type": "registry:ui",
 					"target": "card/card.svelte"
@@ -211,6 +241,295 @@
 					"path": "src/lib/components/ui/card/index.ts",
 					"type": "registry:ui",
 					"target": "card/index.ts"
+				}
+			]
+		},
+		{
+			"name": "field",
+			"type": "registry:ui",
+			"title": "alrein-ui Field",
+			"description": "A strict superset of the shadcn-svelte Field. Adds semantic state (danger/warn/success) and the notched floating label, which is the one structural feature the vuesax form controls have that shadcn has no equivalent for.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/field/field-content.svelte",
+					"type": "registry:ui",
+					"target": "field/field-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-description.svelte",
+					"type": "registry:ui",
+					"target": "field/field-description.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-error.svelte",
+					"type": "registry:ui",
+					"target": "field/field-error.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-floating.svelte",
+					"type": "registry:ui",
+					"target": "field/field-floating.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-group.svelte",
+					"type": "registry:ui",
+					"target": "field/field-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-label.svelte",
+					"type": "registry:ui",
+					"target": "field/field-label.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-legend.svelte",
+					"type": "registry:ui",
+					"target": "field/field-legend.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-separator.svelte",
+					"type": "registry:ui",
+					"target": "field/field-separator.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-set.svelte",
+					"type": "registry:ui",
+					"target": "field/field-set.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field-title.svelte",
+					"type": "registry:ui",
+					"target": "field/field-title.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/field.svelte",
+					"type": "registry:ui",
+					"target": "field/field.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/field/floating-context.svelte.ts",
+					"type": "registry:ui",
+					"target": "field/floating-context.svelte.ts"
+				},
+				{
+					"path": "src/lib/components/ui/field/index.ts",
+					"type": "registry:ui",
+					"target": "field/index.ts"
+				}
+			]
+		},
+		{
+			"name": "input",
+			"type": "registry:ui",
+			"title": "alrein-ui Input",
+			"description": "A strict superset of the shadcn-svelte Input. Adds semantic state, a loading state that blocks interaction without disabling, and floating-label support. No decorative effects — §3.4 withholds them from form fields.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:field"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/input/index.ts",
+					"type": "registry:ui",
+					"target": "input/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/input/input.svelte",
+					"type": "registry:ui",
+					"target": "input/input.svelte"
+				}
+			]
+		},
+		{
+			"name": "textarea",
+			"type": "registry:ui",
+			"title": "alrein-ui Textarea",
+			"description": "A strict superset of the shadcn-svelte Textarea. Adds semantic state, loading, floating-label support and an optional character counter.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:field"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/textarea/index.ts",
+					"type": "registry:ui",
+					"target": "textarea/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/textarea/textarea.svelte",
+					"type": "registry:ui",
+					"target": "textarea/textarea.svelte"
+				}
+			]
+		},
+		{
+			"name": "select",
+			"type": "registry:ui",
+			"title": "alrein-ui Select",
+			"description": "A strict superset of the shadcn-svelte Select, all eleven files intact. Adds semantic state and loading on the trigger. No glow and no height-animating menu morph — see amendments A13 and A14.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:field"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/select/index.ts",
+					"type": "registry:ui",
+					"target": "select/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-content.svelte",
+					"type": "registry:ui",
+					"target": "select/select-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-group-heading.svelte",
+					"type": "registry:ui",
+					"target": "select/select-group-heading.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-group.svelte",
+					"type": "registry:ui",
+					"target": "select/select-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-item.svelte",
+					"type": "registry:ui",
+					"target": "select/select-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-label.svelte",
+					"type": "registry:ui",
+					"target": "select/select-label.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-portal.svelte",
+					"type": "registry:ui",
+					"target": "select/select-portal.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-scroll-down-button.svelte",
+					"type": "registry:ui",
+					"target": "select/select-scroll-down-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-scroll-up-button.svelte",
+					"type": "registry:ui",
+					"target": "select/select-scroll-up-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-separator.svelte",
+					"type": "registry:ui",
+					"target": "select/select-separator.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select-trigger.svelte",
+					"type": "registry:ui",
+					"target": "select/select-trigger.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/select/select.svelte",
+					"type": "registry:ui",
+					"target": "select/select.svelte"
+				}
+			]
+		},
+		{
+			"name": "checkbox",
+			"type": "registry:ui",
+			"title": "alrein-ui Checkbox",
+			"description": "A strict superset of the shadcn-svelte Checkbox. The mark gains the toggle-thumb spring, and variant=\"card\" adds the selectable card presentation with gradient, glow and tilt.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/checkbox/checkbox.svelte",
+					"type": "registry:ui",
+					"target": "checkbox/checkbox.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/checkbox/index.ts",
+					"type": "registry:ui",
+					"target": "checkbox/index.ts"
+				}
+			]
+		},
+		{
+			"name": "radio-group",
+			"type": "registry:ui",
+			"title": "alrein-ui RadioGroup",
+			"description": "A strict superset of the shadcn-svelte RadioGroup. The dot gains the toggle-thumb spring, and variant=\"card\" adds the selectable card presentation. Collapses vuesax radio, radio-card, radio-group and radio-group-cards into one component.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/radio-group/context.svelte.ts",
+					"type": "registry:ui",
+					"target": "radio-group/context.svelte.ts"
+				},
+				{
+					"path": "src/lib/components/ui/radio-group/index.ts",
+					"type": "registry:ui",
+					"target": "radio-group/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/radio-group/radio-group-item.svelte",
+					"type": "registry:ui",
+					"target": "radio-group/radio-group-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/radio-group/radio-group.svelte",
+					"type": "registry:ui",
+					"target": "radio-group/radio-group.svelte"
+				}
+			]
+		},
+		{
+			"name": "switch",
+			"type": "registry:ui",
+			"title": "alrein-ui Switch",
+			"description": "A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/switch/index.ts",
+					"type": "registry:ui",
+					"target": "switch/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/switch/switch.svelte",
+					"type": "registry:ui",
+					"target": "switch/switch.svelte"
 				}
 			]
 		}
