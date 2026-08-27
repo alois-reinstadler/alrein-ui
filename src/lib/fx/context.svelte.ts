@@ -29,15 +29,26 @@ const pointerFineQuery = new MediaQuery('pointer: fine');
  */
 export class FxContext {
 	#parent: FxContext | undefined = undefined;
-	#level: FxLevel | undefined = $state(undefined);
-	#density: FxDensity | undefined = $state(undefined);
+	#level: () => FxLevel | undefined = () => undefined;
+	#density: () => FxDensity | undefined = () => undefined;
 
 	constructor(parent?: FxContext) {
 		this.#parent = parent;
 	}
 
-	/** Called by `<FxScope>` when its props change. */
-	configure(level: FxLevel | undefined, density: FxDensity | undefined): void {
+	/**
+	 * Called by `<FxScope>` during render, with getters rather than values.
+	 *
+	 * This has to be synchronous, not an effect. `$effect.pre` does not run on the
+	 * server, so configuring there left every scope rendering its *parent's* level
+	 * server-side and only correcting on hydration — which defeats the entire
+	 * reason §3.3 puts a literal `data-fx` attribute in the DOM. CSS-only effects
+	 * are supposed to resolve on first paint, before and without JavaScript.
+	 *
+	 * Getters rather than values so a scope whose props change still tracks,
+	 * without needing an effect to push the new value in.
+	 */
+	configure(level: () => FxLevel | undefined, density: () => FxDensity | undefined): void {
 		this.#level = level;
 		this.#density = density;
 	}
@@ -53,12 +64,12 @@ export class FxContext {
 	 * `$state` inside a getter are tracked at access time, so they stay reactive.
 	 */
 	get level(): FxLevel {
-		return inheritLevel(this.#parent?.level ?? 'calm', this.#level);
+		return inheritLevel(this.#parent?.level ?? 'calm', this.#level());
 	}
 
 	/** Density has no sticky value; the nearest scope wins. */
 	get density(): FxDensity {
-		return this.#density ?? this.#parent?.density ?? 'default';
+		return this.#density() ?? this.#parent?.density ?? 'default';
 	}
 
 	get reducedMotion(): boolean {

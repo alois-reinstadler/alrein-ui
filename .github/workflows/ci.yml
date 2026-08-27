@@ -65,6 +65,12 @@ jobs:
       - name: Supersets not reverted to upstream
         run: pnpm supersets:check
 
+      # Verifies the §3.2 policy server-side, at all three effect levels. A
+      # server has no pointer, which is the same situation as a touch device, so
+      # this covers part of §7.7 and §7.9 without a browser.
+      - name: Effect policy resolves correctly server-side
+        run: pnpm ssr:check
+
       # registry.json is generated from registry.config.mjs; this fails if the
       # committed file is stale rather than silently regenerating it.
       - name: Registry declaration up to date

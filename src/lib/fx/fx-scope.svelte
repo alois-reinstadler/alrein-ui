@@ -34,7 +34,13 @@
 	}: Props = $props();
 
 	const context = setFxContext(getFxContext());
-	$effect.pre(() => context.configure(level, density));
+	// Synchronous, not an effect: effects do not run during SSR, and the literal
+	// `data-fx` attribute has to be correct on the server or the CSS-only effects
+	// it exists for resolve wrong on first paint.
+	context.configure(
+		() => level,
+		() => density
+	);
 </script>
 
 <!--

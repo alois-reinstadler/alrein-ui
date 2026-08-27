@@ -14,9 +14,26 @@
 	 * The effect level lives in the layout, not in a page, so it survives
 	 * navigation. Comparing two components at `expressive` is the point of the
 	 * demo, and a control that resets on every click cannot do that.
+	 *
+	 * `?fx=` and `?density=` seed it. That is not a convenience: it is what makes
+	 * the level checkable without a browser. `pnpm ssr:check` fetches each page at
+	 * each level and asserts what may and may not appear in the markup, which
+	 * covers part of acceptance criterion §7.7 in CI rather than by eye.
 	 */
-	let level = $state<FxLevel>('calm');
-	let density = $state<FxDensity>('default');
+	function initialLevel(): FxLevel {
+		const requested = page.url.searchParams.get('fx');
+		return requested === 'off' || requested === 'expressive' || requested === 'calm'
+			? requested
+			: 'calm';
+	}
+
+	function initialDensity(): FxDensity {
+		const requested = page.url.searchParams.get('density');
+		return requested === 'list' || requested === 'table' ? requested : 'default';
+	}
+
+	let level = $state<FxLevel>(initialLevel());
+	let density = $state<FxDensity>(initialDensity());
 	let dark = $state(false);
 
 	const groups = byPhase();
