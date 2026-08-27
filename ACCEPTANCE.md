@@ -377,3 +377,93 @@ motivates validating in one place (a browser will drop a `.exe` onto a zone whos
 3. **The UploadArea demo tripped `F9-raf`** with a fake transport. Rather than allowlist the demo,
    the progress is now advanced by a button — which demonstrates the actual design point better,
    since the caller owns transport and reports progress in.
+
+---
+
+# Phase 3 — navigation and structure
+
+Tabs · Steps · Accordion · Breadcrumb · Pagination · Sidebar · Timeline.
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | `svelte-check` strict, zero errors, zero `any` | **PASS** |
+| 2 | Zero §1 hard-ban items in the diff | **PASS** |
+| 3 | Registry item builds and installs cleanly | **PASS** — re-proven at 31 items |
+| 4 | Effect props only where §3.4 allows | **PASS** |
+| 5 | Keyboard-complete and screen-reader-correct | **PASS**, with one upstream bug fixed |
+| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** — levels verified, light/dark not |
+| 8 | `prefers-reduced-motion: reduce` | **PASS** |
+| 9 | `(pointer: coarse)` | **PASS** |
+| 10 | No layout shift from any effect | **PASS** |
+| 11 | Demo page with every variant | **PASS** |
+| 12 | Visual fidelity | **DONE DIFFERENTLY**, with one known shortfall — see below |
+
+**The indicator was the phase's real work.** Every Tabs and Pagination indicator variant in the
+source animates `width` on a spring — a layout overshoot, eleven times over. All of them are
+re-expressed as FLIP on the shared `MorphIndicator`: `translateX` plus `scaleX`, transform only.
+
+A18 corrected §4.9 in the process: MorphIndicator's consumers are Tabs, **Pagination** and Sidebar,
+not Steps. Steps has no sliding indicator anywhere in the source — its progress is a per-segment
+`scaleX` plus a `stroke-dashoffset` ring, already transform-only.
+
+**5 — Keyboard.** bits-ui had more than A24 credited it with, and checking rather than assuming
+found it: it already implements Pagination's arrow keys, direction-aware next/prev, `Home`/`End`
+and an optional loop. Nothing was hand-rolled. A24's Pagination claim is corrected in the spec,
+which makes it the *second* amendment to have named a gap that bits-ui had already filled — the
+first being A15 on the switch. The lesson is recorded rather than the correction alone: **read the
+primitive before believing a digest about it.**
+
+Two genuine defects were fixed rather than inherited:
+- **Upstream `pagination-ellipsis` sets `aria-hidden="true"` on its wrapper**, which prunes the
+  `<span class="sr-only">More pages</span>` inside it — so the gap in the page run is silent. The
+  attribute moved to the icon. Visually identical, audibly not.
+- **Upstream Pagination's press was dead.** `buttonVariants` ships `fx-press`, but the class is
+  inert without the attachment, so the prev/next buttons had the styling and none of the behaviour.
+
+**12 — One known shortfall, stated plainly.** Tabs `chrome` ships **without its shoulders**. The
+source's sled has two quarter-disc pseudo-elements that would squash under `scaleX`; reproducing
+them needs a counter-scaled *child*, which `MorphIndicator` does not render. The digest predicted
+this as the one thing FLIP cannot reproduce. What ships reads as a browser tab but is not the
+source's silhouette. Recorded as A25a rather than left to be discovered.
+
+The related radius distortion **was** fixed: A19 claimed it "is handled" and it was not, until the
+inverted keyframe learned to pre-divide the radius by the scale (A25a).
+
+## Bugs this phase's checks caught
+
+1. **`shadcn-svelte add sidebar` reverted four supersets at once** — button, input, skeleton and
+   tooltip — having pulled each in as a registry dependency. `pnpm supersets:check` named all four.
+   That is the second occurrence of this failure and the first caught automatically.
+2. **`{#snippet children(...)}` shadows the `children` prop.** Wrapping bits-ui's Root snippet to
+   inject the indicator recursed until the stack overflowed. `svelte-check` did not catch it; only
+   rendering the page did — which is the argument for `ssr:check` existing at all.
+3. **A documented claim about Tailwind v4's `data-active:` was wrong**, and grepping the built
+   stylesheet disproved it before it shipped. `data-active:` is a *named* variant compiling to
+   `:where([data-state=active]), :where([data-active]:not([data-active=false]))`, not a bare
+   attribute test.
+
+---
+
+# Library-wide status
+
+**29 of 29 components. 31 registry items, 172 files.**
+
+| Check | Result |
+|---|---|
+| `pnpm check` | 1135 files, 0 errors, 0 warnings |
+| `pnpm test` | 145 tests |
+| `pnpm bans:check` | 14 rules, 0 violations |
+| `pnpm supersets:check` | 48 extended files still marked |
+| `pnpm registry:gen --check` | 31 items, regenerates identically |
+| `pnpm registry:check` | 31 items validated against disk and build output |
+| `pnpm layout:check` | 45 effect rules, none touch the layout box |
+| `pnpm ssr:check` | 31 pages × 3 effect levels = 93 renders |
+| `pnpm consumer:smoke` | every item installs over real upstream files; consumer builds |
+
+**Still blocked, unchanged since Phase 0:** browser verification. No automation host exists in this
+environment (`preview_status` reports none; CDP on `127.0.0.1:9222` is refused), and per the
+operating rules no browser was started as a workaround. Criteria 6 and 7 remain partial for every
+phase. Everything that can be verified without one has been, and four checks were built specifically
+to narrow the gap — `layout:check`, `ssr:check`, `supersets:check` and `consumer:smoke` — three of
+which caught real bugs that would otherwise have shipped.
