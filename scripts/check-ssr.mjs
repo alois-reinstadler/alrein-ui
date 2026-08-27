@@ -131,13 +131,15 @@ try {
 				pass('static effects may appear where a page asks for them per instance');
 			}
 
-			// §3.2 step 1 again, the sticky half: a nested scope asking for
-			// "expressive" inside an "off" scope must still resolve "off".
-			const offIndex = levels.indexOf('off');
-			if (level !== 'off' && offIndex >= 0 && offIndex < levels.length - 1) {
+			// §3.2 step 1 again, the sticky half: a scope asking for "expressive"
+			// from inside an "off" scope must still resolve "off". The demo pages
+			// tag that exact element, because inferring nesting from document order
+			// breaks as soon as a sibling scope appears further down the page.
+			for (const tag of markup.match(/<div[^>]*data-ssr-check="sticky-off"[^>]*>/g) ?? []) {
+				const resolved = /data-fx="(\w+)"/.exec(tag);
 				assert(
-					levels.slice(offIndex + 1).every((nested) => nested === 'off'),
-					'a scope nested inside data-fx="off" cannot re-enable effects'
+					resolved?.[1] === 'off',
+					`a scope nested inside data-fx="off" resolves to "off" (got "${resolved?.[1]}")`
 				);
 			}
 		}

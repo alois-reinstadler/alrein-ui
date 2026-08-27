@@ -83,7 +83,11 @@
 			<p class="mb-3 text-xs font-medium text-muted-foreground">
 				Bereich: aus, darin ein Bereich, der „ausdrucksstark" verlangt
 			</p>
-			<FxScope level="expressive" class="contents">
+			<!-- data-ssr-check is a hook for `pnpm ssr:check`: it asserts that this
+			     scope, nested inside an `off` one, still resolves to `off` (§3.2 step 1).
+			     Inferring nesting from document order was wrong the moment a sibling
+			     scope appeared later on the page. -->
+			<FxScope level="expressive" class="contents" data-ssr-check="sticky-off">
 				<Button glow>bleibt dunkel</Button>
 			</FxScope>
 		</FxScope>
