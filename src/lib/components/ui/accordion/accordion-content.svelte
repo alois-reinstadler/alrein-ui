@@ -64,22 +64,32 @@
 	 */
 	import { Accordion as AccordionPrimitive } from "bits-ui";
 	import { cn, type WithoutChild } from "$lib/utils.js";
-	import { getAccordionContext } from "./accordion.svelte";
+	import { getAccordionContext, getAccordionItemIds } from "./accordion.svelte";
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		forceMount = true,
+		id,
 		children,
 		...restProps
 	}: WithoutChild<AccordionPrimitive.ContentProps> = $props();
 
 	const accordion = getAccordionContext();
+
+	/*
+	 * The other end of the `aria-controls` link. A consumer-supplied `id` still
+	 * wins; bits-ui's own generated id is the fallback when there is no item
+	 * context at all.
+	 */
+	const itemIds = getAccordionItemIds();
+	const panelId = $derived(id ?? itemIds?.contentId);
 </script>
 
 <AccordionPrimitive.Content
 	bind:ref
 	{forceMount}
+	id={panelId}
 	data-slot="accordion-content"
 	class="fx-collapse group/accordion-content text-sm"
 	{...restProps}

@@ -106,8 +106,25 @@
 	});
 </script>
 
+<!--
+	`data-slot` is re-asserted *after* the merge, and that is a fix rather than a
+	flourish.
+
+	Upstream writes `mergeProps(buttonProps, props)`, and when the button is
+	wrapped in a tooltip — which is exactly what happens whenever `tooltipContent`
+	is passed, i.e. on every button in a collapsible sidebar — bits-ui's
+	`data-slot="tooltip-trigger"` wins the merge and
+	`data-slot="sidebar-menu-button"` disappears from the DOM. Verified in the
+	rendered markup: five of seven menu buttons on the demo page had lost it.
+
+	That silently breaks every `data-[slot=sidebar-menu-button]` selector,
+	including upstream's own, on precisely the buttons a consumer is most likely
+	to be styling. §1 calls `data-slot` non-negotiable and `F7` is the failure it
+	names. The tooltip's own identity survives on `data-tooltip-trigger`, which
+	bits-ui also emits, so nothing is lost by putting this one back on top.
+-->
 {#snippet Button({ props }: { props?: Record<string, unknown> })}
-	{@const mergedProps = mergeProps(buttonProps, props)}
+	{@const mergedProps = { ...mergeProps(buttonProps, props), "data-slot": "sidebar-menu-button" }}
 	{#if child}
 		{@render child({ props: mergedProps })}
 	{:else}

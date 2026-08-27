@@ -95,7 +95,16 @@
 </script>
 
 {#if collapsible === "none"}
+	<!--
+		`data-slot` and `data-variant` are added to this branch; upstream emits
+		neither here, so a non-collapsible sidebar is the one shape a consumer
+		cannot target with `[data-slot=sidebar]` at all. §1 calls `data-slot`
+		non-negotiable, and a branch that quietly omits it is `F7`.
+	-->
 	<div
+		data-slot="sidebar"
+		data-variant={variant}
+		data-side={side}
 		class={cn(
 			"flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground",
 			variant === "ghost" && "bg-transparent",

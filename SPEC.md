@@ -720,3 +720,41 @@ Full reasoning in `SUBSTRATE.md`.
 - **A28 — Tabs `gooey` is optional and must not be the default.** §5 already says so. It needs an
   SVG `feGaussianBlur` + `feColorMatrix` filter and must degrade to `chrome` under reduced motion.
   If it ships, `chrome` remains the default variant.
+
+### Amendments from building Phase 3
+
+- **A21a — `fx-collapse` alone is not enough for a panel bits-ui mounts.** A21 says the utility
+  "needs no measurement, so no `transitionend` listener and no timeout guard". That is true of the
+  CSS and false of the situation: bits-ui's presence layer *does* measure. With `forceMount` off,
+  `AccordionContentState` zeroes `transitionDuration` inside an `afterTick` to measure the panel —
+  which swallows the transition — and then re-applies `hidden` because `getAnimations()` comes back
+  empty. Upstream survives this because a keyframe **animation** restarts when `animationName` is
+  restored; a CSS **transition** does not.
+
+  So `forceMount` is required, and it is exactly the mechanism §4/A4 describes. The cost is a
+  permanently mounted panel, which moves the accessibility question from bits-ui to us; it is paid
+  with `visibility` in the transition list, so it flips at the end of the close and the start of the
+  open — no timer, no listener, consistent with A22.
+- **A24a — bits-ui's Accordion has the same `aria-controls` gap A24 tells us not to inherit.**
+  `AccordionTriggerState` emits `aria-expanded` and stops; `AccordionContentState` emits no id and
+  no `aria-labelledby`. That is the identical defect A24 names in the vuesax source, and
+  **inheriting it from a different upstream is the same outcome for the same user** — so `Accordion.Item`
+  mints one id and both ends use it. `role="region"` is deliberately *not* added: the ARIA practices
+  discourage it past roughly six panels, and neither bits-ui nor shadcn claims it.
+
+  The general rule this establishes: **`F14` says do not re-implement what a primitive already does.
+  It does not say inherit what a primitive fails to do.** Check, then fill the gap narrowly.
+- **A24b — a strict superset sometimes means fixing upstream, not only preserving it.** Two real
+  defects in shadcn-svelte's own components were corrected rather than carried:
+  - **Sidebar loses `data-slot="sidebar-menu-button"` whenever a tooltip is attached.**
+    `mergeProps(buttonProps, props)` lets bits-ui's `data-slot="tooltip-trigger"` win, so upstream's
+    own `data-[slot=sidebar-menu-button]` selectors silently stop matching on exactly the buttons a
+    collapsible sidebar always has — 5 of 7 on our demo page. Re-asserted after the merge, with
+    `data-tooltip-trigger` preserving the tooltip's identity. This is `F7` occurring upstream.
+  - **`pagination-ellipsis` puts `aria-hidden="true"` on the wrapper**, which prunes the
+    `<span class="sr-only">More pages</span>` inside it, so the gap in the page run is announced as
+    nothing at all. The attribute moved to the icon; visually identical, audibly not.
+
+  §1's "never break an existing shadcn call site" is about **API and appearance**. It is not a
+  commitment to reproduce a bug, and where the two conflict the user wins. Every such fix is
+  recorded here rather than made quietly.

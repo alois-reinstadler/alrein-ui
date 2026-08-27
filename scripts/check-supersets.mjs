@@ -77,7 +77,9 @@ const SUPERSETS = [
 	'src/lib/components/ui/sidebar/sidebar-menu.svelte',
 	'src/lib/components/ui/sidebar/sidebar-menu-button.svelte',
 	'src/lib/components/ui/sidebar/sidebar-menu-sub.svelte',
-	'src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte'
+	'src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte',
+	'src/lib/components/ui/sidebar/sidebar-rail.svelte',
+	'src/lib/components/ui/sidebar/sidebar-group-label.svelte'
 ];
 
 const missing = [];

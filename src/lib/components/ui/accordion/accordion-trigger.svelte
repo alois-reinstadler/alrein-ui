@@ -85,7 +85,7 @@
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
 	import { press as pressEffect } from "$lib/fx/press.js";
-	import { getAccordionContext } from "./accordion.svelte";
+	import { getAccordionContext, getAccordionItemIds } from "./accordion.svelte";
 
 	let {
 		ref = $bindable(null),
@@ -100,6 +100,13 @@
 
 	const fx = getFxContext();
 	const accordion = getAccordionContext();
+	/*
+	 * bits-ui emits `aria-expanded` and stops there — no `aria-controls`. The item
+	 * publishes an id so the two ends of the disclosure are linked; see
+	 * `accordion.svelte` for the check against `bits-ui@2.19.0`. Declared before
+	 * `{...restProps}` below, so a consumer can still override it.
+	 */
+	const itemIds = getAccordionItemIds();
 
 	/*
 	 * `ghost + gradient` and `ghost + glow` are contradictions (§3.5): a
@@ -136,6 +143,7 @@
 		bind:ref
 		data-slot="accordion-trigger"
 		class={classes}
+		aria-controls={itemIds?.contentId}
 		{disabled}
 		{...restProps}
 		{@attach pressEffect({ enabled: () => !disabled })}
