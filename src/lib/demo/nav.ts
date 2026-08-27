@@ -26,6 +26,7 @@ export const NAV: NavEntry[] = [
 	{ slug: 'button', name: 'Button', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle Upstream-Varianten plus Gradient, Glow, Shimmer, Tilt und Magnet.' },
 	{ slug: 'card', name: 'Card', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sieben Teilkomponenten plus hero-Variante, interactive, Glow und Tilt.' },
 	{ slug: 'badge', name: 'Badge', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sechs Varianten plus Gradient, Glow bei destructive und Shimmer.' },
+	{ slug: 'button-group', name: 'ButtonGroup', phase: 0, status: 'planned', origin: 'extends', summary: 'Ghost und Gradient an den Kindern — kein Glow, kein Tilt, kein Magnet.' },
 
 	// Phase 1 — form controls
 	{ slug: 'input', name: 'Input', phase: 1, status: 'shipped', origin: 'extends', summary: 'Zustände, Ladezustand und schwebendes Label. Keine Effekte — §3.4.' },
@@ -56,7 +57,8 @@ export const NAV: NavEntry[] = [
 
 	// Phase 4 — complex
 	{ slug: 'color-picker', name: 'ColorPicker', phase: 4, status: 'planned', origin: 'new', summary: 'Sechs Skins auf einer gemeinsamen ColorState-Klasse.' },
-	{ slug: 'code', name: 'Code', phase: 4, status: 'planned', origin: 'new', summary: 'Plus CodeWindow mit Fensterrahmen.' },
+	{ slug: 'code', name: 'Code', phase: 4, status: 'planned', origin: 'new', summary: 'Syntaxhervorhebung, lazy geladen, mit <pre>-Rückfall für SSR.' },
+	{ slug: 'code-window', name: 'CodeWindow', phase: 4, status: 'planned', origin: 'new', summary: 'Code plus Fensterrahmen.' },
 	{ slug: 'upload-area', name: 'UploadArea', phase: 4, status: 'planned', origin: 'new', summary: 'Glow beim Ziehen, Schimmer beim Hochladen, Tilt.' }
 ];
 
