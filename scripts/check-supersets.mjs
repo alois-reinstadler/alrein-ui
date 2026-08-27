@@ -42,7 +42,9 @@ const SUPERSETS = [
 	'src/lib/components/ui/input/input.svelte',
 	'src/lib/components/ui/textarea/textarea.svelte',
 	'src/lib/components/ui/select/select-trigger.svelte',
-	'src/lib/components/ui/select/select-content.svelte'
+	'src/lib/components/ui/select/select-content.svelte',
+	'src/lib/components/ui/alert/alert.svelte',
+	'src/lib/components/ui/tooltip/tooltip-content.svelte'
 ];
 
 const missing = [];

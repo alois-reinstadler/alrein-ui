@@ -43,13 +43,30 @@ export function resolveEffect(
 	// 1 — `data-fx="off"` in the ancestor chain. Dead, no override possible.
 	if (environment.level === 'off') return false;
 
+	/*
+	 * §3.2 step 5, applied before the pointer vetoes because it catches one more
+	 * effect than they do.
+	 *
+	 * §3.2's wording names glow, tilt and magnet, and leaves shimmer unstated.
+	 * §3.4 settles it: the two dense rows in the matrix — `ButtonGroup (children)`
+	 * and `Table rows / any list item` — grant **only** gradient (and ghost, which
+	 * is a variant rather than an effect). Shimmer is a dash in both. So the
+	 * consistent reading is that a dense scope leaves *static surface treatments*
+	 * alone and downgrades everything that moves.
+	 *
+	 * That is also the right answer on its own terms: one shimmering row in a
+	 * table of forty is not attention, it is a fault indicator nobody asked for.
+	 *
+	 * The loading shimmer is unaffected, because it is a CSS class rather than a
+	 * resolved effect — a skeleton row inside a table still animates.
+	 */
+	if (environment.density !== 'default' && effect !== 'gradient') return false;
+
 	if (POINTER_TRACKED.has(effect)) {
 		// 2 — reduced motion kills pointer-tracked effects outright.
 		if (environment.reducedMotion) return false;
 		// 3 — a coarse pointer has nothing to track.
 		if (!environment.pointerFine) return false;
-		// 5 — density scope. gradient and shimmer survive; these do not.
-		if (environment.density !== 'default') return false;
 		// §3.5: magnet is the isolated-CTA effect, and `expressive` only.
 		if (effect === 'magnet' && environment.level !== 'expressive') return false;
 	}

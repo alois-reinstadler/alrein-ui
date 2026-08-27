@@ -83,8 +83,29 @@ describe('step 5 — density scope', () => {
 		expect(resolveEffect(effect, true, env({ density: 'table', level: 'expressive' }))).toBe(false);
 	});
 
-	it.each(STATIC_EFFECTS)('lets %s survive a dense scope', (effect) => {
-		expect(resolveEffect(effect, true, env({ density: 'table' }))).toBe(true);
+	/*
+	 * §3.2 names only glow, tilt and magnet, but §3.4's two dense rows —
+	 * `ButtonGroup (children)` and `Table rows / any list item` — grant gradient
+	 * alone. So shimmer goes too, and the rule reads as "static surface
+	 * treatments survive; anything that moves does not".
+	 */
+	it('lets gradient survive a dense scope — it is a static surface treatment', () => {
+		expect(resolveEffect('gradient', true, env({ density: 'table' }))).toBe(true);
+		expect(resolveEffect('gradient', true, env({ density: 'list' }))).toBe(true);
+	});
+
+	it('downgrades the triggered shimmer too, which §3.2 leaves unstated and §3.4 settles', () => {
+		expect(resolveEffect('shimmer', true, env({ density: 'list' }))).toBe(false);
+		expect(resolveEffect('shimmer', true, env({ density: 'table' }))).toBe(false);
+	});
+
+	it('matches §3.4: the two dense rows in the matrix grant gradient and nothing else', () => {
+		for (const density of ['list', 'table'] as const) {
+			const survivors = ALL_EFFECTS.filter((effect) =>
+				resolveEffect(effect, true, env({ density, level: 'expressive' }))
+			);
+			expect(survivors).toEqual(['gradient']);
+		}
 	});
 });
 

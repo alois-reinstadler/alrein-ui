@@ -52,6 +52,15 @@
 	`display: contents` by default so a scope adds no box and cannot cause the
 	reflow acceptance criterion §7.10 forbids. Pass a `class` to make it a real
 	element when you want one.
+
+	**One trap, and it is easy to walk into.** `display: contents` removes an
+	element from the *box tree* but **not** from the *selector tree*. So wrapping
+	children in an `<FxScope>` still breaks any `>` selector that was reaching
+	them — `[&>[data-slot]]:rounded-r-none` on a parent stops matching, because
+	the children are now grandchildren. If the surrounding component styles its
+	children with `>`, do not wrap: call `setFxContext()` in that component and
+	render `data-fx` / `data-fx-density` on its own element instead.
+	`components/ui/button-group/button-group.svelte` does exactly that, and had to.
 -->
 <div
 	bind:this={ref}

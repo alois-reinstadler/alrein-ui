@@ -3,6 +3,7 @@ import Portal from "./tooltip-portal.svelte";
 import Provider from "./tooltip-provider.svelte";
 import Trigger from "./tooltip-trigger.svelte";
 import Root from "./tooltip.svelte";
+export { type TooltipContentProps } from "./tooltip-content.svelte";
 
 export {
 	Root,
