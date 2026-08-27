@@ -414,12 +414,25 @@ which makes it the *second* amendment to have named a gap that bits-ui had alrea
 first being A15 on the switch. The lesson is recorded rather than the correction alone: **read the
 primitive before believing a digest about it.**
 
-Two genuine defects were fixed rather than inherited:
+Two genuine defects in **shadcn-svelte itself** were fixed rather than inherited (A24b), plus one
+in bits-ui (A24a):
 - **Upstream `pagination-ellipsis` sets `aria-hidden="true"` on its wrapper**, which prunes the
   `<span class="sr-only">More pages</span>` inside it — so the gap in the page run is silent. The
   attribute moved to the icon. Visually identical, audibly not.
 - **Upstream Pagination's press was dead.** `buttonVariants` ships `fx-press`, but the class is
   inert without the attachment, so the prev/next buttons had the styling and none of the behaviour.
+- **Upstream Sidebar loses `data-slot="sidebar-menu-button"` whenever a tooltip is attached**,
+  because `mergeProps` lets bits-ui's `tooltip-trigger` slot win — so upstream's own
+  `data-[slot=…]` selectors stop matching on exactly the buttons a collapsible sidebar always has.
+  Five of seven on the demo page. `F7` occurring upstream.
+- **bits-ui's Accordion emits `aria-expanded` and no `aria-controls`** — the identical gap A24 names
+  in the vuesax source. Inheriting a defect from a different upstream is the same outcome for the
+  same user, so `Accordion.Item` mints one id and both ends use it; verified 9 of 9 in rendered
+  markup.
+
+That §1's "never break an existing shadcn call site" is about **API and appearance**, not a
+commitment to reproduce a bug, is now stated as A24b — with every such fix recorded rather than
+made quietly.
 
 **12 — One known shortfall, stated plainly.** Tabs `chrome` ships **without its shoulders**. The
 source's sled has two quarter-disc pseudo-elements that would squash under `scaleX`; reproducing
