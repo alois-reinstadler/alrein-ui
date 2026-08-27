@@ -98,6 +98,8 @@ export const registry = {
 		// Phase 3 — navigation and structure.
 		ui('steps', 'alrein-ui Steps', 'New — shadcn-svelte has no equivalent. §5 collapses vuesax steps and steps-arrow into one component with a variant. Renders an ordered list rather than a row of buttons, because clicking a pending step does nothing and nothing unresponsive belongs in the tab order. §3.4 grants gradient on the active step and nothing else.'),
 		ui('timeline', 'alrein-ui Timeline', 'New — shadcn-svelte has no equivalent. §5 collapses timeline-compact into a variant. progress is a fractional index, so the rail fill can stop between two markers, which is the only thing worth measuring here. No decorative effects — §3.4 has no row for Timeline.', { fx: false }),
+		// Phase 4 — complex.
+		ui('color-picker', 'alrein-ui ColorPicker', 'New — shadcn-svelte has no equivalent. §5 collapses six vuesax pickers into one component with a variant, all sharing one ColorState. OKLCH is the working space and the stored form, with an internal converter rather than a dependency (A26). No decorative effects: a glow over a colour picker is a lie about the value.', { fx: false }),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

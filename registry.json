@@ -833,6 +833,40 @@
 			]
 		},
 		{
+			"name": "color-picker",
+			"type": "registry:ui",
+			"title": "alrein-ui ColorPicker",
+			"description": "New — shadcn-svelte has no equivalent. §5 collapses six vuesax pickers into one component with a variant, all sharing one ColorState. OKLCH is the working space and the stored form, with an internal converter rather than a dependency (A26). No decorative effects: a glow over a colour picker is a lie about the value.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/color-picker/color-picker.svelte",
+					"type": "registry:ui",
+					"target": "color-picker/color-picker.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color-state.svelte.ts",
+					"type": "registry:ui",
+					"target": "color-picker/color-state.svelte.ts"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/color.ts",
+					"type": "registry:ui",
+					"target": "color-picker/color.ts"
+				},
+				{
+					"path": "src/lib/components/ui/color-picker/index.ts",
+					"type": "registry:ui",
+					"target": "color-picker/index.ts"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",

@@ -40,6 +40,7 @@ const SUPERSETS = [
 	'src/lib/components/ui/field/field.svelte',
 	'src/lib/components/ui/spinner/spinner.svelte',
 	'src/lib/components/ui/steps/steps.svelte',
+	'src/lib/components/ui/color-picker/color-picker.svelte',
 	'src/lib/components/ui/timeline/timeline.svelte',
 	'src/lib/components/ui/rating/rating.svelte',
 	'src/lib/components/ui/chip/chip.svelte',
@@ -50,7 +51,11 @@ const SUPERSETS = [
 	'src/lib/components/ui/select/select-trigger.svelte',
 	'src/lib/components/ui/select/select-content.svelte',
 	'src/lib/components/ui/alert/alert.svelte',
-	'src/lib/components/ui/tooltip/tooltip-content.svelte'
+	'src/lib/components/ui/tooltip/tooltip-content.svelte',
+	'src/lib/components/ui/accordion/accordion.svelte',
+	'src/lib/components/ui/accordion/accordion-item.svelte',
+	'src/lib/components/ui/accordion/accordion-trigger.svelte',
+	'src/lib/components/ui/accordion/accordion-content.svelte'
 ];
 
 const missing = [];

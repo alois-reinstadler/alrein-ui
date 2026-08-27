@@ -146,7 +146,13 @@ export const RULES = [
 		description:
 			"pointermove/scroll/resize listener outside the singleton pointer engine. " +
 			"One shared listener lives in src/lib/fx/pointer.svelte.ts; per-instance listeners " +
-			"are what melted the laptop last time.",
+			"are what melted the laptop last time.\n" +
+			"    What this rule is NOT about: an element-scoped drag. A colour picker's " +
+			"saturation area or a slider thumb legitimately tracks the pointer while the " +
+			"user is dragging it, and the correct shape for that is a Svelte `onpointerdown` " +
+			"handler plus `setPointerCapture`, which routes subsequent moves to that element " +
+			"alone and needs no document-level listener at all. This rule targets exactly " +
+			"the thing capture avoids: an always-on global listener per instance.",
 		exclude: ["src/lib/fx/pointer.svelte.ts"],
 		test: (line) => /addEventListener\s*\(\s*["'`](?:pointermove|scroll|resize)["'`]/.test(line)
 	},
