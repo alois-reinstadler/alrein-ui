@@ -43,7 +43,13 @@ export function shimmer(options: ShimmerOptions = {}): Attachment<HTMLElement> {
 			// Both the duration and the reduced-motion veto come from one token.
 			// Under `prefers-reduced-motion: reduce` the stylesheet sets it to 0ms,
 			// so there is no second code path here to keep in sync (SPEC.md §3.2).
-			const raw = getComputedStyle(node).getPropertyValue('--fx-shimmer-duration').trim();
+			//
+			// Note *which* token: the sweep reads `--fx-shimmer-sweep-duration`, not
+			// `--fx-shimmer-duration`. The loop's token slows under reduced motion
+			// rather than stopping, because a frozen skeleton claims the loading has
+			// finished (A17). The sweep is decoration and does stop, so the two
+			// cannot share a token.
+			const raw = getComputedStyle(node).getPropertyValue('--fx-shimmer-sweep-duration').trim();
 			const seconds = raw.endsWith('ms') ? Number.parseFloat(raw) : Number.parseFloat(raw) * 1000;
 			const duration = Number.isFinite(seconds) ? seconds : 0;
 			if (duration <= 0) return;

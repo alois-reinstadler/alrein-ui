@@ -53,7 +53,23 @@
 	--fx-tilt-max: 6deg;
 	--fx-tilt-perspective: 800px;
 	--fx-magnet-max: 8px;
+	/*
+	 * The loading loop, deliberately separate from the transition scale.
+	 *
+	 * Under reduced motion this gets *slower*, not zero. A frozen loading
+	 * indicator asserts something false: it says the loading has finished. The
+	 * vuesax source reaches the same conclusion independently — its spinner goes
+	 * to 2.4s and its skeleton to 3s rather than stopping.
+	 */
 	--fx-shimmer-duration: 900ms;
+
+	/*
+	 * The triggered attention sweep, which is a different thing from the loop and
+	 * needs its own token precisely *because* of the reduced-motion rule above.
+	 * The loop slows because stopping it would lie; the sweep is decoration, so
+	 * reduced motion takes it to zero and `shimmer.ts` declines to run.
+	 */
+	--fx-shimmer-sweep-duration: 900ms;
 
 	/*
 	 * Opacity fades survive reduced motion at ~100ms. Removing them entirely makes
@@ -67,6 +83,10 @@
  * §3.2 step 2. Transform-driven motion collapses to 1ms; opacity keeps a short
  * fade. The duration scale is overridden at :root, so every `duration-*` utility
  * and every layer that reads the scale follows without a second code path.
+ *
+ * The loading loop is the documented exception (A17). It slows rather than
+ * stops, because a motionless spinner and a motionless skeleton both claim the
+ * work is done. "Calm" is not the same as "lying".
  */
 @media (prefers-reduced-motion: reduce) {
 	:root {
@@ -75,7 +95,8 @@
 		--transition-duration-base: 1ms;
 		--transition-duration-slow: 1ms;
 		--fx-fade-duration: 100ms;
-		--fx-shimmer-duration: 0ms;
+		--fx-shimmer-duration: 3000ms;
+		--fx-shimmer-sweep-duration: 0ms;
 	}
 }
 

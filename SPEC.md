@@ -598,3 +598,58 @@ Full reasoning in `SUBSTRATE.md`.
   the layout change *is* the thing being animated, not a decoration over one. `check-layout-safety`
   only polices the effect layer, so this is out of its scope by construction — but say so in the
   source where it appears, or a reviewer will read it as an `F11` violation.
+
+### Phase 2/3 amendments (from `references/VUESAX-INTENT-2.md`)
+
+- **A17 — Reduced motion has a third correct answer, and loading indicators need it.** §3.2 step 2
+  says loops stop. That is right for decoration and **wrong for a loading indicator**: a motionless
+  spinner and a motionless skeleton both assert that the work has finished. The vuesax source
+  reaches the same conclusion independently — it slows its spinner to 2.4s and its skeleton to 3s
+  rather than stopping them. So `--fx-shimmer-duration` (the loop) slows to 3s under reduced
+  motion, while `--fx-shimmer-sweep-duration` (the triggered attention sweep, which *is*
+  decoration) goes to zero and the attachment declines to run. Two tokens, because one would have
+  to lie to one of them. Calm is not the same as lying.
+- **A18 — §4.9 is corrected: MorphIndicator's consumers are Tabs, Pagination and Sidebar, not
+  Steps.** Steps has no sliding indicator anywhere in the source: its progress is a per-segment
+  `scaleX`/`scaleY` on the connector plus a `stroke-dashoffset` ring, which is already
+  transform-only and already §1-clean. Pagination is the fourth real consumer and §4.9 missed it.
+- **A19 — Tabs' window-mask reveal is declined.** The source's indicator is not an empty pill: it
+  clips a counter-translated copy of the label strip, so the active label reads through it. Under a
+  transform-only FLIP that copy stretches with the indicator and the letters distort. It is
+  recoverable — a second `Element.animate()` on the inner strip with the inverse `scaleX` over the
+  same duration — but it doubles the moving parts of the most-used navigation component to buy an
+  effect §3.4 does not grant Tabs in the first place. Tabs recolours its active label, as upstream
+  shadcn-svelte does. The `border-radius` distortion under `scaleX` is a real and separate concern
+  and **is** handled: `border-radius` is paint, not layout, so it is animated alongside.
+- **A20 — Four more source patterns declined, on the record rather than by omission.** A reader of
+  the shadow CSS will find all of these and assume they belong.
+  - **The 3D press** appears in *nine of nineteen* components. A10 already declined it; the reason
+    holds harder here, because Avatar and Pagination buttons routinely host tooltips. The source's
+    own majority — Chip, Tabs, Accordion, Rating — uses a flat scale, which is what A10 chose.
+  - **The "water-drop" text reveal** (Checkbox label, Tabs, Breadcrumb): clones the element's text
+    and paints an expanding radial through `background-clip: text` over 1820ms. It reads
+    `textContent`, so it silently breaks for any rich label. Three occurrences make it intentional,
+    not accidental — and it is still an effect §3.4 grants none of the three.
+  - **The cursor light on text** (Tabs, Breadcrumb, Pagination, Accordion): a pointer-tracked
+    `background-clip: text` radial that brightens glyphs under the cursor. That is a **glow**,
+    applied to four components §3.4 gives no glow. Declining it is one decision, not four.
+  - **The "neighbour light" lamp system** (Alert, Chip, Sidebar, and most Phase 1 controls): a
+    second, non-cursor proximity engine that finds other coloured elements nearby and throws
+    *their* colour onto this one, on its own `--lit-*` variables so it does not collide with the
+    cursor glow. §3.1 has no entry for it and §3.4 has no row. It is out — but its CSS is in nearly
+    every shadow sheet, so it is out on the record.
+- **A21 — `collapse` should be `grid-template-rows: 0fr ↔ 1fr`, not an animated height.** Used by
+  Accordion (six skins) and Sidebar submenus (four). It needs no measurement, no `transitionend`
+  listener and no fallback timer, and it survives content resizing. It is an **A16 carve-out** — the
+  layout change is the animation — and, like the floating label, must say so in the file where it
+  appears or a reviewer reads it as `F11`. The source's overshoot on it is **separately declined**:
+  `0fr → 1fr` overshooting means the panel opens taller than its content and settles back.
+- **A22 — The timeout-fallback rule, stated honestly.** The source guards a transition with a
+  timeout in exactly three places, and every one is animating a *measured* value. Everywhere the
+  animation is a class toggle over CSS-declared values there is no listener at all, because there is
+  nothing to clean up. **The fallback is needed exactly where a measurement is, and nowhere else.**
+  That is the rule A13 was reaching for.
+- **A23 — `--fx-glow-radius: 180px` is a Button-sized number, not a universal one.** The source
+  scales its proximity radius to the element: Rating star 90px, Tabs and Pagination 96, Breadcrumb
+  120, Avatar and Chip 160, Timeline 200, Accordion 220, Alert 240, Sidebar 320. Any component
+  larger than a Button that is granted glow must pass its own radius rather than inherit the token.

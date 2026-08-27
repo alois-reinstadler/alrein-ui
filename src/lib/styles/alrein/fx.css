@@ -209,8 +209,10 @@
  * it runs until the class comes off, because the thing it describes is still
  * happening.
  *
- * Under reduced motion `--fx-shimmer-duration` is 0ms, which stops the loop
- * without a second code path (§3.2 step 2).
+ * Under reduced motion `--fx-shimmer-duration` gets *slower* — 3s — rather than
+ * stopping (A17). A motionless loading indicator claims the work has finished,
+ * and "calm" is not the same as "lying". The triggered sweep below reads a
+ * different token, which does go to zero, because that one is decoration.
  */
 @utility fx-shimmer-loading {
 	background-image: linear-gradient(
