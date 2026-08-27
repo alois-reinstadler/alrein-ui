@@ -5,3 +5,5 @@ export {
 	//
 	Root as Textarea,
 };
+export { textareaVariants } from "./textarea.svelte";
+export type { TextareaProps } from "./textarea.svelte";

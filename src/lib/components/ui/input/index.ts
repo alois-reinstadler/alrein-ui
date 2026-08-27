@@ -5,3 +5,5 @@ export {
 	//
 	Root as Input,
 };
+export { inputVariants } from "./input.svelte";
+export type { InputProps } from "./input.svelte";

@@ -35,3 +35,6 @@ export {
 	GroupHeading as SelectGroupHeading,
 	Portal as SelectPortal,
 };
+
+export type { SelectTriggerProps } from "./select-trigger.svelte";
+export { selectTriggerVariants } from "./select-trigger.svelte";

@@ -45,12 +45,30 @@
 
 	## Why there is no JavaScript
 
-	"Is the field filled?" is `:not(:placeholder-shown)`, and "is it focused?" is
-	`:focus-within`. Both are CSS, so the label floats before hydration and keeps
-	working if the bundle never arrives. **The control must carry
-	`placeholder=" "`** — a single space — or `:placeholder-shown` never matches
-	and the label stays down over the user's text. Input and Textarea set that for
-	you when they are inside a floating field.
+	"Is the field filled?" is `:is(input, textarea):not(:placeholder-shown)`, and
+	"is it focused?" is `:focus-within`. Both are CSS, so the label floats before
+	hydration and keeps working if the bundle never arrives. **The control must
+	carry `placeholder=" "`** — a single space — or `:placeholder-shown` never
+	matches and the label stays down over the user's text. Input and Textarea set
+	that for you when they are inside a floating field.
+
+	The element selector in there is load-bearing, and the first version of this
+	file got it wrong. `:has(:not(:placeholder-shown))` reads as "contains
+	something that is not showing a placeholder" — which is true of the `<legend>`,
+	the `<span>` inside it and the `<label>` itself. It is therefore *always* true,
+	and the label floats permanently no matter what the field contains. Restricting
+	the inner selector to `input` and `textarea` is what makes it mean what it
+	looks like it means.
+
+	A `<button>` — a Select trigger — has no `:placeholder-shown` state at all, so
+	it can never float the label this way. Select drives the float from focus and
+	from whether it has a value, which is its own business.
+
+	Both rules are Tailwind arbitrary variants rather than a scoped `<style>`
+	block, and that is not a style preference. Svelte scopes component CSS to the
+	elements it can see, and the control arrives through a snippet — so a scoped
+	`fieldset:has(input…) legend` selector is pruned as unused and silently
+	stops working. Tailwind's output is global, so it matches.
 
 	## Why the label appears twice
 
@@ -79,6 +97,29 @@
 	// Published so the control inside the snippet can adopt it without the
 	// consumer wiring an id by hand.
 	setFloatingFieldId(() => controlId);
+
+	/*
+	 * The one way to misuse this: put an explicit `id` on the control but not a
+	 * matching `for` on the field. The control keeps its own id, the label keeps
+	 * pointing at the generated one, and the association silently breaks — a
+	 * label that looks right and does nothing, which is worse than no label.
+	 *
+	 * Dev-only, and an effect rather than a render-time check on purpose: it has
+	 * to read the DOM the snippet produced, and it must not touch SSR output.
+	 */
+	$effect(() => {
+		if (!import.meta.env.DEV) return;
+		const fieldset = ref;
+		if (!fieldset) return;
+		const control = fieldset.querySelector<HTMLElement>('input, textarea, select, button');
+		if (!control || !control.id || control.id === controlId) return;
+		console.warn(
+			`[alrein-ui] <Field.Floating label="${label}"> labels id "${controlId}" but its control ` +
+				`has id "${control.id}", so the label points at nothing. Pass the same id as ` +
+				`\`for\` on the field, or drop the id from the control and let the field generate one.`,
+			fieldset
+		);
+	});
 </script>
 
 <fieldset
@@ -86,6 +127,10 @@
 	data-slot="field-floating"
 	data-state={state}
 	class={cn(
+		// The distance from the field's vertical centre to its top border. Not a
+		// duration or an easing, so not part of the motion scale; it depends on the
+		// control's height and so belongs to this component.
+		"[--field-floating-rise:0.85rem]",
 		"relative min-w-0 rounded-md border border-input bg-transparent px-2.5 pb-1 transition-colors duration-fast ease-fx-out",
 		"has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
 		"has-disabled:cursor-not-allowed has-disabled:opacity-50",
@@ -117,7 +162,7 @@
 			// Raised when focused or filled. `--float-y` lands the label on the top
 			// border; `scale` shrinks it to the notch's text size.
 			"[fieldset:focus-within_&]:-translate-y-[calc(50%+var(--field-floating-rise))] [fieldset:focus-within_&]:scale-[0.8]",
-			"[fieldset:has(:not(:placeholder-shown))_&]:-translate-y-[calc(50%+var(--field-floating-rise))] [fieldset:has(:not(:placeholder-shown))_&]:scale-[0.8]",
+			"[fieldset:has(:is(input,textarea):not(:placeholder-shown))_&]:-translate-y-[calc(50%+var(--field-floating-rise))] [fieldset:has(:is(input,textarea):not(:placeholder-shown))_&]:scale-[0.8]",
 			"[fieldset:focus-within_&]:text-ring",
 			"[fieldset[data-state=danger]_&]:text-destructive [fieldset[data-state=warn]_&]:text-warning [fieldset[data-state=success]_&]:text-success"
 		)}
@@ -128,26 +173,3 @@
 	{@render children()}
 </fieldset>
 
-<style>
-	/*
-	 * One value, not a duration or an easing, so it is not part of the motion
-	 * scale. It is the distance from the field's vertical centre to its top
-	 * border, which depends on the control's height and so belongs here rather
-	 * than in the token layer.
-	 */
-	fieldset {
-		--field-floating-rise: 0.85rem;
-	}
-
-	/*
-	 * `group-focus-within` on the legend needs the fieldset to be the group, and
-	 * Tailwind's `group` marker cannot sit on the same element as the variant that
-	 * reads it. Scoped CSS is the smaller of the two evils here; the alternative
-	 * is a wrapper div that would break the fieldset/legend relationship the
-	 * notch depends on.
-	 */
-	fieldset:focus-within legend,
-	fieldset:has(:not(:placeholder-shown)) legend {
-		max-width: 100%;
-	}
-</style>

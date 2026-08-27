@@ -5,3 +5,5 @@ export {
 	//
 	Root as Switch,
 };
+
+export type { SwitchProps } from "./switch.svelte";
