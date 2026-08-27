@@ -113,6 +113,7 @@ export const registry = {
 			dependencies: ['tailwind-variants', 'shiki'],
 			registryDependencies: ['local:theme', 'local:button']
 		},
+		ui('upload-area', 'alrein-ui UploadArea', 'New — shadcn-svelte has no equivalent. §5 puts UploadArea and the Button progress state on one shared UploadState class. A real file input does the work and drag-and-drop is layered on top, so keyboard users are not excluded. The component owns selection, validation and progress bookkeeping; the caller owns the transport.'),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

@@ -42,6 +42,7 @@ const SUPERSETS = [
 	'src/lib/components/ui/steps/steps.svelte',
 	'src/lib/components/ui/color-picker/color-picker.svelte',
 	'src/lib/components/ui/code/code.svelte',
+	'src/lib/components/ui/upload-area/upload-area.svelte',
 	'src/lib/components/ui/code/code-window.svelte',
 	'src/lib/components/ui/timeline/timeline.svelte',
 	'src/lib/components/ui/rating/rating.svelte',

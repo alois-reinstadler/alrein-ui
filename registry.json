@@ -903,6 +903,36 @@
 			]
 		},
 		{
+			"name": "upload-area",
+			"type": "registry:ui",
+			"title": "alrein-ui UploadArea",
+			"description": "New — shadcn-svelte has no equivalent. §5 puts UploadArea and the Button progress state on one shared UploadState class. A real file input does the work and drag-and-drop is layered on top, so keyboard users are not excluded. The component owns selection, validation and progress bookkeeping; the caller owns the transport.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/upload-area/index.ts",
+					"type": "registry:ui",
+					"target": "upload-area/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/upload-area/upload-area.svelte",
+					"type": "registry:ui",
+					"target": "upload-area/upload-area.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/upload-area/upload.svelte.ts",
+					"type": "registry:ui",
+					"target": "upload-area/upload.svelte.ts"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",

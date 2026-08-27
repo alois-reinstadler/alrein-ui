@@ -59,7 +59,7 @@ export const NAV: NavEntry[] = [
 	{ slug: 'color-picker', name: 'ColorPicker', phase: 4, status: 'shipped', origin: 'new', summary: 'Sechs Skins auf einer geteilten ColorState-Klasse, OKLCH als Arbeitsraum.' },
 	{ slug: 'code', name: 'Code', phase: 4, status: 'shipped', origin: 'new', summary: 'Shiki lazy geladen, mit echtem <pre>-Rückfall und Zeilennummern als CSS-Zähler.' },
 	{ slug: 'code-window', name: 'CodeWindow', phase: 4, status: 'shipped', origin: 'new', summary: 'Code plus Fensterrahmen — ein Wrapper, keine zweite Implementierung.' },
-	{ slug: 'upload-area', name: 'UploadArea', phase: 4, status: 'planned', origin: 'new', summary: 'Glow beim Ziehen, Schimmer beim Hochladen, Tilt.' }
+	{ slug: 'upload-area', name: 'UploadArea', phase: 4, status: 'shipped', origin: 'new', summary: 'Glow beim Ziehen, Ladeschimmer, Tilt — auf einer geteilten UploadState-Klasse.' }
 ];
 
 export const PHASE_TITLES: Record<0 | 1 | 2 | 3 | 4, string> = {
