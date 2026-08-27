@@ -24,7 +24,7 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { createReadStream } from "node:fs";
-import { mkdtemp, rm, readFile, stat } from "node:fs/promises";
+import { mkdtemp, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
@@ -223,9 +223,57 @@ async function main() {
 	);
 
 	step("Add Tailwind to the consumer");
-	await run("pnpm", ["dlx", "sv@latest", "add", "tailwindcss", "--install", "pnpm"], {
-		cwd: consumerDir
-	});
+	// `tailwindcss=plugins:none` is required, not cosmetic: bare `tailwindcss`
+	// still opens the plugin multiselect, and a cancelled prompt exits 0 without
+	// installing anything. `sv add --help` states the rule — to skip prompts,
+	// every option must be set explicitly.
+	await run(
+		"pnpm",
+		[
+			"dlx",
+			"sv@latest",
+			"add",
+			"tailwindcss=plugins:none",
+			"--install",
+			"pnpm",
+			"--no-git-check",
+			"--no-download-check"
+		],
+		{ cwd: consumerDir }
+	);
+
+	// Exit 0 is not proof the add-on ran, for the reason above.
+	const consumerPkg = JSON.parse(await readFile(join(consumerDir, "package.json"), "utf8"));
+	const consumerDeps = { ...consumerPkg.dependencies, ...consumerPkg.devDependencies };
+	if (!consumerDeps.tailwindcss) {
+		throw new Error(
+			"`sv add tailwindcss` exited 0 but tailwindcss is not in the consumer's package.json — " +
+				"a prompt was almost certainly cancelled by the closed stdin."
+		);
+	}
+	info(`tailwindcss ${consumerDeps.tailwindcss} installed`);
+
+	step("Normalise the global stylesheet to src/app.css");
+	// sv 0.17 puts the Tailwind entry at src/routes/layout.css. shadcn-svelte's
+	// own default — and this repo's components.json — is src/app.css, and that
+	// matters beyond taste: the theme item's css payload injects
+	// `@import "./lib/styles/alrein/index.css"`, which is resolved relative to
+	// the file it is injected into. From src/app.css that is src/lib/styles/…
+	// (correct); from src/routes/layout.css it would be src/routes/lib/styles/…
+	// (a 404 at build time). So the consumer is moved onto the convention the
+	// registry documents, rather than the registry being bent to the scaffold.
+	const scaffoldCss = join(consumerDir, "src", "routes", "layout.css");
+	const appCssPath = join(consumerDir, "src", "app.css");
+	if ((await exists(scaffoldCss)) && !(await exists(appCssPath))) {
+		await rename(scaffoldCss, appCssPath);
+		const layoutPath = join(consumerDir, "src", "routes", "+layout.svelte");
+		const layout = await readFile(layoutPath, "utf8");
+		await writeFile(layoutPath, layout.replace("./layout.css", "../app.css"), "utf8");
+		info("moved src/routes/layout.css → src/app.css and repointed +layout.svelte");
+	}
+	if (!(await exists(appCssPath))) {
+		throw new Error("consumer has no src/app.css after the Tailwind add-on ran");
+	}
 
 	step("Initialise shadcn-svelte in the consumer");
 	await run(

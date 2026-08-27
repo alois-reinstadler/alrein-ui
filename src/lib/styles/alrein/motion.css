@@ -1,0 +1,280 @@
+/**
+ * alrein-ui motion layer — the CSS half of the token pair.
+ *
+ * These utilities are the **default** way to animate anything bits-ui mounts
+ * (SPEC.md A4). Put one on a `Content` and it animates itself off the
+ * `data-state` attribute bits-ui already sets — no `forceMount`, no `child`
+ * snippet, no JS:
+ *
+ *   <Popover.Content class="fx-scale-fade">…</Popover.Content>
+ *   <Tooltip.Content class="fx-slide-up">…</Tooltip.Content>
+ *
+ * The Svelte transition functions in `$lib/motion/transitions.ts` are the other
+ * half, reserved for motion that needs a measured value (`collapse`,
+ * `crossfade`) and for elements you mount yourself. Both halves read the *same*
+ * custom properties — the ones registered by `tokens.css` plus the four geometry
+ * properties declared below — so they cannot drift.
+ *
+ * There is no `prefers-reduced-motion` block in this file, on purpose.
+ * `tokens.css` collapses `--transition-duration-*` to 1ms at `:root`, and every
+ * duration below is a `var()` reference to one of those, so the collapse arrives
+ * for free. A second code path here could only introduce a disagreement.
+ */
+
+:root {
+	/*
+	 * Motion geometry, shared with the JS half.
+	 *
+	 * Lengths are declared in `px` deliberately: custom properties are not
+	 * resolved to used values by `getComputedStyle`, so a `rem` here would reach
+	 * `slideDistance()` as the bare number `0.5`. Keeping them in px is what lets
+	 * one declaration feed both the keyframes and the transition functions.
+	 */
+	--fx-slide-distance: 8px;
+	--fx-scale-from: 0.96;
+	--fx-blur-amount: 4px;
+
+	/*
+	 * Where a scale grows from. Floating components should set this on their own
+	 * content element from whatever anchor variable their positioner exposes, so
+	 * a menu appears to unfold from its trigger rather than from its middle.
+	 */
+	--fx-transform-origin: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Keyframes                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Every keyframe below is one-sided — only the `from` (entering) or the `to`
+ * (leaving) end is declared. The other end is whatever the element already is,
+ * so a utility never has to know an element's resting opacity, scale or filter,
+ * and never fights a class that set one.
+ */
+
+@keyframes fx-fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes fx-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes fx-blur-fade-in {
+	from {
+		opacity: 0;
+		filter: blur(var(--fx-blur-amount));
+	}
+}
+
+@keyframes fx-blur-fade-out {
+	to {
+		opacity: 0;
+		filter: blur(var(--fx-blur-amount));
+	}
+}
+
+/*
+ * Slide names describe the direction of travel while *entering*: `fx-slide-up`
+ * starts below its resting position and rises into it. Leaving reverses, so an
+ * element retreats the way it arrived instead of continuing past.
+ *
+ * `translate` is used rather than `transform` so a sliding element can still be
+ * scaled or tilted by something else without the two clobbering each other.
+ */
+
+@keyframes fx-slide-up-in {
+	from {
+		opacity: 0;
+		translate: 0 var(--fx-slide-distance);
+	}
+}
+
+@keyframes fx-slide-up-out {
+	to {
+		opacity: 0;
+		translate: 0 var(--fx-slide-distance);
+	}
+}
+
+@keyframes fx-slide-down-in {
+	from {
+		opacity: 0;
+		translate: 0 calc(var(--fx-slide-distance) * -1);
+	}
+}
+
+@keyframes fx-slide-down-out {
+	to {
+		opacity: 0;
+		translate: 0 calc(var(--fx-slide-distance) * -1);
+	}
+}
+
+@keyframes fx-slide-left-in {
+	from {
+		opacity: 0;
+		translate: var(--fx-slide-distance) 0;
+	}
+}
+
+@keyframes fx-slide-left-out {
+	to {
+		opacity: 0;
+		translate: var(--fx-slide-distance) 0;
+	}
+}
+
+@keyframes fx-slide-right-in {
+	from {
+		opacity: 0;
+		translate: calc(var(--fx-slide-distance) * -1) 0;
+	}
+}
+
+@keyframes fx-slide-right-out {
+	to {
+		opacity: 0;
+		translate: calc(var(--fx-slide-distance) * -1) 0;
+	}
+}
+
+@keyframes fx-scale-in {
+	from {
+		scale: var(--fx-scale-from);
+	}
+}
+
+@keyframes fx-scale-out {
+	to {
+		scale: var(--fx-scale-from);
+	}
+}
+
+@keyframes fx-scale-fade-in {
+	from {
+		opacity: 0;
+		scale: var(--fx-scale-from);
+	}
+}
+
+@keyframes fx-scale-fade-out {
+	to {
+		opacity: 0;
+		scale: var(--fx-scale-from);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+/* Utilities                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Two selectors per utility.
+ *
+ * The open one matches `[data-state]:not([data-state='closed'])` rather than
+ * `[data-state='open']` because bits-ui does not always say "open" — a tooltip
+ * reports `delayed-open` or `instant-open` depending on how it was summoned, and
+ * a checkbox reports `checked`. Matching everything that is not closed covers
+ * all of them without a list that goes stale.
+ *
+ * Durations follow SPEC.md §2: `base` in, one step down to `fast` out, because
+ * users never wait to dismiss. `fx-fade` is the exception — see its comment.
+ */
+
+@utility fx-fade {
+	/*
+	 * The only utility driven by `--fx-fade-duration` instead of the enter/exit
+	 * pair. SPEC.md §3.2 step 2 keeps opacity fades alive at ~100ms under reduced
+	 * motion while transform-driven motion collapses to 1ms, and that floor is
+	 * what the token encodes. It costs one speed in both directions, which is
+	 * imperceptible on a pure opacity ramp — and `fade()` in `transitions.ts`
+	 * makes the identical trade, so the halves stay in step.
+	 */
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-fade-in var(--fx-fade-duration) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-fade-out var(--fx-fade-duration) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-blur-fade {
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-blur-fade-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-blur-fade-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-slide-up {
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-slide-up-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-slide-up-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-slide-down {
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-slide-down-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-slide-down-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-slide-left {
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-slide-left-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-slide-left-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-slide-right {
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-slide-right-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-slide-right-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-scale {
+	transform-origin: var(--fx-transform-origin);
+
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-scale-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-scale-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}
+
+@utility fx-scale-fade {
+	transform-origin: var(--fx-transform-origin);
+
+	&[data-state]:not([data-state='closed']) {
+		animation: fx-scale-fade-in var(--transition-duration-base) var(--ease-fx-out) both;
+	}
+
+	&[data-state='closed'] {
+		animation: fx-scale-fade-out var(--transition-duration-fast) var(--ease-fx-in) both;
+	}
+}

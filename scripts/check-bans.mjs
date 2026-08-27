@@ -63,9 +63,10 @@ const HARD_LINE_LIMIT = 700;
 /**
  * The rules.
  *
- * `test`    (line, ctx) => boolean          ctx: { path, ext, isStyle, lineNumber }
- * `include` optional (ctx) => boolean       further narrows the default src glob
- * `exclude` optional string[]               allowlisted paths; exact or `dir/**`
+ * `test`    (code, ctx) => boolean   `code` is the line with comments stripped.
+ *                                  ctx: { path, ext, isStyle, lineNumber, raw }
+ * `include` optional (ctx) => boolean   further narrows the default src scope
+ * `exclude` optional string[]           allowlisted paths; exact or `dir/**`
  *
  * Adding a rule is appending one object; nothing else in this file changes.
  */

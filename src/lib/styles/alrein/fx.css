@@ -143,6 +143,13 @@
  */
 @utility fx-press {
 	position: relative;
+	/*
+	 * The tint is a `z-index: -1` pseudo-element, which paints after the host's
+	 * own background but *before* its inline content — so a button's label is
+	 * never washed out by its own press effect. `isolation: isolate` keeps that
+	 * negative index from escaping behind an ancestor's background.
+	 */
+	isolation: isolate;
 	scale: calc(1 - var(--fx-press) * var(--fx-press-depth));
 	transition: scale var(--transition-duration-instant) var(--ease-fx-spring);
 
@@ -150,7 +157,7 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		z-index: 0;
+		z-index: -1;
 		border-radius: inherit;
 		pointer-events: none;
 		background: radial-gradient(
@@ -176,12 +183,13 @@
  */
 @utility fx-glow {
 	position: relative;
+	isolation: isolate;
 
 	&::before {
 		content: '';
 		position: absolute;
 		inset: 0;
-		z-index: 0;
+		z-index: -1;
 		border-radius: inherit;
 		pointer-events: none;
 		background: radial-gradient(
@@ -298,10 +306,13 @@
 }
 
 /*
- * Effect layers sit at z-index 0 behind the content; anything a component wants
- * readable goes above. Declared once here so no component has to remember it.
+ * An explicit content layer, for components that render a distinct inner element
+ * anyway. Button does not use it: wrapping a button's children in a span would
+ * make `gap-1.5` apply between one child instead of between the icon and the
+ * label, which changes layout. The `z-index: -1` pseudo-elements above are what
+ * make that wrapper unnecessary.
  */
 @utility fx-content {
 	position: relative;
-	z-index: 1;
+	z-index: 0;
 }

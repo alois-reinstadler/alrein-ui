@@ -1,0 +1,141 @@
+# CI for the alrein-ui registry.
+#
+# Three jobs:
+#   check  — runs on every push and PR. Fast: types, hard bans, registry build
+#            and validation, and a production build of the docs site.
+#   pages  — runs only on main. Publishes build/ to GitHub Pages, which is also
+#            where the registry JSON is served from (SPEC.md A8), so the site
+#            build and the registry build are deliberately the same artifact.
+#   smoke  — the §7.3 acceptance proof. NOT part of `check`: it scaffolds an
+#            entire SvelteKit app and installs it from scratch, which takes
+#            minutes and hammers the npm registry. Nightly and on demand only.
+#            Run it locally before a release with `pnpm consumer:smoke`.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # 03:17 UTC nightly — off the hour, because everyone schedules on the hour.
+    - cron: "17 3 * * *"
+
+# Only the newest run per branch matters; cancel the rest.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # check-bans.mjs diffs the working tree against origin/main, so the
+          # default single-commit fetch is not enough.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Types (svelte-check)
+        run: pnpm check
+
+      - name: Hard bans (SPEC.md §1, §8.3)
+        run: pnpm bans:check
+
+      - name: Build registry
+        run: pnpm registry:build
+
+      - name: Validate registry
+        run: pnpm registry:check
+
+      - name: Build site
+        run: pnpm exec vite build
+
+  pages:
+    name: Publish to GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    # One deployment at a time; never cancel one halfway through.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        # `pnpm build` runs registry:build then vite build, so static/r/*.json is
+        # emitted before SvelteKit copies static/ into build/.
+        env:
+          BASE_PATH: /alrein-ui
+        run: pnpm build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+  smoke:
+    name: Consumer smoke (§7.3)
+    # Deliberately not a dependency of anything. Nightly, or on demand from the
+    # Actions tab. Never on push or pull_request — see the header.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    # Generous: `sv create` + two pnpm installs + a SvelteKit build.
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Scaffold a real consumer and install the registry into it
+        run: pnpm consumer:smoke
