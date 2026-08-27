@@ -135,42 +135,6 @@
 }
 
 /**
- * press — "I registered your click". Always on, never opt-in (§3.1).
- *
- * The spring is here and, apart from toggle thumbs, only here. `--ease-fx-spring`
- * overshoots, and overshoot on anything that moves layout reads as slow and drunk
- * in a data-dense screen (SPEC.md §2).
- */
-@utility fx-press {
-	position: relative;
-	/*
-	 * The tint is a `z-index: -1` pseudo-element, which paints after the host's
-	 * own background but *before* its inline content — so a button's label is
-	 * never washed out by its own press effect. `isolation: isolate` keeps that
-	 * negative index from escaping behind an ancestor's background.
-	 */
-	isolation: isolate;
-	scale: calc(1 - var(--fx-press) * var(--fx-press-depth));
-	transition: scale var(--transition-duration-instant) var(--ease-fx-spring);
-
-	&::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		border-radius: inherit;
-		pointer-events: none;
-		background: radial-gradient(
-			circle at var(--fx-press-x) var(--fx-press-y),
-			color-mix(in oklab, var(--fx-tint) 28%, transparent),
-			transparent 65%
-		);
-		opacity: var(--fx-press);
-		transition: opacity var(--transition-duration-instant) var(--ease-fx-out);
-	}
-}
-
-/**
  * glow — "this is the highest-intent target on this surface" (§3.1).
  *
  * An inner radial highlight clipped to the element's own rounded box. A6: this

@@ -99,7 +99,7 @@ export const RULES = [
 			"The spring curve is restricted to press feedback and toggle thumbs only " +
 			"(switch thumb, checkbox mark). It overshoots, and overshoot anywhere else reads " +
 			"as slow and drunk in a data-dense screen.",
-		exclude: ["src/lib/fx/press.ts", TOKENS],
+		exclude: ["src/lib/fx/press.ts", "src/lib/styles/alrein/press.css", TOKENS],
 		test: (line) => /ease-fx-spring/.test(line)
 	},
 	{

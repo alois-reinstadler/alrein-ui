@@ -1,0 +1,48 @@
+/**
+ * press — the one place in the library, besides toggle thumbs, permitted to
+ * overshoot (SPEC.md §2).
+ *
+ * This lives in its own file purely so `pnpm bans:check` can allowlist
+ * `--ease-fx-spring` at file granularity. Keeping it inside `fx.css` would mean
+ * allowlisting the file that holds *every* effect, which makes the rule useless
+ * — and that rule exists because the prior attempt used the spring curve 124
+ * times across 30 components (SPEC.md §8, `F6`).
+ *
+ * The `@property` registrations for --fx-press* stay in fx.css with the rest.
+ */
+
+/**
+ * press — "I registered your click". Always on, never opt-in (§3.1).
+ *
+ * The spring is here and, apart from toggle thumbs, only here. `--ease-fx-spring`
+ * overshoots, and overshoot on anything that moves layout reads as slow and drunk
+ * in a data-dense screen (SPEC.md §2).
+ */
+@utility fx-press {
+	position: relative;
+	/*
+	 * The tint is a `z-index: -1` pseudo-element, which paints after the host's
+	 * own background but *before* its inline content — so a button's label is
+	 * never washed out by its own press effect. `isolation: isolate` keeps that
+	 * negative index from escaping behind an ancestor's background.
+	 */
+	isolation: isolate;
+	scale: calc(1 - var(--fx-press) * var(--fx-press-depth));
+	transition: scale var(--transition-duration-instant) var(--ease-fx-spring);
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: inherit;
+		pointer-events: none;
+		background: radial-gradient(
+			circle at var(--fx-press-x) var(--fx-press-y),
+			color-mix(in oklab, var(--fx-tint) 28%, transparent),
+			transparent 65%
+		);
+		opacity: var(--fx-press);
+		transition: opacity var(--transition-duration-instant) var(--ease-fx-out);
+	}
+}
