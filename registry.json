@@ -31,6 +31,11 @@
 					"path": "src/lib/styles/alrein/fx.css",
 					"type": "registry:file",
 					"target": "~/src/lib/styles/alrein/fx.css"
+				},
+				{
+					"path": "src/lib/styles/alrein/motion.css",
+					"type": "registry:file",
+					"target": "~/src/lib/styles/alrein/motion.css"
 				}
 			],
 			"css": {

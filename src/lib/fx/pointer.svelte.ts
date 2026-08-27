@@ -199,8 +199,9 @@ function render(): void {
 	// but a frame already in flight can still land here.
 	if (document.hidden || !pointerKnown) return;
 
-	let litGlows: Map<Element, number> | undefined;
-	if (import.meta.env.DEV) litGlows = new Map();
+	// §3.5 budget, dev only: one glowing and one tilting element per surface.
+	let active: Map<Element, { glow: number; tilt: number }> | undefined;
+	if (import.meta.env.DEV) active = new Map();
 
 	for (const entry of entries) {
 		if (!entry.visible) continue;
@@ -224,21 +225,30 @@ function render(): void {
 				break;
 		}
 
-		if (litGlows && entry.effect === 'glow' && !entry.atRest) {
-			litGlows.set(entry.scope, (litGlows.get(entry.scope) ?? 0) + 1);
+		if (active && !entry.atRest && entry.effect !== 'magnet') {
+			const counts = active.get(entry.scope) ?? { glow: 0, tilt: 0 };
+			counts[entry.effect] += 1;
+			active.set(entry.scope, counts);
 		}
 	}
 
-	if (litGlows) {
-		for (const [scope, count] of litGlows) {
-			if (count <= 1 || warnedScopes.has(scope)) continue;
+	if (active) {
+		for (const [scope, counts] of active) {
+			const over = (['glow', 'tilt'] as const).filter((effect) => counts[effect] > 1);
+			if (over.length === 0 || warnedScopes.has(scope)) continue;
 			warnedScopes.add(scope);
-			console.warn(
-				`[alrein-ui] ${count} elements are glowing at once inside this FxScope. ` +
-					`SPEC.md §3.5 allows one glowing element per visible surface — glow means ` +
-					`"highest-intent target here", and it stops meaning anything at two.`,
-				scope
-			);
+			for (const effect of over) {
+				console.warn(
+					`[alrein-ui] ${counts[effect]} elements are ${effect === 'glow' ? 'glowing' : 'tilting'} ` +
+						`at once inside this FxScope. SPEC.md §3.5 allows one per visible surface. ` +
+						(effect === 'glow'
+							? 'Glow means "highest-intent target here", and it stops meaning anything at two.'
+							: 'Tilt reads as physical objects; a whole grid of them reads as a broken page. ' +
+								'At data-fx="expressive" Card tilts by default — pass tilt={false} on the rest, ' +
+								'or wrap the grid in <FxScope density="list">.'),
+					scope
+				);
+			}
 		}
 	}
 }

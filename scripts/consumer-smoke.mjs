@@ -58,8 +58,18 @@ function info(message) {
 /**
  * Runs a command to completion, streaming its output through with a prefix.
  *
- * stdin is always piped and always closed: without that, `sv create` and
- * `shadcn-svelte init` block on a prompt and the whole script hangs.
+ * stdin is piped and kept open for the life of the child, with `y\n` written on
+ * a timer. Both matter, and both were learned the hard way:
+ *
+ *   - Closing stdin immediately makes @clack/prompts read EOF and *cancel* the
+ *     prompt. `shadcn-svelte init` then exits 0 having silently skipped the
+ *     "Updates to your src/app.css are required. Continue?" step, so the run
+ *     looks green and nothing was written.
+ *   - Not writing anything at all hangs until the timeout.
+ *
+ * Flags cover the prompts that have flags (`sv add tailwindcss=plugins:none`,
+ * `shadcn-svelte add -y`); the stylesheet confirmation has none, so it is
+ * answered here.
  */
 function run(command, args, { cwd, input = "y\n", timeout = STEP_TIMEOUT_MS, env } = {}) {
 	return new Promise((resolvePromise, rejectPromise) => {
@@ -69,6 +79,8 @@ function run(command, args, { cwd, input = "y\n", timeout = STEP_TIMEOUT_MS, env
 			env: { ...process.env, ...env },
 			stdio: ["pipe", "pipe", "pipe"]
 		});
+		// A closed pipe when the child exits mid-write is expected, not a failure.
+		child.stdin.on("error", () => {});
 
 		let output = "";
 		const capture = (chunk) => {
@@ -84,10 +96,9 @@ function run(command, args, { cwd, input = "y\n", timeout = STEP_TIMEOUT_MS, env
 		child.stdout.on("data", capture);
 		child.stderr.on("data", capture);
 
-		// Some prompts appear only after the process has read a first answer, so
-		// feed a few and then EOF rather than a single line.
-		child.stdin.write(input.repeat(6));
-		child.stdin.end();
+		const nudge = setInterval(() => {
+			if (!child.stdin.destroyed && child.stdin.writable) child.stdin.write(input);
+		}, 700);
 
 		const timer = setTimeout(() => {
 			child.kill("SIGKILL");
@@ -101,11 +112,13 @@ function run(command, args, { cwd, input = "y\n", timeout = STEP_TIMEOUT_MS, env
 
 		child.on("error", (error) => {
 			clearTimeout(timer);
+			clearInterval(nudge);
 			rejectPromise(error);
 		});
 
 		child.on("close", (code, signal) => {
 			clearTimeout(timer);
+			clearInterval(nudge);
 			if (code === 0) {
 				resolvePromise(output);
 				return;
