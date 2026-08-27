@@ -48,8 +48,14 @@
 	<nav aria-label="Komponenten" class="hidden w-52 shrink-0 py-8 lg:block">
 		<a
 			href="{base}/"
-			class="mb-6 block cn-font-heading text-lg font-medium"
+			class="block cn-font-heading text-lg font-medium"
 			aria-current={current === '' ? 'page' : undefined}>alrein-ui</a
+		>
+		<a
+			href="{base}/fx"
+			aria-current={current === 'fx' ? 'page' : undefined}
+			class="mt-2 mb-6 block rounded-md px-2 py-1 text-sm transition-colors duration-fast ease-fx-out hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium"
+			>Effektsystem</a
 		>
 		{#each groups as group (group.phase)}
 			<p class="mt-5 mb-1.5 text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase">
