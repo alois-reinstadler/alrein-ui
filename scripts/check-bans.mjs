@@ -68,6 +68,18 @@ const TOKENS = "src/lib/styles/alrein/tokens.css";
  * long class list shrinks to almost nothing. CSS gets the tighter raw limit
  * because a stylesheet has no string literals to collapse.
  */
+/**
+ * Test files are excluded from the motion rules. A test that pins
+ * `[0.34, 1.56, 0.64, 1]` in order to assert the spring overshoots is
+ * *verification* of the restriction, not a use of it — flagging it would mean
+ * the rule punishes the code that proves the rule works.
+ *
+ * They are NOT excluded from the structural rules (`F9-raf`, `F12-timer`,
+ * `F13-dom`, `S1-svelte4`), because a test that reaches for those is testing
+ * something that should not exist.
+ */
+const TEST_FILES = ["**/*.test.ts", "**/*.spec.ts"];
+
 const CODE_LINE_LIMIT = 160;
 const HARD_LINE_LIMIT = 1200;
 const HARD_LINE_LIMIT_CSS = 400;
@@ -89,7 +101,7 @@ export const RULES = [
 			"Literal duration in a transition/animation declaration. Use the motion scale: " +
 			"a `duration-instant|fast|base|slow` utility, or var(--transition-duration-*).",
 		include: (ctx) => ctx.isStyle,
-		exclude: [TOKENS],
+		exclude: [TOKENS, ...TEST_FILES],
 		test: (line) => {
 			for (const decl of matchDeclarations(line, /(?:transition|animation)(?:-duration)?/)) {
 				if (/(?:^|[^\w.-])[0-9]*\.?[0-9]+m?s(?![\w-])/.test(decl)) return true;
@@ -102,7 +114,7 @@ export const RULES = [
 		description:
 			"Literal cubic-bezier(). Use the easing scale: an `ease-fx-out|in|spring` utility, " +
 			"or var(--ease-fx-*).",
-		exclude: [TOKENS],
+		exclude: [TOKENS, ...TEST_FILES],
 		test: (line) => /cubic-bezier\s*\(/.test(line)
 	},
 	{
@@ -111,7 +123,7 @@ export const RULES = [
 			"The spring curve is restricted to press feedback and toggle thumbs only " +
 			"(switch thumb, checkbox mark). It overshoots, and overshoot anywhere else reads " +
 			"as slow and drunk in a data-dense screen.",
-		exclude: ["src/lib/fx/press.ts",
+		exclude: [...TEST_FILES, "src/lib/fx/press.ts",
 			"src/lib/styles/alrein/press.css",
 			// Toggle thumbs — the second and only other site SPEC.md §2 permits an
 			// overshoot curve on. A switch thumb, a checkbox mark and a radio dot are
@@ -330,11 +342,18 @@ function isTestFile(path) {
 	return /(?:^|\/)(?:__tests__|__mocks__)\//.test(path) || /\.(?:test|spec)\.[cm]?[jt]s$/.test(path);
 }
 
+/**
+ * Three pattern shapes, deliberately no more: an exact path, a `dir/**` prefix,
+ * and a `**\/*.suffix` tail. A real glob library would be a dependency, and the
+ * allowlist is meant to stay short enough to read.
+ */
 function matchesAllowlist(path, patterns) {
 	if (!patterns) return false;
-	return patterns.some((pattern) =>
-		pattern.endsWith("/**") ? path.startsWith(pattern.slice(0, -2)) : path === pattern
-	);
+	return patterns.some((pattern) => {
+		if (pattern.startsWith("**/")) return path.endsWith(pattern.slice(3).replace(/^\*/, ""));
+		if (pattern.endsWith("/**")) return path.startsWith(pattern.slice(0, -2));
+		return path === pattern;
+	});
 }
 
 function git(args) {
