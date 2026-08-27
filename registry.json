@@ -46,6 +46,173 @@
 			"css": {
 				"@import \"./lib/styles/alrein/index.css\"": {}
 			}
+		},
+		{
+			"name": "fx",
+			"type": "registry:lib",
+			"title": "alrein-ui Effect System",
+			"description": "The singleton pointer engine, the five effect attachments, the capability matrix from SPEC.md §3.4 and the FxContext/FxScope policy layer that implements the §3.2 resolution order. One requestAnimationFrame and one pointermove listener serve the whole page.",
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/fx/capabilities.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/capabilities.ts"
+				},
+				{
+					"path": "src/lib/fx/resolution.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/resolution.ts"
+				},
+				{
+					"path": "src/lib/fx/context.svelte.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/context.svelte.ts"
+				},
+				{
+					"path": "src/lib/fx/pointer.svelte.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/pointer.svelte.ts"
+				},
+				{
+					"path": "src/lib/fx/glow.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/glow.ts"
+				},
+				{
+					"path": "src/lib/fx/tilt.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/tilt.ts"
+				},
+				{
+					"path": "src/lib/fx/magnet.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/magnet.ts"
+				},
+				{
+					"path": "src/lib/fx/press.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/press.ts"
+				},
+				{
+					"path": "src/lib/fx/shimmer.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/shimmer.ts"
+				},
+				{
+					"path": "src/lib/fx/index.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/index.ts"
+				},
+				{
+					"path": "src/lib/fx/fx-scope.svelte",
+					"type": "registry:file",
+					"target": "~/src/lib/fx/fx-scope.svelte"
+				}
+			]
+		},
+		{
+			"name": "motion",
+			"type": "registry:lib",
+			"title": "alrein-ui Motion Primitives",
+			"description": "A correct CSS cubic-bezier solver, eight transition primitives as Svelte transition functions, and the shared FLIP MorphIndicator. The CSS half ships with the theme item; both read the same motion tokens so they cannot drift.",
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/motion/easing.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/motion/easing.ts"
+				},
+				{
+					"path": "src/lib/motion/transitions.ts",
+					"type": "registry:file",
+					"target": "~/src/lib/motion/transitions.ts"
+				},
+				{
+					"path": "src/lib/motion/morph-indicator.svelte",
+					"type": "registry:file",
+					"target": "~/src/lib/motion/morph-indicator.svelte"
+				}
+			]
+		},
+		{
+			"name": "button",
+			"type": "registry:ui",
+			"title": "alrein-ui Button",
+			"description": "A strict superset of the shadcn-svelte Button. Every upstream variant, size and prop is unchanged; adds always-on press feedback plus gradient, glow, shimmer, tilt and magnet where SPEC.md §3.4 permits them. Overwrites the upstream file in place.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/button/button.svelte",
+					"type": "registry:ui",
+					"target": "button/button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/button/index.ts",
+					"type": "registry:ui",
+					"target": "button/index.ts"
+				}
+			]
+		},
+		{
+			"name": "badge",
+			"type": "registry:ui",
+			"title": "alrein-ui Badge",
+			"description": "A strict superset of the shadcn-svelte Badge. All six upstream variants unchanged; adds gradient, glow (status-critical only) and a triggered shimmer. Overwrites the upstream file in place.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/badge/badge.svelte",
+					"type": "registry:ui",
+					"target": "badge/badge.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/badge/index.ts",
+					"type": "registry:ui",
+					"target": "badge/index.ts"
+				}
+			]
+		},
+		{
+			"name": "card",
+			"type": "registry:ui",
+			"title": "alrein-ui Card",
+			"description": "A strict superset of the shadcn-svelte Card. All seven sub-components are untouched; the root adds variant=hero, interactive, gradient, glow and tilt. Keeps overflow-hidden and uses an inner clipped glow so a first-child image still gets rounded corners.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/card/card.svelte",
+					"type": "registry:ui",
+					"target": "card/card.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/card/index.ts",
+					"type": "registry:ui",
+					"target": "card/index.ts"
+				}
+			]
 		}
 	]
 }

@@ -24,7 +24,7 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { createReadStream } from "node:fs";
-import { mkdtemp, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
@@ -313,19 +313,47 @@ async function main() {
 		{ cwd: consumerDir }
 	);
 
-	step("Install the theme item from the local registry");
-	await run("pnpm", ["dlx", "shadcn-svelte@latest", "add", `${origin}/r/theme.json`, "-y"], {
+	// The upstream components go in FIRST, so the alrein items overwrite real
+	// files rather than landing in an empty directory. That is the whole claim in
+	// SPEC.md §0 — "extend in place" — and installing into a bare project would
+	// prove nothing about it.
+	step("Install the upstream shadcn-svelte button, card and badge");
+	await run("pnpm", ["dlx", "shadcn-svelte@latest", "add", "button", "card", "badge", "-y", "--no-deps"], {
 		cwd: consumerDir
 	});
 
-	step("Assert the item landed where registry.json said it would");
-	const registry = JSON.parse(await readFile(join(ROOT, "registry.json"), "utf8"));
-	const theme = registry.items.find((item) => item.name === "theme");
-	if (!theme) throw new Error("registry.json has no item named 'theme'");
+	const upstreamButton = await readFile(
+		join(consumerDir, "src/lib/components/ui/button/button.svelte"),
+		"utf8"
+	);
+	assert(
+		!upstreamButton.includes("fx-press"),
+		"the upstream button really is upstream before we overwrite it"
+	);
 
-	for (const file of theme.files) {
-		// `~/` in a target means the consumer's project root.
-		const relative = file.target.replace(/^~\//, "");
+	step("Install every alrein-ui item from the local registry");
+	const registry = JSON.parse(await readFile(join(ROOT, "registry.json"), "utf8"));
+	const itemNames = registry.items.map((item) => item.name);
+	await run(
+		"pnpm",
+		[
+			"dlx",
+			"shadcn-svelte@latest",
+			"add",
+			...itemNames.map((name) => `${origin}/r/${name}.json`),
+			"-y",
+			"-o"
+		],
+		{ cwd: consumerDir }
+	);
+
+	step("Assert every item landed where registry.json said it would");
+	for (const file of registry.items.flatMap((item) => item.files)) {
+		// `~/` means the consumer's project root; anything else on a registry:ui
+		// item is relative to the `ui` alias, which is where "in place" happens.
+		const relative = file.target.startsWith("~/")
+			? file.target.slice(2)
+			: join("src/lib/components/ui", file.target);
 		const installed = join(consumerDir, relative);
 		const landed = await exists(installed);
 		assert(landed, `${relative} exists`);
@@ -349,6 +377,31 @@ async function main() {
 		console.log("--- end ---\n");
 	}
 
+	// The point of the whole exercise: the consumer's Button is now ours, at the
+	// same import path, with the upstream API intact.
+	step("Assert the overwrite happened in place, and is still a superset");
+	const installedButton = await readFile(
+		join(consumerDir, "src/lib/components/ui/button/button.svelte"),
+		"utf8"
+	);
+	assert(installedButton.includes("fx-press"), "the button at ui/button/ is now the alrein one");
+	for (const variant of ["destructive", "outline", "secondary", "ghost", "link"]) {
+		assert(
+			installedButton.includes(`${variant}:`),
+			`upstream variant "${variant}" survived the overwrite`
+		);
+	}
+	for (const size of ["icon-xs", "icon-sm", "icon-lg"]) {
+		assert(installedButton.includes(`"${size}"`), `upstream size "${size}" survived the overwrite`);
+	}
+	const installedCardDir = await readdir(join(consumerDir, "src/lib/components/ui/card"));
+	for (const part of ["card-header", "card-title", "card-description", "card-content", "card-footer", "card-action"]) {
+		assert(
+			installedCardDir.includes(`${part}.svelte`),
+			`Card sub-component "${part}" survived the overwrite`
+		);
+	}
+
 	if (failures.length > 0) {
 		throw new Error(`${failures.length} assertion(s) failed:\n  - ${failures.join("\n  - ")}`);
 	}
@@ -357,7 +410,7 @@ async function main() {
 	await run("pnpm", ["build"], { cwd: consumerDir });
 
 	step("Done");
-	console.log("\nconsumer:smoke OK — theme installs from the registry and the consumer builds.\n");
+	console.log("\nconsumer:smoke OK — every item installs from the registry, the components overwrite the upstream shadcn-svelte files in place with their API intact, and the consumer builds.\n");
 }
 
 process.on("SIGINT", async () => {
