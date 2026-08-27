@@ -933,6 +933,371 @@
 			]
 		},
 		{
+			"name": "tabs",
+			"type": "registry:ui",
+			"title": "alrein-ui Tabs",
+			"description": "A strict superset of the shadcn-svelte Tabs. The active indicator runs on the shared FLIP MorphIndicator rather than animating width. §3.4 grants ghost only; the window-mask label reveal is declined (A19).",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/tabs/index.ts",
+					"type": "registry:ui",
+					"target": "tabs/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/tabs/tabs-content.svelte",
+					"type": "registry:ui",
+					"target": "tabs/tabs-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tabs/tabs-list.svelte",
+					"type": "registry:ui",
+					"target": "tabs/tabs-list.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tabs/tabs-trigger.svelte",
+					"type": "registry:ui",
+					"target": "tabs/tabs-trigger.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tabs/tabs.svelte",
+					"type": "registry:ui",
+					"target": "tabs/tabs.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tabs/tabs.svelte.ts",
+					"type": "registry:ui",
+					"target": "tabs/tabs.svelte.ts"
+				}
+			]
+		},
+		{
+			"name": "accordion",
+			"type": "registry:ui",
+			"title": "alrein-ui Accordion",
+			"description": "A strict superset of the shadcn-svelte Accordion. The panel collapse is grid-template-rows 0fr to 1fr (A21) — no measurement, no transitionend listener, no timeout guard, and it survives content resizing. §3.4 grants ghost, gradient on the header and glow on the trigger.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/accordion/accordion-content.svelte",
+					"type": "registry:ui",
+					"target": "accordion/accordion-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/accordion/accordion-item.svelte",
+					"type": "registry:ui",
+					"target": "accordion/accordion-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/accordion/accordion-trigger.svelte",
+					"type": "registry:ui",
+					"target": "accordion/accordion-trigger.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/accordion/accordion.svelte",
+					"type": "registry:ui",
+					"target": "accordion/accordion.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/accordion/index.ts",
+					"type": "registry:ui",
+					"target": "accordion/index.ts"
+				}
+			]
+		},
+		{
+			"name": "breadcrumb",
+			"type": "registry:ui",
+			"title": "alrein-ui Breadcrumb",
+			"description": "A strict superset of the shadcn-svelte Breadcrumb. §3.4 grants ghost only; the source's 3D press, 620ms label spring, water-drop text reveal and cursor-light-on-text are all declined (A20).",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-ellipsis.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-item.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-link.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-link.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-list.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-list.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-page.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-page.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb-separator.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb-separator.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/breadcrumb.svelte",
+					"type": "registry:ui",
+					"target": "breadcrumb/breadcrumb.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/breadcrumb/index.ts",
+					"type": "registry:ui",
+					"target": "breadcrumb/index.ts"
+				}
+			]
+		},
+		{
+			"name": "pagination",
+			"type": "registry:ui",
+			"title": "alrein-ui Pagination",
+			"description": "A strict superset of the shadcn-svelte Pagination. The active indicator runs on the shared MorphIndicator — Pagination is its fourth real consumer, which §4.9 missed (A18). §3.4 grants ghost only.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/pagination/index.ts",
+					"type": "registry:ui",
+					"target": "pagination/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-content.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-ellipsis.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-ellipsis.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-item.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-link.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-link.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-next-button.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-next-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-next.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-next.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-prev-button.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-prev-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-previous.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-previous.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination-status.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination-status.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination.svelte",
+					"type": "registry:ui",
+					"target": "pagination/pagination.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/pagination/pagination.svelte.ts",
+					"type": "registry:ui",
+					"target": "pagination/pagination.svelte.ts"
+				}
+			]
+		},
+		{
+			"name": "sidebar",
+			"type": "registry:ui",
+			"title": "alrein-ui Sidebar",
+			"description": "A strict superset of the shadcn-svelte Sidebar. The submenu collapse uses grid-template-rows (A21) and the active highlight runs on the vertical MorphIndicator, which the digest confirms is fully compatible. §3.4 grants ghost only.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/sidebar/constants.ts",
+					"type": "registry:ui",
+					"target": "sidebar/constants.ts"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/context.svelte.ts",
+					"type": "registry:ui",
+					"target": "sidebar/context.svelte.ts"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/index.ts",
+					"type": "registry:ui",
+					"target": "sidebar/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-content.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-footer.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-footer.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-group-action.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-group-action.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-group-content.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-group-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-group-label.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-group-label.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-group.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-header.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-header.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-indicator.svelte.ts",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-indicator.svelte.ts"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-input.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-input.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-inset.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-inset.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-action.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-action.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-badge.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-badge.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-button.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-item.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-skeleton.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-sub-button.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-sub-item.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-sub-item.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu-sub.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu-sub.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-menu.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-menu.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-provider.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-provider.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-rail.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-rail.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-separator.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-separator.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar-trigger.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar-trigger.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/sidebar/sidebar.svelte",
+					"type": "registry:ui",
+					"target": "sidebar/sidebar.svelte"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",

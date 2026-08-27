@@ -1,8 +1,31 @@
 <script lang="ts" module>
 	import { tv, type VariantProps } from "tailwind-variants";
 
+	/**
+	 * alrein-ui Sidebar.MenuButton — upstream's file plus press, and minus one
+	 * animated layout property.
+	 *
+	 * Two edits to the upstream `base:` string, both deliberate:
+	 *
+	 * 1. **`padding` is dropped from `transition-[width,height,padding]`.** Layout
+	 *    inventory rows 22 and 23 decline the source's animated `padding-left` on
+	 *    the active item and `margin-right` on its badge outright — "indent by
+	 *    `translateX` on the content, or not at all". Upstream does not indent an
+	 *    active item, so there is nothing to re-express; what is left is a padding
+	 *    step that happens once, at the moment the rail collapses, and does not
+	 *    need to be interpolated. `width` and `height` stay: those are the rail
+	 *    collapse, which is the A16 carve-out documented in `sidebar.svelte`.
+	 * 2. **`fx-press` is appended**, plus `duration-slow ease-fx-out` so the
+	 *    remaining size transition runs on the same token as the rail it belongs
+	 *    to rather than on Tailwind's 150ms default.
+	 *
+	 * §3.4 gives Sidebar `ghost` and nothing else, so there are no effect props
+	 * here. Press is not an effect in that sense — §3.1 makes it always-on and
+	 * never opt-in — and the source agrees: its menu items sink on `:active` too.
+	 * The flat scale is A10's; the source's 3D press is declined library-wide.
+	 */
 	export const sidebarMenuButtonVariants = tv({
-		base: "gap-2 rounded-md p-2 text-left text-sm ring-sidebar-ring transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground data-open:hover:bg-sidebar-accent data-open:hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground peer/menu-button group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
+		base: "gap-2 rounded-md p-2 text-left text-sm ring-sidebar-ring transition-[width,height] duration-slow ease-fx-out fx-press group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground data-open:hover:bg-sidebar-accent data-open:hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground peer/menu-button group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
 		variants: {
 			variant: {
 				default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -28,7 +51,9 @@
 	import { mergeProps } from "bits-ui";
 	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 	import { cn, type WithElementRef, type WithoutChildrenOrChild } from "$lib/utils.js";
+	import { press as pressEffect } from "$lib/fx/press.js";
 	import { useSidebar } from "./context.svelte.js";
+	import { getSidebarIndicator } from "./sidebar-indicator.svelte.js";
 	import type { ComponentProps, Snippet } from "svelte";
 	import type { HTMLAttributes } from "svelte/elements";
 
@@ -54,6 +79,23 @@
 
 	const sidebar = useSidebar();
 
+	/*
+	 * `null` unless an ancestor `Sidebar.Menu` asked for an indicator, in which
+	 * case the active button publishes its node so the shared MorphIndicator has
+	 * something to measure. Registering from an `$effect` rather than inline
+	 * because it is a DOM node and a lifetime — the cleanup is the whole point,
+	 * or an unmounted button leaves the indicator pointed at a detached element.
+	 */
+	const indicator = getSidebarIndicator();
+
+	$effect(() => {
+		if (!indicator || !isActive || !ref) return;
+		indicator.activeItem = ref;
+		return () => {
+			if (indicator.activeItem === ref) indicator.activeItem = null;
+		};
+	});
+
 	const buttonProps = $derived({
 		class: cn(sidebarMenuButtonVariants({ variant, size }), className),
 		"data-slot": "sidebar-menu-button",
@@ -69,7 +111,13 @@
 	{#if child}
 		{@render child({ props: mergedProps })}
 	{:else}
-		<button bind:this={ref} {...mergedProps}>
+		<!--
+			The `child` branch above gets the classes but not the attachment: an
+			attachment belongs to an element this component renders, and in that
+			branch the consumer renders the element. `fx-press` is inert without the
+			attachment driving `--fx-press`, so nothing looks half-applied.
+		-->
+		<button bind:this={ref} {...mergedProps} {@attach pressEffect()}>
 			{@render children?.()}
 		</button>
 	{/if}

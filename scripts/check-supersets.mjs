@@ -71,7 +71,13 @@ const SUPERSETS = [
 	'src/lib/components/ui/pagination/pagination-previous.svelte',
 	'src/lib/components/ui/pagination/pagination-next.svelte',
 	'src/lib/components/ui/pagination/pagination-prev-button.svelte',
-	'src/lib/components/ui/pagination/pagination-next-button.svelte'
+	'src/lib/components/ui/pagination/pagination-next-button.svelte',
+	'src/lib/components/ui/sidebar/sidebar.svelte',
+	'src/lib/components/ui/sidebar/sidebar-provider.svelte',
+	'src/lib/components/ui/sidebar/sidebar-menu.svelte',
+	'src/lib/components/ui/sidebar/sidebar-menu-button.svelte',
+	'src/lib/components/ui/sidebar/sidebar-menu-sub.svelte',
+	'src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte'
 ];
 
 const missing = [];

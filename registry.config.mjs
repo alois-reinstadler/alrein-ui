@@ -114,6 +114,11 @@ export const registry = {
 			registryDependencies: ['local:theme', 'local:button']
 		},
 		ui('upload-area', 'alrein-ui UploadArea', 'New — shadcn-svelte has no equivalent. §5 puts UploadArea and the Button progress state on one shared UploadState class. A real file input does the work and drag-and-drop is layered on top, so keyboard users are not excluded. The component owns selection, validation and progress bookkeeping; the caller owns the transport.'),
+		ui('tabs', 'alrein-ui Tabs', 'A strict superset of the shadcn-svelte Tabs. The active indicator runs on the shared FLIP MorphIndicator rather than animating width. §3.4 grants ghost only; the window-mask label reveal is declined (A19).'),
+		ui('accordion', 'alrein-ui Accordion', 'A strict superset of the shadcn-svelte Accordion. The panel collapse is grid-template-rows 0fr to 1fr (A21) — no measurement, no transitionend listener, no timeout guard, and it survives content resizing. §3.4 grants ghost, gradient on the header and glow on the trigger.'),
+		ui('breadcrumb', 'alrein-ui Breadcrumb', 'A strict superset of the shadcn-svelte Breadcrumb. §3.4 grants ghost only; the source\'s 3D press, 620ms label spring, water-drop text reveal and cursor-light-on-text are all declined (A20).'),
+		ui('pagination', 'alrein-ui Pagination', 'A strict superset of the shadcn-svelte Pagination. The active indicator runs on the shared MorphIndicator — Pagination is its fourth real consumer, which §4.9 missed (A18). §3.4 grants ghost only.'),
+		ui('sidebar', 'alrein-ui Sidebar', 'A strict superset of the shadcn-svelte Sidebar. The submenu collapse uses grid-template-rows (A21) and the active highlight runs on the vertical MorphIndicator, which the digest confirms is fully compatible. §3.4 grants ghost only.'),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

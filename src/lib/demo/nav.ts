@@ -47,12 +47,12 @@ export const NAV: NavEntry[] = [
 	{ slug: 'skeleton', name: 'Skeleton', phase: 2, status: 'shipped', origin: 'extends', summary: 'Der einzige Ort für den Dauerschimmer, plus ein Licht für die ganze Gruppe.' },
 
 	// Phase 3 — navigation/structure
-	{ slug: 'tabs', name: 'Tabs', phase: 3, status: 'planned', origin: 'extends', summary: 'variant="gooey" | "chrome", beide auf MorphIndicator.' },
+	{ slug: 'tabs', name: 'Tabs', phase: 3, status: 'shipped', origin: 'extends', summary: 'Auf MorphIndicator. Panels korrekt verdrahtet, anders als in der Quelle.' },
 	{ slug: 'steps', name: 'Steps', phase: 3, status: 'shipped', origin: 'new', summary: 'variant=\"line\" | \"arrow\", vertikal, mit gestaffelter Choreografie.' },
-	{ slug: 'accordion', name: 'Accordion', phase: 3, status: 'planned', origin: 'extends', summary: 'Gradient nur am Kopf, Glow am Auslöser.' },
-	{ slug: 'breadcrumb', name: 'Breadcrumb', phase: 3, status: 'planned', origin: 'extends', summary: 'Ghost.' },
-	{ slug: 'pagination', name: 'Pagination', phase: 3, status: 'planned', origin: 'extends', summary: 'variant="full" | "compact".' },
-	{ slug: 'sidebar', name: 'Sidebar', phase: 3, status: 'planned', origin: 'extends', summary: 'Ghost, plus MorphIndicator.' },
+	{ slug: 'accordion', name: 'Accordion', phase: 3, status: 'shipped', origin: 'extends', summary: 'Collapse über grid-template-rows, ohne Messung und ohne Timer.' },
+	{ slug: 'breadcrumb', name: 'Breadcrumb', phase: 3, status: 'shipped', origin: 'extends', summary: 'Ghost. Vier Quell-Effekte abgelehnt (A20).' },
+	{ slug: 'pagination', name: 'Pagination', phase: 3, status: 'shipped', origin: 'extends', summary: 'Auf MorphIndicator. Der vierte echte Konsument, nicht Steps (A18).' },
+	{ slug: 'sidebar', name: 'Sidebar', phase: 3, status: 'shipped', origin: 'extends', summary: 'Ghost, plus MorphIndicator vertikal.' },
 	{ slug: 'timeline', name: 'Timeline', phase: 3, status: 'shipped', origin: 'new', summary: 'variant=\"compact\", Fortschritt hält zwischen zwei Markierungen.' },
 
 	// Phase 4 — complex
