@@ -57,6 +57,9 @@ jobs:
       - name: Hard bans (SPEC.md §1, §8.3)
         run: pnpm bans:check
 
+      - name: Unit tests (SPEC.md §3.2 resolution order)
+        run: pnpm test
+
       - name: Build registry
         run: pnpm registry:build
 
@@ -65,6 +68,11 @@ jobs:
 
       - name: Build site
         run: pnpm exec vite build
+
+      # Must run after the build: it inspects the generated stylesheet rather
+      # than the source, so it catches anything Tailwind or Lightning CSS emits.
+      - name: Effects never touch layout (SPEC.md §7.10)
+        run: pnpm layout:check
 
   pages:
     name: Publish to GitHub Pages

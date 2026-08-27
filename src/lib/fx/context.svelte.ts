@@ -1,10 +1,10 @@
 import { getContext, hasContext, setContext } from 'svelte';
 import { MediaQuery } from 'svelte/reactivity';
 import { prefersReducedMotion } from 'svelte/motion';
-import { POINTER_TRACKED, type FxEffect } from './capabilities.js';
+import type { FxEffect } from './capabilities.js';
+import { inheritLevel, resolveEffect, type FxDensity, type FxLevel } from './resolution.js';
 
-export type FxLevel = 'off' | 'calm' | 'expressive';
-export type FxDensity = 'default' | 'list' | 'table';
+export type { FxDensity, FxLevel };
 
 const KEY = Symbol('alrein-fx');
 
@@ -53,9 +53,7 @@ export class FxContext {
 	 * `$state` inside a getter are tracked at access time, so they stay reactive.
 	 */
 	get level(): FxLevel {
-		const inherited = this.#parent?.level ?? 'calm';
-		if (inherited === 'off') return 'off';
-		return this.#level ?? inherited;
+		return inheritLevel(this.#parent?.level ?? 'calm', this.#level);
 	}
 
 	/** Density has no sticky value; the nearest scope wins. */
@@ -72,49 +70,33 @@ export class FxContext {
 	}
 
 	/**
-	 * SPEC.md §3.2, in order, first veto wins.
+	 * Resolve one effect through SPEC.md §3.2. The chain itself lives in
+	 * `resolution.ts` as a pure function so it can be unit-tested without a DOM;
+	 * this method only supplies the live environment.
 	 *
-	 * @param effect     which effect is being resolved
-	 * @param requested  the per-instance prop, or `undefined` if the caller did
-	 *                   not pass one. `false` is a real answer and vetoes.
-	 * @param options.available
-	 *                   the `◐` condition from §3.4 — the component evaluates it
-	 *                   ("is this the primary variant?", "is size ≥ md?") because
-	 *                   only the component knows. Defaults to `true` for `●` cells.
-	 * @param options.fxDefault
-	 *                   whether this component lights this effect up on its own at
-	 *                   `expressive` (§3.3). Defaults to `false`: calm by default,
-	 *                   nothing glows unless asked.
+	 * @param requested the per-instance prop, or `undefined` if none was passed
+	 * @param request.available the `◐` condition from §3.4, evaluated by the
+	 *        component ("is this the primary variant?", "is size >= md?")
+	 * @param request.fxDefault whether this component lights up on its own at
+	 *        `expressive`. Defaults to false: calm by default, nothing glows
+	 *        unless asked.
 	 */
 	resolve(
 		effect: FxEffect,
 		requested: boolean | undefined,
-		options: { available?: boolean; fxDefault?: boolean } = {}
+		request: { available?: boolean; fxDefault?: boolean } = {}
 	): boolean {
-		const { available = true, fxDefault = false } = options;
-
-		// 1 — data-fx="off" in the ancestor chain. No override possible.
-		if (this.level === 'off') return false;
-
-		if (POINTER_TRACKED.has(effect)) {
-			// 2 — reduced motion kills pointer-tracked effects outright.
-			if (this.reducedMotion) return false;
-			// 3 — coarse pointer has nothing to track.
-			if (!this.pointerFine) return false;
-			// 5 — density scope. gradient and shimmer survive; these do not.
-			if (this.density !== 'default') return false;
-			// §3.5: magnet is isolated-CTA only, and only at `expressive`.
-			if (effect === 'magnet' && this.level !== 'expressive') return false;
-		}
-
-		// 4 — the capability matrix, including the `◐` condition.
-		if (!available) return false;
-
-		// 6 — the per-instance prop beats the preset in both directions.
-		if (requested !== undefined) return requested;
-
-		// 7 — the preset default. `calm` never lights anything up on its own.
-		return this.level === 'expressive' && fxDefault;
+		return resolveEffect(
+			effect,
+			requested,
+			{
+				level: this.level,
+				density: this.density,
+				reducedMotion: this.reducedMotion,
+				pointerFine: this.pointerFine
+			},
+			request
+		);
 	}
 }
 
