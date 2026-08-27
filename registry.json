@@ -333,7 +333,8 @@
 			],
 			"registryDependencies": [
 				"local:theme",
-				"local:field"
+				"local:field",
+				"local:spinner"
 			],
 			"files": [
 				{
@@ -358,7 +359,8 @@
 			],
 			"registryDependencies": [
 				"local:theme",
-				"local:field"
+				"local:field",
+				"local:spinner"
 			],
 			"files": [
 				{
@@ -505,6 +507,30 @@
 					"path": "src/lib/components/ui/radio-group/radio-group.svelte",
 					"type": "registry:ui",
 					"target": "radio-group/radio-group.svelte"
+				}
+			]
+		},
+		{
+			"name": "spinner",
+			"type": "registry:ui",
+			"title": "alrein-ui Spinner",
+			"description": "New — shadcn-svelte has no equivalent. §5 collapses vuesax spinner-grid and spinner-comet into one component with variant=\"arc\" | \"grid\" | \"comet\". Speed is a first-class axis; the loop slows under reduced motion rather than stopping, because a frozen spinner claims the work has finished.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/spinner/index.ts",
+					"type": "registry:ui",
+					"target": "spinner/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/spinner/spinner.svelte",
+					"type": "registry:ui",
+					"target": "spinner/spinner.svelte"
 				}
 			]
 		},

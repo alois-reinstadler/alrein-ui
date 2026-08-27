@@ -40,7 +40,7 @@ export const NAV: NavEntry[] = [
 	{ slug: 'alert', name: 'Alert', phase: 2, status: 'planned', origin: 'extends', summary: 'Gradient, Glow bei danger/warn, Shimmer einmalig beim Einblenden.' },
 	{ slug: 'avatar', name: 'Avatar', phase: 2, status: 'planned', origin: 'extends', summary: 'Präsenzzustand, Ladeschimmer, Tilt ab Größe lg. Plus AvatarGroup.' },
 	{ slug: 'chip', name: 'Chip', phase: 2, status: 'planned', origin: 'new', summary: 'Ghost und Gradient.' },
-	{ slug: 'spinner', name: 'Spinner', phase: 2, status: 'planned', origin: 'new', summary: 'variant="grid" | "comet".' },
+	{ slug: 'spinner', name: 'Spinner', phase: 2, status: 'shipped', origin: 'new', summary: 'variant="arc" | "grid" | "comet", plus Geschwindigkeit und Overlay.' },
 	{ slug: 'tooltip', name: 'Tooltip', phase: 2, status: 'planned', origin: 'extends', summary: 'Keine Effekte — §3.4 gibt Tooltip nichts.' },
 	{ slug: 'rating', name: 'Rating', phase: 2, status: 'planned', origin: 'new', summary: 'Plus variant="emoji".' },
 	{ slug: 'skeleton', name: 'Skeleton', phase: 2, status: 'planned', origin: 'extends', summary: 'Der einzige Ort für den Dauerschimmer.' },

@@ -23,7 +23,7 @@ const ROOT = resolve(import.meta.dirname, '..');
 // Vary the port so a stale server from a previous run cannot answer for us.
 const PORT = 4173 + Number(process.hrtime.bigint() % 200n);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/fx', '/button', '/card', '/badge', '/input', '/textarea', '/checkbox', '/radio-group', '/switch', '/select', '/field'];
+const PAGES = ['/', '/fx', '/button', '/card', '/badge', '/input', '/textarea', '/checkbox', '/radio-group', '/switch', '/select', '/field', '/spinner'];
 const LEVELS = ['off', 'calm', 'expressive'];
 
 /** Effects the engine drives from a pointer. A server has none, so must a touch device. */
@@ -133,7 +133,10 @@ try {
 			// Conditional on there being a pressable element at all: a page of form
 			// fields has nothing to press, and Input deliberately has no press
 			// (§3.4 gives form fields no effects).
-			const pressable = (markup.match(/data-slot="(?:button|checkbox-card|radio-card|card)"/g) ?? []).length;
+			// Only things that press *unconditionally*. A plain Card does not: it
+			// gains press with `interactive`, and the Spinner page renders two
+			// non-interactive ones to demonstrate the overlay.
+			const pressable = (markup.match(/data-slot="(?:button|checkbox-card|radio-card)"/g) ?? []).length;
 			if (pressable > 0) {
 				assert(
 					classedElements(markup, 'fx-press').length > 0,

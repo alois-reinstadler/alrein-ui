@@ -110,6 +110,7 @@
 
 <script lang="ts">
 	import { cn } from "$lib/utils.js";
+	import { Spinner } from "$lib/components/ui/spinner/index.js";
 	import { getFloatingFieldId } from "$lib/components/ui/field/floating-context.svelte.js";
 
 	let {
@@ -183,36 +184,27 @@
 <!--
 	The busy spinner.
 
-	TODO(phase-2): replace this with `<Spinner />` once Phase 2 ships it. It is
-	inline only because that component does not exist yet; the shape — a dashed
-	ring turning at the loading-loop duration — is the one Spinner will have, so
-	the swap is a deletion.
+	Phase 2 shipped `<Spinner />`, so this is now that component rather than a
+	local copy of it. Spinner owns the `role="status"` / `aria-live` wiring; here
+	it is `aria-hidden`, because the control already carries `aria-busy` and two
+	announcements of the same fact is one too many.
 
-	The rotation is a *loop*, not a transition, so its duration is
-	`--fx-shimmer-duration` (the library's loading-loop token) rather than the
-	80/120/180/240 transition scale: a full turn in 120ms is a strobe. Reduced
-	motion collapses that token to 0ms in `tokens.css`, which parks the ring
-	instead of spinning it, and `aria-busy` carries the meaning either way — so
-	there is no second `motion-reduce:` code path to disagree with the token.
-
-	Tailwind's own `spin` keyframes are reused instead of a `<style>` block on
-	purpose: a scoped style block makes Svelte stamp its hash class onto every
-	element in the file, including the `<textarea>`, and the rendered class list of
-	an upstream call site has to stay byte-identical.
+	The rotation is a *loop*, not a transition, so its duration comes from
+	`--fx-spin-duration` rather than the 80/120/180/240 transition scale: a full
+	turn in 120ms is a strobe. Under reduced motion that token slows to 2.4s
+	instead of stopping (A17), because a parked ring claims the request has
+	finished. Spinner owns all of that; this file no longer has an opinion.
 -->
 {#snippet spinner()}
-	<svg
+	<Spinner
 		data-slot="textarea-spinner"
 		aria-hidden="true"
-		viewBox="0 0 24 24"
-		fill="none"
+		size="sm"
 		class={cn(
-			"pointer-events-none absolute top-2 size-4 animate-spin text-muted-foreground [animation-duration:var(--fx-shimmer-duration)]",
+			"pointer-events-none absolute top-2",
 			isFloating ? "end-0" : "end-2.5"
 		)}
-	>
-		<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="22 35" />
-	</svg>
+	/>
 {/snippet}
 
 {#snippet control()}

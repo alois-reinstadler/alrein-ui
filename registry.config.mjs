@@ -80,11 +80,12 @@ export const registry = {
 		// Phase 1 — form controls. §3.4 grants Input, Textarea and Select no
 		// decorative effects at all, so those three depend on `theme` but not `fx`.
 		ui('field', 'alrein-ui Field', 'A strict superset of the shadcn-svelte Field. Adds semantic state (danger/warn/success) and the notched floating label, which is the one structural feature the vuesax form controls have that shadcn has no equivalent for.', { fx: false }),
-		ui('input', 'alrein-ui Input', 'A strict superset of the shadcn-svelte Input. Adds semantic state, a loading state that blocks interaction without disabling, and floating-label support. No decorative effects — §3.4 withholds them from form fields.', { fx: false, deps: ['local:field'] }),
-		ui('textarea', 'alrein-ui Textarea', 'A strict superset of the shadcn-svelte Textarea. Adds semantic state, loading, floating-label support and an optional character counter.', { fx: false, deps: ['local:field'] }),
+		ui('input', 'alrein-ui Input', 'A strict superset of the shadcn-svelte Input. Adds semantic state, a loading state that blocks interaction without disabling, and floating-label support. No decorative effects — §3.4 withholds them from form fields.', { fx: false, deps: ['local:field', 'local:spinner'] }),
+		ui('textarea', 'alrein-ui Textarea', 'A strict superset of the shadcn-svelte Textarea. Adds semantic state, loading, floating-label support and an optional character counter.', { fx: false, deps: ['local:field', 'local:spinner'] }),
 		ui('select', 'alrein-ui Select', 'A strict superset of the shadcn-svelte Select, all eleven files intact. Adds semantic state and loading on the trigger. No glow and no height-animating menu morph — see amendments A13 and A14.', { fx: false, deps: ['local:field'] }),
 		ui('checkbox', 'alrein-ui Checkbox', 'A strict superset of the shadcn-svelte Checkbox. The mark gains the toggle-thumb spring, and variant="card" adds the selectable card presentation with gradient, glow and tilt.'),
 		ui('radio-group', 'alrein-ui RadioGroup', 'A strict superset of the shadcn-svelte RadioGroup. The dot gains the toggle-thumb spring, and variant="card" adds the selectable card presentation. Collapses vuesax radio, radio-card, radio-group and radio-group-cards into one component.'),
+		ui('spinner', 'alrein-ui Spinner', 'New — shadcn-svelte has no equivalent. §5 collapses vuesax spinner-grid and spinner-comet into one component with variant="arc" | "grid" | "comet". Speed is a first-class axis; the loop slows under reduced motion rather than stopping, because a frozen spinner claims the work has finished.', { fx: false }),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };
