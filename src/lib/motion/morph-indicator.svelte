@@ -144,19 +144,53 @@
 		const scaleX = followX && next.width > 0 ? from.width / next.width : 1;
 		const scaleY = followY && next.height > 0 ? from.height / next.height : 1;
 
+		const computed = getComputedStyle(node);
+		const easing = computed.getPropertyValue('--ease-fx-out').trim() || 'ease-out';
+
+		/*
+		 * A19's radius compensation, and it is not optional decoration.
+		 *
+		 * A `scaleX` of 2.5 on a pill whose radius is half its height turns it into
+		 * a lozenge for the length of the travel — the corners stretch with
+		 * everything else. Pre-dividing the radius by the scale on the *inverted*
+		 * keyframe means it renders at its intended size throughout, and CSS
+		 * interpolates it back to the real value as the scale unwinds.
+		 *
+		 * `border-radius: Xpx / Ypx` sets the horizontal and vertical radii
+		 * independently, which is exactly what a non-uniform scale needs. This is
+		 * paint, not layout, so §1 permits animating it — and `check-layout-safety`
+		 * agrees, because `border-radius` is not in its layout set.
+		 *
+		 * Skipped entirely when both scales are 1, which is the common case for a
+		 * uniform row (Pagination's buttons are all `size-9`), so nothing pays for
+		 * a track it does not need.
+		 */
+		const radius = Number.parseFloat(computed.borderTopLeftRadius) || 0;
+		const distorts = radius > 0 && (Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001);
+
 		// P(lay).
 		node.animate(
-			[
-				{
-					transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
-					transformOrigin: 'top left'
-				},
-				{ transform: 'none', transformOrigin: 'top left' }
-			],
-			{
-				duration: duration('base'),
-				easing: getComputedStyle(node).getPropertyValue('--ease-fx-out').trim() || 'ease-out'
-			}
+			distorts
+				? [
+						{
+							transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+							transformOrigin: 'top left',
+							borderRadius: `${radius / scaleX}px / ${radius / scaleY}px`
+						},
+						{
+							transform: 'none',
+							transformOrigin: 'top left',
+							borderRadius: `${radius}px`
+						}
+					]
+				: [
+						{
+							transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+							transformOrigin: 'top left'
+						},
+						{ transform: 'none', transformOrigin: 'top left' }
+					],
+			{ duration: duration('base'), easing }
 		);
 	});
 </script>

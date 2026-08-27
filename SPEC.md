@@ -656,9 +656,20 @@ Full reasoning in `SUBSTRATE.md`.
 - **A24 — Accessibility gaps in the source that must not be inherited (Phase 2/3).** Recorded here
   because each one looks like a design choice in the shadow CSS and is not.
   - **Pagination has no keyboard handling at all.** Every page number is a tab stop, and with no
-    ellipsis handling a hundred-page set is a hundred stops. It needs a roving tabindex — which is
-    bits-ui's job, not ours (`F14`), so check `bits-ui` first and only hand-roll if it genuinely has
-    nothing.
+    ellipsis handling a hundred-page set is a hundred stops.
+
+    **Correction (verified against `bits-ui@2.19.0`, `dist/bits/pagination/pagination.svelte.js`):**
+    bits-ui already has this. A shared `handleTriggerKeydown` is wired into both
+    `PaginationPageState` and `PaginationButtonState`; it collects the page nodes, maps next/prev
+    from the orientation *and* the resolved text direction, and handles `Home`/`End` with an
+    optional `loop`. So, as with the switch in A15, this amendment named a gap that is bits-ui's
+    and is already filled. Nothing was hand-rolled (`F14`).
+
+    A roving tabindex was **also** declined, and on its own merits rather than by omission: the
+    defect does not survive the change of design. The source has no ellipsis, so a hundred pages is
+    a hundred buttons; bits-ui windows the run, so at `siblingCount: 1` it is at most seven page
+    buttons plus two arrows *regardless of count*. Nine stops in a nav landmark is ordinary, and a
+    roving tabindex would remove Tab as an escape for anyone who does not know the arrows work.
   - **Tabs declares `role="tablist"` and `role="tab"` with no panels and no `aria-controls`.** A tab
     that controls nothing is a lie to a screen reader. Either wire the panels properly or do not
     claim the roles.
@@ -668,6 +679,19 @@ Full reasoning in `SUBSTRATE.md`.
     for free.
   - **No Phase 3 component persists state**, so Sidebar's collapsed rail flashes open on first paint
     after a reload. Whatever we do about that, it has to be decided rather than discovered.
+- **A25a — `MorphIndicator` compensates the border radius under a non-uniform scale.** A19 asserted
+  this "is handled"; it was not, until now. A `scaleX` of 2.5 on a pill whose radius is half its
+  height renders a lozenge for the length of the travel. The inverted keyframe pre-divides the
+  radius by the scale — `border-radius: {r/sx}px / {r/sy}px`, using the two-value form because a
+  non-uniform scale needs independent horizontal and vertical radii — and CSS interpolates back as
+  the scale unwinds. Paint, not layout, so §1 permits it. Skipped when both scales are 1, which is
+  the common case for a uniform row.
+
+  **Still outstanding, and honestly so: `chrome` ships without its shoulders.** The source's sled
+  has two quarter-disc pseudo-elements that would squash under `scaleX`, and reproducing them needs
+  a counter-scaled *child*, which `MorphIndicator` does not render. The digest predicted exactly
+  this as the one thing FLIP cannot reproduce. What ships is a top-rounded sled on a lip, which
+  reads as a browser tab but is not the source's silhouette.
 - **A25 — `MorphIndicator` must re-measure on two signals besides selection.** A container resize,
   caught by a `ResizeObserver` on the offset parent — not a `window` resize listener, because the
   container can change without the window and `pointer.svelte.ts` owns window-level listeners. And

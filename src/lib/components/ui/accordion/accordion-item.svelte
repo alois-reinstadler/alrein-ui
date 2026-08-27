@@ -13,7 +13,9 @@
 	 */
 	import { Accordion as AccordionPrimitive } from "bits-ui";
 	import { cn } from "$lib/utils.js";
-	import { getAccordionContext } from "./accordion.svelte";
+	import { getAccordionContext, setAccordionItemIds } from "./accordion.svelte";
+
+	const uid = $props.id();
 
 	let {
 		ref = $bindable(null),
@@ -22,6 +24,13 @@
 	}: AccordionPrimitive.ItemProps = $props();
 
 	const accordion = getAccordionContext();
+
+	/*
+	 * One id per item, published for the trigger's `aria-controls` and used as the
+	 * panel's own id. bits-ui does not link the two — see `accordion.svelte` for
+	 * the check and the reasoning.
+	 */
+	setAccordionItemIds({ contentId: `${uid}-content` });
 </script>
 
 <AccordionPrimitive.Item

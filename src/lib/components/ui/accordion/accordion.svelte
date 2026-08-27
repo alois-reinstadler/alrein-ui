@@ -92,6 +92,42 @@
 		return { variant: "default" };
 	}
 
+	/**
+	 * Per-item ids, so the trigger can point `aria-controls` at its own panel.
+	 *
+	 * A24 says not to hand-roll ARIA for a disclosure without checking what
+	 * already exists. Checked, against `bits-ui@2.19.0`: `AccordionTriggerState`
+	 * emits `aria-expanded` and **nothing else** — no `aria-controls` — and
+	 * `AccordionContentState` emits no `role="region"` and no `aria-labelledby`.
+	 * Upstream shadcn-svelte adds none of it either.
+	 *
+	 * That is the same gap the digest records against the vuesax source, where two
+	 * of its six skins *do* wire all three, "which shows it was known and skipped".
+	 * A24 says the source's gaps are not inherited; inheriting the identical gap
+	 * from a different upstream is the same outcome.
+	 *
+	 * So one id is generated per item and used at both ends. It costs one context
+	 * and no behaviour: bits-ui still owns the keyboard, the focus and the open
+	 * state. `role="region"` is deliberately *not* added — the ARIA practices
+	 * advise against it once an accordion has more than about six panels, and
+	 * neither bits-ui nor shadcn claims it.
+	 */
+	export interface AccordionItemIds {
+		readonly contentId: string;
+	}
+
+	const ITEM_KEY = Symbol("alrein-accordion-item");
+
+	export function setAccordionItemIds(ids: AccordionItemIds): void {
+		setContext(ITEM_KEY, ids);
+	}
+
+	/** `undefined` outside an item, so `aria-controls` is simply not emitted. */
+	export function getAccordionItemIds(): AccordionItemIds | undefined {
+		if (hasContext(ITEM_KEY)) return getContext<AccordionItemIds>(ITEM_KEY);
+		return undefined;
+	}
+
 	export type AccordionProps = AccordionNamespace.RootProps & {
 		/** `ghost` is the transparent, divider-less surface §3.1 calls a variant. */
 		variant?: AccordionVariant;
