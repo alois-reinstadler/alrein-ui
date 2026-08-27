@@ -2,9 +2,11 @@
 @import "tw-animate-css";
 @import "shadcn-svelte/tailwind.css";
 @import "@fontsource-variable/inter";
+@import "./lib/styles/tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 @plugin '@tailwindcss/typography';
+
 
 :root {
 	--background: oklch(1 0 0);

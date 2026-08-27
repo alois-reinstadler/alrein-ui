@@ -1,0 +1,92 @@
+/**
+ * alrein-ui token layer.
+ *
+ * Per SPEC.md A9, size, spacing and colour come from shadcn-svelte's Tailwind
+ * scale and token set. Nothing here restates a height, a padding, a radius or a
+ * palette colour. What lives here is only what shadcn has no equivalent for:
+ * the motion scale and the effect inputs.
+ */
+
+@theme {
+	/*
+	 * Motion — business-snappy (SPEC.md §2). Registered in the --transition-duration
+	 * and --ease namespaces so they surface as ordinary Tailwind utilities:
+	 * `duration-base`, `ease-fx-out`, … There is no bespoke prop and no custom
+	 * property to remember; motion is expressed the same way as any other Tailwind
+	 * value. (A2: anything that resolves to Tailwind classes is a variant.)
+	 */
+	--transition-duration-instant: 80ms; /* press feedback, hover tint */
+	--transition-duration-fast: 120ms; /* focus ring, checkbox mark, tooltip in */
+	--transition-duration-base: 180ms; /* the default: dropdowns, popovers, tab indicator */
+	--transition-duration-slow: 240ms; /* accordion collapse, sheet/drawer, modal */
+
+	/*
+	 * Deliberately namespaced `fx` rather than overriding Tailwind's built-in
+	 * --ease-in / --ease-out. Overriding those would restyle every existing
+	 * `ease-out` in a consumer's app, including upstream shadcn components, which
+	 * breaks the strict-superset promise in §1.
+	 *
+	 * --ease-fx-spring is allowed on exactly two things: press feedback (scale
+	 * down/up) and toggle thumbs (switch, checkbox mark). It overshoots, and
+	 * overshoot on anything that moves layout reads as slow and drunk in a
+	 * data-dense screen. `pnpm bans:check` greps for it.
+	 */
+	--ease-fx-out: cubic-bezier(0.22, 1, 0.36, 1); /* everything entering */
+	--ease-fx-in: cubic-bezier(0.4, 0, 1, 1); /* everything leaving */
+	--ease-fx-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* RESTRICTED — see above */
+}
+
+:root {
+	/*
+	 * Effect inputs, read by the effect layers and by the pointer engine. None of
+	 * these could be a Tailwind utility, so a custom property is the right shape.
+	 *
+	 * A5: --fx-tint holds a full colour, not an RGB triplet. Every alpha step is
+	 * color-mix(in oklab, var(--fx-tint) N%, transparent), so the effect layer
+	 * stays inside the OKLCH system shadcn already uses and inherits a consumer's
+	 * theme change for free.
+	 */
+	--fx-tint: var(--primary);
+
+	--fx-glow-radius: 180px;
+	--fx-glow-opacity: 0.35;
+	--fx-tilt-max: 6deg;
+	--fx-tilt-perspective: 800px;
+	--fx-magnet-max: 8px;
+	--fx-shimmer-duration: 900ms;
+
+	/*
+	 * Opacity fades survive reduced motion at ~100ms. Removing them entirely makes
+	 * the UI feel broken rather than calm (§3.2 step 2), so they read this token
+	 * instead of the duration scale.
+	 */
+	--fx-fade-duration: var(--transition-duration-base);
+}
+
+/*
+ * §3.2 step 2. Transform-driven motion collapses to 1ms; opacity keeps a short
+ * fade. The duration scale is overridden at :root, so every `duration-*` utility
+ * and every layer that reads the scale follows without a second code path.
+ */
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--transition-duration-instant: 1ms;
+		--transition-duration-fast: 1ms;
+		--transition-duration-base: 1ms;
+		--transition-duration-slow: 1ms;
+		--fx-fade-duration: 100ms;
+		--fx-shimmer-duration: 0ms;
+	}
+}
+
+/*
+ * Squircle (§2). Chromium 139+ gets a true superellipse; Safari and Firefox get
+ * the plain border-radius that is already there. No SVG clip-path fallback — it
+ * kills box-shadow, breaks glow bleed and mangles borders, which is exactly the
+ * set of things this library depends on.
+ */
+@utility sq {
+	@supports (corner-shape: squircle) {
+		corner-shape: squircle;
+	}
+}
