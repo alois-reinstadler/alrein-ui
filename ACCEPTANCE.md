@@ -260,3 +260,120 @@ Browser verification, unchanged from Phase 0. `mcp__t3-code__preview_*` reports 
 and CDP on `127.0.0.1:9222` is refused. Criteria 6 and 7 are waiting on it. Everything that *can* be
 verified without one has been, and three checks were built specifically to close the gap:
 `layout:check`, `ssr:check` and `supersets:check`.
+
+---
+
+# Phase 2 — feedback and display
+
+Alert · Avatar (+ AvatarGroup) · Chip · Spinner · Tooltip · Rating · Skeleton. Plus ButtonGroup,
+which belongs to Phase 0's Button family and had been missing from the inventory.
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | `svelte-check` strict, zero errors, zero `any` | **PASS** |
+| 2 | Zero §1 hard-ban items in the diff | **PASS** |
+| 3 | Registry item builds and installs cleanly | **PASS** |
+| 4 | Effect props only where §3.4 allows; forbidden combos are type errors | **PASS** |
+| 5 | Keyboard-complete and screen-reader-correct | **PASS** |
+| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** — structural, unobserved |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** — levels verified, light/dark not |
+| 8 | `prefers-reduced-motion: reduce` | **PASS** |
+| 9 | `(pointer: coarse)` | **PASS** |
+| 10 | No layout shift from any effect | **PASS (proven statically)** |
+| 11 | Demo page with every variant and every allowed effect | **PASS** |
+| 12 | Side-by-side visual check against the vuesax source | **DONE DIFFERENTLY** — see Phase 1 |
+
+**3 — Registry.** `pnpm consumer:smoke` was re-run in full against all 21 items of the time: it
+scaffolds a real SvelteKit consumer, installs the **upstream** button, card and badge, asserts they
+really are upstream, then installs every alrein item over them and asserts by name that all five
+upstream Button variants, all three extra icon sizes and all six Card sub-components survived. All
+assertions passed and the consumer built. That is the criterion met rather than argued.
+
+**5 — Keyboard.** Rating is the one that mattered, and the answer came from reading `bits-ui`
+rather than assuming: it has a `RatingGroup` primitive, so arrow keys, form association and
+announcement are inherited rather than written. A24 records what the source does instead —
+`role="slider"` on a wrapper while keeping N focusable `<button>` stars, which is invalid — and that
+is not inherited.
+
+**8 — Reduced motion.** This phase is where A17 was found and fixed, and Skeleton is where it
+matters most: the token layer was stopping the loading loop, and a motionless skeleton asserts the
+content has arrived. The loop now slows; the *triggered* sweep, which is decoration, still stops,
+which is why the two need separate tokens.
+
+**§3.4 in practice.** Skeleton is the only component in the phase whose source needed no decline —
+vuesax applies nothing beyond the matrix there either. Everything else needed at least one, and
+they are recorded in A20 rather than left implicit.
+
+## Bugs this phase's checks caught
+
+1. **`shadcn-svelte add field input-group` reverted the entire alrein Button to stock**, having
+   pulled it in as a registry dependency. `pnpm supersets:check` exists because of this, and it
+   caught the same failure again in Phase 3 — where `add sidebar` reverted **four** supersets at
+   once — this time automatically and by name.
+2. **`layout:check` was passing because it had nothing to look at.** It reads the built stylesheet,
+   and Tailwind tree-shakes a utility nothing uses, so a newly added `fx-collapse` was reported as
+   "32 rules, 0 violations" while the rule under review was not in the file. `@source inline()` now
+   forces every effect utility into the build; coverage went from 30 rules to 45.
+3. **`ssr:check`'s class matcher used a word boundary**, so `\bfx-shimmer\b` matched inside
+   `[animation-duration:var(--fx-shimmer-duration)]` — a token the loading spinner legitimately
+   reads. It compares whole class tokens now.
+
+---
+
+# Phase 4 — complex
+
+ColorPicker · Code · CodeWindow · UploadArea.
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | `svelte-check` strict, zero errors, zero `any` | **PASS** |
+| 2 | Zero §1 hard-ban items in the diff | **PASS** |
+| 3 | Registry item builds and validates | **PASS** — 26 items, 114 files |
+| 4 | Effect props only where §3.4 allows | **PASS** |
+| 5 | Keyboard-complete and screen-reader-correct | **PASS** |
+| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** |
+| 8 | `prefers-reduced-motion: reduce` | **PASS** |
+| 9 | `(pointer: coarse)` | **PASS** |
+| 10 | No layout shift from any effect | **PASS** |
+| 11 | Demo page with every variant | **PASS** |
+| 12 | Visual fidelity | **DONE DIFFERENTLY** |
+
+**The dependency decisions (A26–A28) were made before any code was written**, as §5 requires.
+ColorPicker uses an internal OKLCH converter rather than `culori`, on the argument that a registry
+ships source into a consumer's repository so a dependency here is one every consumer inherits.
+Shiki ships, but lazily, from the web bundle, with a fourteen-language allowlist, and declared on
+the `code` item alone — installing Button does not pull a syntax highlighter.
+
+**4 — Three of the four components are granted nothing at all**, and in each case the reason is
+sharper than "the matrix says so": a glow over a colour picker misreports the value it exists to
+show; a gradient behind code fights the syntax colours; a decorated spinner competes with what it is
+saying. UploadArea is the exception, and each of its three effects carries a distinct signal — glow
+answers "will letting go here do anything?" and is available only while a file is over the zone.
+
+**5 — Accessibility is most of the work in this phase.** ColorPicker's sliders are the control and
+the 2D area is an `aria-hidden` pointer affordance, because a two-axis colour field has no honest
+ARIA shape — the source puts `role="slider"` on one, which is invalid for the same reason A24 flags
+on Rating. UploadArea is a real `<input type="file">` with drag-and-drop layered on top; a dropzone
+that is only a dropzone excludes every keyboard user. Code's un-highlighted render is readable,
+selectable and copyable from first paint and stays so if Shiki never loads.
+
+**Tests.** 145 total, up from 57 at the end of Phase 1. The new ones earn the two decisions that
+were argued rather than obvious: 43 for the colour converter — checked against Ottosson's published
+values, not only against its own inverse — and 22 for the upload state, including the case that
+motivates validating in one place (a browser will drop a `.exe` onto a zone whose input says
+`accept="image/*"`, because the drop path never goes through the input).
+
+## Bugs this phase's checks caught
+
+1. **The Code fallback used `{@html escapeHtml(code)}`** — routing a string through `@html` to
+   un-escape what had just been escaped, strictly more dangerous for identical output. It renders
+   plain `{code}` now, which Svelte escapes. `F13-dom` was extended to ban `{@html}` outright, with
+   Code as the single allowlisted use, and verified by planting one in `card.svelte`.
+2. **Two bugs in my own colour tests**, both of which would have made the suite lie: one demanded
+   5e-7 precision that two cube roots and two gamma curves cannot give, and one asserted round-trip
+   stability while holding a channel at `0.5` — and `0.5 × 255` is exactly `127.5`, a rounding tie
+   that any perturbation flips. A test built on a tie measures the tie.
+3. **The UploadArea demo tripped `F9-raf`** with a fake transport. Rather than allowlist the demo,
+   the progress is now advanced by a button — which demonstrates the actual design point better,
+   since the caller owns transport and reports progress in.
