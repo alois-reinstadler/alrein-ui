@@ -1,0 +1,10 @@
+[
+	{
+		"name": "theme",
+		"title": "alrein-ui Theme",
+		"type": "registry:theme",
+		"description": "Motion scale and effect tokens for alrein-ui. Adds the --transition-duration-*, --ease-fx-* and --fx-* values plus the `sq` squircle utility on top of the shadcn-svelte token set, and wires the stylesheet into your app.css. Every other alrein-ui item depends on this.",
+		"registryDependencies": [],
+		"relativeUrl": "theme.json"
+	}
+]

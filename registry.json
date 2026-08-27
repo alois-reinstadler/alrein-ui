@@ -1,0 +1,41 @@
+{
+	"$schema": "https://shadcn-svelte.com/schema/registry.json",
+	"name": "alrein-ui",
+	"homepage": "https://alois-reinstadler.github.io/alrein-ui",
+	"aliases": {
+		"lib": "$lib",
+		"ui": "$lib/components/ui",
+		"components": "$lib/components",
+		"utils": "$lib/utils",
+		"hooks": "$lib/hooks"
+	},
+	"items": [
+		{
+			"name": "theme",
+			"type": "registry:theme",
+			"title": "alrein-ui Theme",
+			"description": "Motion scale and effect tokens for alrein-ui. Adds the --transition-duration-*, --ease-fx-* and --fx-* values plus the `sq` squircle utility on top of the shadcn-svelte token set, and wires the stylesheet into your app.css. Every other alrein-ui item depends on this.",
+			"registryDependencies": [],
+			"files": [
+				{
+					"path": "src/lib/styles/alrein/index.css",
+					"type": "registry:file",
+					"target": "~/src/lib/styles/alrein/index.css"
+				},
+				{
+					"path": "src/lib/styles/alrein/tokens.css",
+					"type": "registry:file",
+					"target": "~/src/lib/styles/alrein/tokens.css"
+				},
+				{
+					"path": "src/lib/styles/alrein/fx.css",
+					"type": "registry:file",
+					"target": "~/src/lib/styles/alrein/fx.css"
+				}
+			],
+			"css": {
+				"@import \"./lib/styles/alrein/index.css\"": {}
+			}
+		}
+	]
+}

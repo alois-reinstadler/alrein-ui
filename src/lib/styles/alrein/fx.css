@@ -1,0 +1,307 @@
+/**
+ * The visible half of the effect system (SPEC.md §3).
+ *
+ * The pointer engine writes numbers; this file decides what they look like.
+ * Nothing here reads a colour, a duration or an easing that is not a token.
+ *
+ * ## How the effects compose
+ *
+ * Each effect owns a different CSS property, so two effects on one element never
+ * fight over `transform` the way the prior attempt did (SPEC.md §8, `F9`):
+ *
+ *   magnet → `translate`      press → `scale`
+ *   tilt   → `transform`      glow  → `::before`      press tint → `::after`
+ *   shimmer→ `background-image`
+ *
+ * The individual `translate` / `rotate` / `scale` properties are applied before
+ * `transform`, so magnet and press compose with tilt and none of them clobber a
+ * consumer's own `transform`. Upstream shadcn-svelte uses neither `::before` nor
+ * `::after` on Button, Badge or Card, so both pseudo-elements are free.
+ *
+ * None of these properties affect the layout box (§1), which is what makes
+ * acceptance criterion §7.10 — zero reflow when toggling `data-fx` — hold.
+ */
+
+/*
+ * Registering the custom properties buys three things: CSS transitions can
+ * interpolate them, the Web Animations API can animate them continuously rather
+ * than discretely (the triggered shimmer depends on this), and every layer gets
+ * a correct initial value without a `var(…, fallback)` at each use site.
+ */
+@property --fx-glow {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 0;
+}
+@property --fx-glow-x {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 50%;
+}
+@property --fx-glow-y {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 50%;
+}
+@property --fx-press {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 0;
+}
+@property --fx-press-x {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 50%;
+}
+@property --fx-press-y {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 50%;
+}
+@property --fx-tilt-x {
+	syntax: '<angle>';
+	inherits: false;
+	initial-value: 0deg;
+}
+@property --fx-tilt-y {
+	syntax: '<angle>';
+	inherits: false;
+	initial-value: 0deg;
+}
+@property --fx-magnet-x {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+@property --fx-magnet-y {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+@property --fx-shimmer-position {
+	syntax: '<percentage>';
+	inherits: true;
+	initial-value: -100%;
+}
+
+:root {
+	/*
+	 * How far press scales down. Factored out as a token so `data-fx="off"` and
+	 * reduced motion can zero the transform while keeping the colour response —
+	 * §3.3 says press "degrades to colour/opacity only", not that it disappears.
+	 */
+	--fx-press-depth: 0.03;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--fx-press-depth: 0;
+	}
+}
+
+/*
+ * §3.2 step 1. `data-fx="off"` is dead with no override possible, and it has to
+ * hold in CSS alone, before and without JavaScript, because shimmer-loading and
+ * gradient have no JS half at all. The pointer-tracked effects are already
+ * vetoed in `FxContext.resolve`; these rules are what makes the CSS-only ones
+ * obey, and what keeps the page honest if the bundle never loads.
+ */
+[data-fx='off'] {
+	--fx-press-depth: 0;
+}
+
+[data-fx='off'] :is(.fx-shimmer-loading, .fx-shimmer) {
+	animation: none;
+	background-image: none;
+}
+
+[data-fx='off'] :is(.fx-glow, .fx-glow-bloom, .fx-gradient) {
+	--fx-glow: 0;
+	background-image: none;
+	box-shadow: none;
+}
+
+/* §3.2 step 3: a coarse pointer has nothing to track, so these never light up. */
+@media (pointer: coarse) {
+	.fx-glow,
+	.fx-tilt,
+	.fx-magnet {
+		--fx-glow: 0;
+		--fx-tilt-x: 0deg;
+		--fx-tilt-y: 0deg;
+		--fx-magnet-x: 0px;
+		--fx-magnet-y: 0px;
+	}
+}
+
+/**
+ * press — "I registered your click". Always on, never opt-in (§3.1).
+ *
+ * The spring is here and, apart from toggle thumbs, only here. `--ease-fx-spring`
+ * overshoots, and overshoot on anything that moves layout reads as slow and drunk
+ * in a data-dense screen (SPEC.md §2).
+ */
+@utility fx-press {
+	position: relative;
+	scale: calc(1 - var(--fx-press) * var(--fx-press-depth));
+	transition: scale var(--transition-duration-instant) var(--ease-fx-spring);
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		background: radial-gradient(
+			circle at var(--fx-press-x) var(--fx-press-y),
+			color-mix(in oklab, var(--fx-tint) 28%, transparent),
+			transparent 65%
+		);
+		opacity: var(--fx-press);
+		transition: opacity var(--transition-duration-instant) var(--ease-fx-out);
+	}
+}
+
+/**
+ * glow — "this is the highest-intent target on this surface" (§3.1).
+ *
+ * An inner radial highlight clipped to the element's own rounded box. A6: this
+ * is what lets Card glow while keeping the `overflow-hidden` upstream relies on
+ * to round a first-child image, and it means glow never needs an ancestor to
+ * relax its clipping.
+ *
+ * §3.5: never on a form field. A glow on focus competes with the focus ring and
+ * users read it as an error state. The capability matrix withholds the prop.
+ */
+@utility fx-glow {
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		background: radial-gradient(
+			var(--fx-glow-radius) circle at var(--fx-glow-x) var(--fx-glow-y),
+			color-mix(in oklab, var(--fx-tint) calc(var(--fx-glow-opacity) * 100%), transparent),
+			transparent 70%
+		);
+		opacity: var(--fx-glow);
+		transition: opacity var(--transition-duration-fast) var(--ease-fx-out);
+	}
+}
+
+/**
+ * The outer half of glow, for elements that may bleed outside their box.
+ * Separate from `fx-glow` because A6 keeps this off Card. Intensity rides on the
+ * tint's alpha rather than on opacity, so it composes with an existing shadow.
+ *
+ * §3.5 accessibility floor: this sits behind the focus ring and never alters it.
+ */
+@utility fx-glow-bloom {
+	box-shadow: 0 0 calc(var(--fx-glow-radius) * 0.12)
+		color-mix(in oklab, var(--fx-tint) calc(var(--fx-glow) * 45%), transparent);
+	transition: box-shadow var(--transition-duration-fast) var(--ease-fx-out);
+}
+
+/**
+ * tilt — "a discrete object you can pick up" (§3.1). Max 6° from the token.
+ *
+ * §3.5: the `perspective()` here creates a containing block for
+ * `position: fixed`, so a component that hosts floating UI may not carry this
+ * class or its portals land in the wrong place. The capability matrix enforces
+ * that by withholding the prop from anything with a trigger.
+ */
+@utility fx-tilt {
+	transform: perspective(var(--fx-tilt-perspective)) rotateX(var(--fx-tilt-x)) rotateY(var(--fx-tilt-y));
+	transform-style: preserve-3d;
+	transition: transform var(--transition-duration-fast) var(--ease-fx-out);
+}
+
+/**
+ * magnet — "the unmissable single CTA" (§3.1). Never in chrome, a form or a list.
+ * Uses the `translate` property so it stacks with press's `scale` and, if a
+ * component ever carried both, with tilt's `transform`.
+ */
+@utility fx-magnet {
+	translate: var(--fx-magnet-x) var(--fx-magnet-y);
+	transition: translate var(--transition-duration-base) var(--ease-fx-out);
+}
+
+/**
+ * shimmer, loading mode — an idle loop, and pure CSS. No JavaScript is involved:
+ * put this class on a Skeleton, a loading Avatar or an uploading UploadArea and
+ * it runs until the class comes off, because the thing it describes is still
+ * happening.
+ *
+ * Under reduced motion `--fx-shimmer-duration` is 0ms, which stops the loop
+ * without a second code path (§3.2 step 2).
+ */
+@utility fx-shimmer-loading {
+	background-image: linear-gradient(
+		105deg,
+		transparent 40%,
+		color-mix(in oklab, var(--fx-tint) 22%, transparent) 50%,
+		transparent 60%
+	);
+	background-size: 250% 100%;
+	background-repeat: no-repeat;
+	animation: fx-shimmer-sweep var(--fx-shimmer-duration) linear infinite;
+}
+
+/**
+ * shimmer, attention mode — finite and triggered, driven by `shimmer.ts` through
+ * the Web Animations API. Twelve badges shimmering forever is a migraine, not a
+ * design system (§3.5), so the looping variant above and this one are separate
+ * classes that cannot be confused for each other.
+ */
+@utility fx-shimmer {
+	background-image: linear-gradient(
+		105deg,
+		transparent 40%,
+		color-mix(in oklab, var(--fx-tint) 30%, transparent) 50%,
+		transparent 60%
+	);
+	background-size: 250% 100%;
+	background-repeat: no-repeat;
+	background-position: var(--fx-shimmer-position) 0;
+}
+
+@keyframes fx-shimmer-sweep {
+	from {
+		background-position: -150% 0;
+	}
+	to {
+		background-position: 250% 0;
+	}
+}
+
+/**
+ * gradient — "primary emphasis / promotional surface" (§3.1). A static surface
+ * treatment, not a pointer effect.
+ *
+ * §3.5: derived from the accent via computed stops, **never** a hardcoded two-hex
+ * pair, or theming breaks the moment someone changes the accent. Both stops are
+ * `color-mix` against `--fx-tint`, so a consumer retheming `--primary` retints
+ * this for free and contrast against the foreground is preserved by construction.
+ */
+@utility fx-gradient {
+	background-image: linear-gradient(
+		135deg,
+		color-mix(in oklab, var(--fx-tint) 88%, white),
+		var(--fx-tint) 45%,
+		color-mix(in oklab, var(--fx-tint) 82%, black)
+	);
+}
+
+/*
+ * Effect layers sit at z-index 0 behind the content; anything a component wants
+ * readable goes above. Declared once here so no component has to remember it.
+ */
+@utility fx-content {
+	position: relative;
+	z-index: 1;
+}
