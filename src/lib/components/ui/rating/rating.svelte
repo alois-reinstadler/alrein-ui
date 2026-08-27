@@ -98,6 +98,7 @@
 			size: {
 				sm: { root: "gap-0.5", item: "size-4", glyph: "text-sm", value: "ms-1.5 text-xs" },
 				default: { root: "gap-1", item: "size-5", glyph: "text-lg", value: "ms-2 text-sm" },
+				lg: { root: "gap-1.5", item: "size-7", glyph: "text-2xl", value: "ms-2.5 text-base" },
 			},
 			/*
 			 * Matches `Field`'s own `state`. `danger` maps to shadcn's `--destructive`;

@@ -26,7 +26,7 @@ export const NAV: NavEntry[] = [
 	{ slug: 'button', name: 'Button', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle Upstream-Varianten plus Gradient, Glow, Shimmer, Tilt und Magnet.' },
 	{ slug: 'card', name: 'Card', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sieben Teilkomponenten plus hero-Variante, interactive, Glow und Tilt.' },
 	{ slug: 'badge', name: 'Badge', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sechs Varianten plus Gradient, Glow bei destructive und Shimmer.' },
-	{ slug: 'button-group', name: 'ButtonGroup', phase: 0, status: 'planned', origin: 'extends', summary: 'Ghost und Gradient an den Kindern — kein Glow, kein Tilt, kein Magnet.' },
+	{ slug: 'button-group', name: 'ButtonGroup', phase: 0, status: 'shipped', origin: 'extends', summary: 'Ghost und Gradient an den Kindern, durchgesetzt als Dichtebereich.' },
 
 	// Phase 1 — form controls
 	{ slug: 'input', name: 'Input', phase: 1, status: 'shipped', origin: 'extends', summary: 'Zustände, Ladezustand und schwebendes Label. Keine Effekte — §3.4.' },
@@ -38,13 +38,13 @@ export const NAV: NavEntry[] = [
 	{ slug: 'field', name: 'Field', phase: 1, status: 'shipped', origin: 'extends', summary: 'Zustandssemantik danger/warn/success und das schwebende Label.' },
 
 	// Phase 2 — feedback/display
-	{ slug: 'alert', name: 'Alert', phase: 2, status: 'planned', origin: 'extends', summary: 'Gradient, Glow bei danger/warn, Shimmer einmalig beim Einblenden.' },
-	{ slug: 'avatar', name: 'Avatar', phase: 2, status: 'planned', origin: 'extends', summary: 'Präsenzzustand, Ladeschimmer, Tilt ab Größe lg. Plus AvatarGroup.' },
-	{ slug: 'chip', name: 'Chip', phase: 2, status: 'planned', origin: 'new', summary: 'Ghost und Gradient.' },
+	{ slug: 'alert', name: 'Alert', phase: 2, status: 'shipped', origin: 'extends', summary: 'Ghost, Gradient, Glow bei danger/warn, Shimmer einmalig beim Einblenden.' },
+	{ slug: 'avatar', name: 'Avatar', phase: 2, status: 'shipped', origin: 'extends', summary: 'Präsenz, Ladeschimmer, Tilt ab lg. Plus AvatarGroup.' },
+	{ slug: 'chip', name: 'Chip', phase: 2, status: 'shipped', origin: 'new', summary: 'Ghost und Gradient. Auswählbar und entfernbar.' },
 	{ slug: 'spinner', name: 'Spinner', phase: 2, status: 'shipped', origin: 'new', summary: 'variant="arc" | "grid" | "comet", plus Geschwindigkeit und Overlay.' },
-	{ slug: 'tooltip', name: 'Tooltip', phase: 2, status: 'planned', origin: 'extends', summary: 'Keine Effekte — §3.4 gibt Tooltip nichts.' },
-	{ slug: 'rating', name: 'Rating', phase: 2, status: 'planned', origin: 'new', summary: 'Plus variant="emoji".' },
-	{ slug: 'skeleton', name: 'Skeleton', phase: 2, status: 'planned', origin: 'extends', summary: 'Der einzige Ort für den Dauerschimmer.' },
+	{ slug: 'tooltip', name: 'Tooltip', phase: 2, status: 'shipped', origin: 'extends', summary: 'Keine Effekte — §3.4 gibt Tooltip nichts. Bewegung aus den Tokens.' },
+	{ slug: 'rating', name: 'Rating', phase: 2, status: 'shipped', origin: 'new', summary: 'Auf bits-ui RatingGroup. Plus variant=\"emoji\" und halbe Schritte.' },
+	{ slug: 'skeleton', name: 'Skeleton', phase: 2, status: 'shipped', origin: 'extends', summary: 'Der einzige Ort für den Dauerschimmer, plus ein Licht für die ganze Gruppe.' },
 
 	// Phase 3 — navigation/structure
 	{ slug: 'tabs', name: 'Tabs', phase: 3, status: 'planned', origin: 'extends', summary: 'variant="gooey" | "chrome", beide auf MorphIndicator.' },

@@ -86,6 +86,15 @@ export const registry = {
 		ui('checkbox', 'alrein-ui Checkbox', 'A strict superset of the shadcn-svelte Checkbox. The mark gains the toggle-thumb spring, and variant="card" adds the selectable card presentation with gradient, glow and tilt.'),
 		ui('radio-group', 'alrein-ui RadioGroup', 'A strict superset of the shadcn-svelte RadioGroup. The dot gains the toggle-thumb spring, and variant="card" adds the selectable card presentation. Collapses vuesax radio, radio-card, radio-group and radio-group-cards into one component.'),
 		ui('spinner', 'alrein-ui Spinner', 'New — shadcn-svelte has no equivalent. §5 collapses vuesax spinner-grid and spinner-comet into one component with variant="arc" | "grid" | "comet". Speed is a first-class axis; the loop slows under reduced motion rather than stopping, because a frozen spinner claims the work has finished.', { fx: false }),
+
+		// Phase 2 — feedback and display.
+		ui('button-group', 'alrein-ui ButtonGroup', 'A strict superset of the shadcn-svelte ButtonGroup. Its §3.4 row constrains its children rather than itself: buttons in a group may be painted and may not move. Enforced through the existing density scope, set on the group\'s own element because an FxScope wrapper would break the joined-edge selectors.'),
+		ui('alert', 'alrein-ui Alert', 'A strict superset of the shadcn-svelte Alert. All sub-components intact; adds ghost, warning and success variants plus gradient, glow (danger/warn only) and a shimmer that runs once on mount.'),
+		ui('avatar', 'alrein-ui Avatar', 'A strict superset of the shadcn-svelte Avatar, all six sub-components intact. Adds size, presence, a loading shimmer, a fallback gradient and tilt at size >= lg. The presence glow is never the only signal of state.'),
+		ui('tooltip', 'alrein-ui Tooltip', 'A strict superset of the shadcn-svelte Tooltip. §3.4 grants it no effects at all; the extension is motion only, moved onto the shared data-[state] utilities so it reads the same tokens as everything else.', { fx: false }),
+		ui('skeleton', 'alrein-ui Skeleton', 'A strict superset of the shadcn-svelte Skeleton. Adds the loading shimmer — the one place the idle loop belongs — and a Group that runs a single light across every bone instead of one per element.'),
+		ui('chip', 'alrein-ui Chip', 'New — shadcn-svelte has no equivalent. Selectable and removable, with a real focusable remove button. §3.4 grants ghost and gradient and nothing else, because chips travel in packs.'),
+		ui('rating', 'alrein-ui Rating', 'New — shadcn-svelte has no equivalent. Built on bits-ui RatingGroup so arrow keys, form association and announcement come for free. Adds variant="emoji", half steps and a value display. No decorative effects.', { fx: false }),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

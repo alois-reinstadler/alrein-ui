@@ -536,6 +536,254 @@
 			]
 		},
 		{
+			"name": "button-group",
+			"type": "registry:ui",
+			"title": "alrein-ui ButtonGroup",
+			"description": "A strict superset of the shadcn-svelte ButtonGroup. Its §3.4 row constrains its children rather than itself: buttons in a group may be painted and may not move. Enforced through the existing density scope, set on the group's own element because an FxScope wrapper would break the joined-edge selectors.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/button-group/button-group-separator.svelte",
+					"type": "registry:ui",
+					"target": "button-group/button-group-separator.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/button-group/button-group-text.svelte",
+					"type": "registry:ui",
+					"target": "button-group/button-group-text.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/button-group/button-group.svelte",
+					"type": "registry:ui",
+					"target": "button-group/button-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/button-group/index.ts",
+					"type": "registry:ui",
+					"target": "button-group/index.ts"
+				}
+			]
+		},
+		{
+			"name": "alert",
+			"type": "registry:ui",
+			"title": "alrein-ui Alert",
+			"description": "A strict superset of the shadcn-svelte Alert. All sub-components intact; adds ghost, warning and success variants plus gradient, glow (danger/warn only) and a shimmer that runs once on mount.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/alert/alert-action.svelte",
+					"type": "registry:ui",
+					"target": "alert/alert-action.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/alert/alert-description.svelte",
+					"type": "registry:ui",
+					"target": "alert/alert-description.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/alert/alert-title.svelte",
+					"type": "registry:ui",
+					"target": "alert/alert-title.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/alert/alert.svelte",
+					"type": "registry:ui",
+					"target": "alert/alert.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/alert/index.ts",
+					"type": "registry:ui",
+					"target": "alert/index.ts"
+				}
+			]
+		},
+		{
+			"name": "avatar",
+			"type": "registry:ui",
+			"title": "alrein-ui Avatar",
+			"description": "A strict superset of the shadcn-svelte Avatar, all six sub-components intact. Adds size, presence, a loading shimmer, a fallback gradient and tilt at size >= lg. The presence glow is never the only signal of state.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/avatar/avatar-badge.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar-badge.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/avatar-fallback.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar-fallback.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/avatar-group-count.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar-group-count.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/avatar-group.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/avatar-image.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar-image.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/avatar.svelte",
+					"type": "registry:ui",
+					"target": "avatar/avatar.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/avatar/index.ts",
+					"type": "registry:ui",
+					"target": "avatar/index.ts"
+				}
+			]
+		},
+		{
+			"name": "tooltip",
+			"type": "registry:ui",
+			"title": "alrein-ui Tooltip",
+			"description": "A strict superset of the shadcn-svelte Tooltip. §3.4 grants it no effects at all; the extension is motion only, moved onto the shared data-[state] utilities so it reads the same tokens as everything else.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/tooltip/index.ts",
+					"type": "registry:ui",
+					"target": "tooltip/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/tooltip/tooltip-content.svelte",
+					"type": "registry:ui",
+					"target": "tooltip/tooltip-content.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tooltip/tooltip-portal.svelte",
+					"type": "registry:ui",
+					"target": "tooltip/tooltip-portal.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tooltip/tooltip-provider.svelte",
+					"type": "registry:ui",
+					"target": "tooltip/tooltip-provider.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tooltip/tooltip-trigger.svelte",
+					"type": "registry:ui",
+					"target": "tooltip/tooltip-trigger.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/tooltip/tooltip.svelte",
+					"type": "registry:ui",
+					"target": "tooltip/tooltip.svelte"
+				}
+			]
+		},
+		{
+			"name": "skeleton",
+			"type": "registry:ui",
+			"title": "alrein-ui Skeleton",
+			"description": "A strict superset of the shadcn-svelte Skeleton. Adds the loading shimmer — the one place the idle loop belongs — and a Group that runs a single light across every bone instead of one per element.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/skeleton/index.ts",
+					"type": "registry:ui",
+					"target": "skeleton/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/skeleton/skeleton-group.svelte",
+					"type": "registry:ui",
+					"target": "skeleton/skeleton-group.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/skeleton/skeleton.svelte",
+					"type": "registry:ui",
+					"target": "skeleton/skeleton.svelte"
+				}
+			]
+		},
+		{
+			"name": "chip",
+			"type": "registry:ui",
+			"title": "alrein-ui Chip",
+			"description": "New — shadcn-svelte has no equivalent. Selectable and removable, with a real focusable remove button. §3.4 grants ghost and gradient and nothing else, because chips travel in packs.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/chip/chip.svelte",
+					"type": "registry:ui",
+					"target": "chip/chip.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/chip/index.ts",
+					"type": "registry:ui",
+					"target": "chip/index.ts"
+				}
+			]
+		},
+		{
+			"name": "rating",
+			"type": "registry:ui",
+			"title": "alrein-ui Rating",
+			"description": "New — shadcn-svelte has no equivalent. Built on bits-ui RatingGroup so arrow keys, form association and announcement come for free. Adds variant=\"emoji\", half steps and a value display. No decorative effects.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/rating/index.ts",
+					"type": "registry:ui",
+					"target": "rating/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/rating/rating.svelte",
+					"type": "registry:ui",
+					"target": "rating/rating.svelte"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",
