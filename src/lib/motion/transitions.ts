@@ -313,8 +313,20 @@ export interface CollapseParams extends MotionParams {
  * show where the surrounding content is going. There is no transform-only
  * equivalent — `scale-y` would squash the text and leave the gap behind.
  *
- * Also the reason this exists as a Svelte transition rather than a CSS class
- * (SPEC.md A4): the natural height has to be measured at run time.
+ * ## Prefer `fx-collapse` (A21)
+ *
+ * There is a second collapse in this library, and for most cases it is the right
+ * one: the `fx-collapse` utility in `styles/alrein/motion.css`, which animates
+ * `grid-template-rows: 0fr ↔ 1fr` on a wrapper. It needs **no measurement**, and
+ * therefore no `transitionend` listener and no timeout guard (A22) — and it
+ * tracks content resizing for free, because the `1fr` is resolved by layout on
+ * every frame rather than captured once when the transition starts. An image
+ * that loads inside an open accordion panel leaves this function's captured
+ * height stale; it does not affect `fx-collapse` at all.
+ *
+ * Reach for *this* one only when the element is mounted and unmounted by Svelte
+ * (`{#if}`) rather than toggled by a `data-state` attribute, since a CSS
+ * transition has nothing to run on an element that no longer exists.
  *
  * Padding, margin and border widths on the collapsing axis are animated with the
  * height so the panel does not keep a residual band of chrome at t = 0.

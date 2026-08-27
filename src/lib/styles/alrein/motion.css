@@ -314,6 +314,11 @@
  * The source overshoots this transition (1.8, and 2.2 in one skin). **Declined**
  * (A21): `0fr` overshooting past `1fr` means the panel opens taller than its own
  * content and settles back, which reads as the layout being unsure of itself.
+ *
+ * The `collapse()` Svelte transition in `motion/transitions.ts` is the other
+ * half of this pair. Use that one only when Svelte mounts and unmounts the
+ * element with `{#if}`, since a CSS transition has nothing to run on an element
+ * that has been removed. Everywhere a `data-state` attribute toggles, use this.
  */
 @utility fx-collapse {
 	display: grid;
