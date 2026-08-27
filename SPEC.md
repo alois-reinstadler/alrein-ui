@@ -547,3 +547,46 @@ Full reasoning in `SUBSTRATE.md`.
   tokens (`--fx-*`: glow tint/radius, tilt max, magnet max, shimmer duration). Nothing that could
   be a Tailwind utility becomes a custom property. (Maintainer, 2026-08-27. Reinforces `A2`,
   closes `F15`.)
+
+### Phase 1 amendments (from the vuesax source digest, `references/VUESAX-INTENT.md`)
+
+- **A10 — Press stays a flat scale; the vuesax 3D press is not ported.** The source applies
+  `perspective(P) rotateX(−ny·A) rotateY(nx·B) scale(S)` — a tilt toward the cursor — to all six
+  form controls. It is a genuine signature, and it is declined for a structural reason: `perspective()`
+  creates a containing block for `position: fixed`, and press is *always on* (§3.1). Every button
+  that opens a dropdown, every select trigger, every popover trigger would anchor its portal to a
+  transformed ancestor and land in the wrong place. That is the exact hazard §3.5 documents for
+  tilt, and it is why tilt is withheld from anything with a trigger. §2 already specifies press as
+  "scale down/up", so this follows the spec rather than the source.
+- **A11 — Overshoot stays at exactly two sites.** The source has a *third*: the checkbox/radio
+  **label** springs back over 620ms on an explicit `linear()` damped spring peaking at 1.15. Not
+  ported. Extending the allowance from two mechanics to three is precisely the creep that ended in
+  124 spring uses across 30 components (`F6`). The thumb pop itself (`0.86 → 1.14 → 1`) is ported in
+  character, at our scale rather than the source's 420ms.
+- **A12 — The three vuesax overshoots on layout properties are not ported.** The floating label's
+  `max-width`, RadioGroup's indicator `width`/`height`, and Select's menu `height` morph all
+  overshoot a layout property. §1 forbids it. `MorphIndicator` therefore overshoots transform only
+  and interpolates size linearly — which is what FLIP does anyway.
+- **A13 — Select's trigger→menu morph is not ported.** It animates `height` over 560ms, drives
+  itself with inline styles plus a `transitionend` listener and a timeout fallback, and §3.4 gives
+  Select no effects at all. The menu uses the `data-[state]` utilities in `motion.css` like every
+  other bits-ui surface. **The one idea worth stealing is the close handoff**: the real trigger
+  reappears already carrying a blur that then clears, so the swap is never visible. That is a
+  `filter`, not a layout change, and it is portable — recorded here for Phase 2's popovers.
+- **A14 — Select's glow is not ported.** The source has it on by default; §3.4 gives Select no glow,
+  and §3.5 forbids glow on form fields outright because users read a glow on focus as an error
+  state.
+- **A15 — The vuesax accessibility defects are not inherited.** The source makes Input's clear and
+  password-reveal buttons `tabIndex = -1` (mouse-only), never wires the hint through
+  `aria-describedby`, and labels with a bare `aria-label`. alrein-ui uses a real `<label>`, real
+  focusable buttons, and a real `aria-describedby` chain. Behaviour that bits-ui already owns —
+  the switch's absolute arrow keys, RadioGroup's auto-select on arrow, indeterminate → checked —
+  is left to bits-ui rather than re-implemented (`F14`). **Deferred:** the switch's pointer-drag
+  gesture. It is not in §5's collapse list and it would mean hand-rolling pointer handling on a
+  control bits-ui owns.
+- **A16 — The floating label is structure, not an effect.** It is a `<fieldset>` with a zero-height
+  `<legend>` whose `max-width` animates, cutting a real gap in the top border rather than painting
+  an opaque backing. That animates a layout property, and it gets the same carve-out as `collapse`:
+  the layout change *is* the thing being animated, not a decoration over one. `check-layout-safety`
+  only polices the effect layer, so this is out of its scope by construction — but say so in the
+  source where it appears, or a reviewer will read it as an `F11` violation.

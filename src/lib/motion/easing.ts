@@ -74,12 +74,25 @@ const FALLBACK_BLUR_PX = 4;
 /**
  * Resolved token values, keyed by custom-property name.
  *
- * Deliberately never invalidated. A reload is the only thing that can change the
- * motion scale in practice, and an invalidation hook would mean either a media
- * query listener per module (the `F8` copy-paste failure) or a `getComputedStyle`
- * call per animation frame (the `F10` one).
+ * Cached because `getComputedStyle` is not free and a transition may start on
+ * any frame — reading per animation is the `F10` failure. The cache is cleared
+ * on exactly one signal: a change to `prefers-reduced-motion`, which is the only
+ * thing that moves the scale without a reload.
+ *
+ * That listener is registered **once for the module**, not once per component.
+ * The prior attempt copy-pasted a reduced-motion check into 124 places (`F8`);
+ * one listener that invalidates one cache is the opposite of that.
+ *
+ * Without this, `prefers-reduced-motion` toggled at runtime would collapse the
+ * CSS half (which re-resolves `var(--transition-duration-*)` live) while the
+ * Svelte transition functions kept their pre-change numbers — the two halves
+ * disagreeing is precisely what this module exists to prevent.
  */
 const tokenCache = new Map<string, number>();
+
+if (typeof matchMedia === 'function') {
+	matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => tokenCache.clear());
+}
 
 /** `null` outside the browser, which is also the signal to use a fallback. */
 function readRawToken(property: string): string | null {
