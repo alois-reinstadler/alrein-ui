@@ -64,6 +64,13 @@
 	--fx-shimmer-duration: 900ms;
 
 	/*
+	 * The other loop. Same A17 rule as the shimmer: under reduced motion it slows
+	 * rather than stops, because a frozen spinner asserts that the request has
+	 * finished. 900ms matches the source's base arc; the `speed` prop scales it.
+	 */
+	--fx-spin-duration: 900ms;
+
+	/*
 	 * The triggered attention sweep, which is a different thing from the loop and
 	 * needs its own token precisely *because* of the reduced-motion rule above.
 	 * The loop slows because stopping it would lie; the sweep is decoration, so
@@ -96,6 +103,7 @@
 		--transition-duration-slow: 1ms;
 		--fx-fade-duration: 100ms;
 		--fx-shimmer-duration: 3000ms;
+		--fx-spin-duration: 2400ms;
 		--fx-shimmer-sweep-duration: 0ms;
 	}
 }

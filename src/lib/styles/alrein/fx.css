@@ -244,6 +244,35 @@
 	background-position: var(--fx-shimmer-position) 0;
 }
 
+/*
+ * Loading-indicator keyframes.
+ *
+ * These live beside the shimmer loop rather than in a component's own `<style>`
+ * block for one reason: a scoped style block makes Svelte stamp its hash class
+ * onto every element in the file, which changes the rendered class attribute of
+ * anything that also has to stay byte-identical to upstream. Keyframes are
+ * global anyway, so there is nothing to scope.
+ *
+ * Both read `--spin`, which the Spinner's `speed` variant derives from
+ * `--fx-spin-duration` — so A17's reduced-motion slowdown reaches every speed
+ * from one place.
+ */
+@keyframes spinner-turn {
+	to {
+		rotate: 360deg;
+	}
+}
+
+@keyframes spinner-fade {
+	0%,
+	100% {
+		opacity: 0.2;
+	}
+	40% {
+		opacity: 1;
+	}
+}
+
 @keyframes fx-shimmer-sweep {
 	from {
 		background-position: -150% 0;
