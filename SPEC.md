@@ -538,3 +538,12 @@ Full reasoning in `SUBSTRATE.md`.
   evaluated inside the pointer engine loop, or attachments tear down on every `data-fx` change.
 - **A8 — Registry is served from the GitHub repo** (GitHub Pages). Phase 0 additionally proves
   `shadcn-svelte add` end-to-end against a local static server.
+- **A9 — Size, spacing and colour come from shadcn-svelte, not vuesax.** Supersedes the `--ctrl-*`
+  block in §2, which is **withdrawn entirely** (not merely scoped to new components as A1 said).
+  Heights, padding, radii, font sizes and colours all resolve to shadcn's Tailwind scale and token
+  set: `h-9`, `px-2.5`, `rounded-md`, `--radius`, `--primary`, `--muted`, `--ring`, … New
+  components pick the nearest shadcn size rather than inventing one. **New CSS variables are added
+  only where shadcn has no equivalent** — the motion scale (`--dur-*`, `--ease-*`) and the effect
+  tokens (`--fx-*`: glow tint/radius, tilt max, magnet max, shimmer duration). Nothing that could
+  be a Tailwind utility becomes a custom property. (Maintainer, 2026-08-27. Reinforces `A2`,
+  closes `F15`.)
