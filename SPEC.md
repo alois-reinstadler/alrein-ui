@@ -653,3 +653,24 @@ Full reasoning in `SUBSTRATE.md`.
   scales its proximity radius to the element: Rating star 90px, Tabs and Pagination 96, Breadcrumb
   120, Avatar and Chip 160, Timeline 200, Accordion 220, Alert 240, Sidebar 320. Any component
   larger than a Button that is granted glow must pass its own radius rather than inherit the token.
+- **A24 — Accessibility gaps in the source that must not be inherited (Phase 2/3).** Recorded here
+  because each one looks like a design choice in the shadow CSS and is not.
+  - **Pagination has no keyboard handling at all.** Every page number is a tab stop, and with no
+    ellipsis handling a hundred-page set is a hundred stops. It needs a roving tabindex — which is
+    bits-ui's job, not ours (`F14`), so check `bits-ui` first and only hand-roll if it genuinely has
+    nothing.
+  - **Tabs declares `role="tablist"` and `role="tab"` with no panels and no `aria-controls`.** A tab
+    that controls nothing is a lie to a screen reader. Either wire the panels properly or do not
+    claim the roles.
+  - **Rating puts `role="slider"` on the wrapper *and* keeps focusable `<button>` stars.** That is
+    invalid — a slider has one focusable element with a value, not N children. The correct native
+    shape is a radio group, which brings arrow-key navigation, form association and announcement
+    for free.
+  - **No Phase 3 component persists state**, so Sidebar's collapsed rail flashes open on first paint
+    after a reload. Whatever we do about that, it has to be decided rather than discovered.
+- **A25 — `MorphIndicator` must re-measure on two signals besides selection.** A container resize,
+  caught by a `ResizeObserver` on the offset parent — not a `window` resize listener, because the
+  container can change without the window and `pointer.svelte.ts` owns window-level listeners. And
+  `document.fonts.ready`, because text measured against a fallback font is measured wrong and a
+  `ResizeObserver` on the *track* does not see it: the track's box often does not change, only the
+  item inside it. The source re-measures four ways for exactly this reason.

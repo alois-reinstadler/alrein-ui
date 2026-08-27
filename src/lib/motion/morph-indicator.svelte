@@ -56,6 +56,22 @@
 	/** The box we last placed the indicator at, in offset-parent coordinates. */
 	let previous: { x: number; y: number; width: number; height: number } | null = null;
 
+	/**
+	 * Bumped to force a re-measure without the target changing.
+	 *
+	 * Two things move an indicator without anyone selecting anything, and both
+	 * would otherwise leave it stale under the wrong tab:
+	 *
+	 * - **The container resizes.** A `ResizeObserver` on the offset parent catches
+	 *   it. Not a `window` resize listener: the container can change size without
+	 *   the window doing so, and `pointer.svelte.ts` owns window-level listeners.
+	 * - **A web font arrives late.** Text reflows after first paint, so a tab
+	 *   measured against the fallback font is measured wrong. `document.fonts.ready`
+	 *   is the signal, and a `ResizeObserver` on the *track* does not see it,
+	 *   because the track's own box often does not change — only the tab inside it.
+	 */
+	let remeasure = $state(0);
+
 	/*
 	 * An `$effect` rather than a `$derived` because this is genuinely imperative:
 	 * it measures live layout and drives an animation. §1 asks for `$effect` to be
@@ -63,7 +79,31 @@
 	 */
 	$effect(() => {
 		const node = ref;
+		if (!node) return;
+		const parent = node.offsetParent;
+		if (!(parent instanceof HTMLElement)) return;
+
+		const observer = new ResizeObserver(() => (remeasure += 1));
+		observer.observe(parent);
+		return () => observer.disconnect();
+	});
+
+	$effect(() => {
+		if (typeof document === 'undefined' || !document.fonts) return;
+		let live = true;
+		void document.fonts.ready.then(() => {
+			if (live) remeasure += 1;
+		});
+		return () => {
+			live = false;
+		};
+	});
+
+	$effect(() => {
+		const node = ref;
 		const active = target;
+		// Read so a resize or a late font re-runs this placement.
+		remeasure;
 		if (!node) return;
 
 		if (!active) {
