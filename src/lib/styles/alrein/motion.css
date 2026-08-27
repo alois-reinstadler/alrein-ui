@@ -278,3 +278,65 @@
 		animation: fx-scale-fade-out var(--transition-duration-fast) var(--ease-fx-in) both;
 	}
 }
+
+/**
+ * collapse — the CSS half, and per A21 the one that should be reached for first.
+ *
+ * `grid-template-rows: 0fr → 1fr` on a wrapper whose single child is
+ * `overflow: hidden`. The whole mechanism is two class states and one
+ * transition:
+ *
+ *   <div class="fx-collapse" data-state={open ? "open" : "closed"}>
+ *     <div>…content…</div>
+ *   </div>
+ *
+ * ## Why this rather than an animated height
+ *
+ * A height animation has to know the height, which means measuring, which means
+ * a `transitionend` listener to clear the inline value and a timeout to guard
+ * against the listener never firing (A22). Three moving parts, and it breaks the
+ * moment the content resizes while open — a lazily-loaded image inside an
+ * accordion panel leaves the panel the wrong size until the next toggle.
+ *
+ * `0fr → 1fr` needs no measurement, no listener and no timer, and it tracks
+ * content resizing for free because the `1fr` is resolved by layout on every
+ * frame rather than captured once.
+ *
+ * ## Why this is not an `F11` violation
+ *
+ * It animates a layout property, and that is the **A16 carve-out**: the layout
+ * change *is* the animation, not a decoration draped over one — exactly like the
+ * floating label. `check-layout-safety` scopes to the effect layer, so this is
+ * out of its reach by construction rather than by exemption. Saying so here is
+ * what A16 asks for, because a reviewer who greps for animated layout properties
+ * will land on this line.
+ *
+ * The source overshoots this transition (1.8, and 2.2 in one skin). **Declined**
+ * (A21): `0fr` overshooting past `1fr` means the panel opens taller than its own
+ * content and settles back, which reads as the layout being unsure of itself.
+ */
+@utility fx-collapse {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--transition-duration-slow) var(--ease-fx-out);
+
+	& > * {
+		overflow: hidden;
+		/*
+		 * `min-height: 0` is load-bearing: a grid item's automatic minimum size is
+		 * its content, which would keep the row from ever reaching 0fr.
+		 */
+		min-height: 0;
+	}
+
+	&[data-state='open'] {
+		grid-template-rows: 1fr;
+	}
+
+	/* Exit one step faster than enter (§2), which is a plain token swap here. */
+	&[data-state='closed'] {
+		grid-template-rows: 0fr;
+		transition-duration: var(--transition-duration-base);
+		transition-timing-function: var(--ease-fx-in);
+	}
+}

@@ -13,3 +13,21 @@
 @import "./fx.css";
 @import "./press.css";
 @import "./motion.css";
+
+/*
+ * Force every effect utility into the build, whether or not anything currently
+ * uses it.
+ *
+ * Two reasons, and the second is the important one:
+ *
+ * 1. A consumer applies these by hand — `class="fx-glow fx-collapse"` on their
+ *    own markup — and Tailwind cannot see a class that only exists in an app it
+ *    is not scanning.
+ * 2. **`pnpm layout:check` reads the built stylesheet.** A utility that nothing
+ *    in this repo uses yet is tree-shaken out, so the check silently has nothing
+ *    to look at and passes. That is exactly what happened when `fx-collapse` was
+ *    added: it reported 32 rules and zero violations while the rule under review
+ *    was not in the file at all. A check that passes because it found nothing is
+ *    worse than no check.
+ */
+@source inline("fx-press fx-glow fx-glow-bloom fx-tilt fx-magnet fx-shimmer fx-shimmer-loading fx-gradient fx-content fx-collapse fx-fade fx-blur-fade fx-slide-up fx-slide-down fx-slide-left fx-slide-right fx-scale fx-scale-fade sq");

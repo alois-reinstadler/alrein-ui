@@ -52,6 +52,31 @@ const LAYOUT_PROPERTIES = new Set([
  */
 const TIMING_PROPERTIES = new Set(['transition', 'transition-property', 'animation', 'animation-name']);
 
+/**
+ * The A16 carve-outs: places where a layout property *is* the animation rather
+ * than a decoration draped over one.
+ *
+ * Enumerated here rather than allowed silently, because "this one is fine" is
+ * exactly the reasoning that turns a rule into a suggestion. Each entry needs a
+ * reason, and the reason has to also appear in the source file — A16's own
+ * instruction — so that a reviewer grepping for animated layout properties finds
+ * an explanation at both ends.
+ */
+const CARVE_OUTS = [
+	{
+		prefix: '.fx-collapse',
+		why:
+			'A21/A16 — `grid-template-rows: 0fr → 1fr` is the collapse itself, not an effect over ' +
+			'one. It is the alternative to an animated height, which would need a measurement, a ' +
+			'transitionend listener and a timeout guard, and would still break when the content ' +
+			'resizes while open.'
+	}
+];
+
+function carveOutFor(selector) {
+	return CARVE_OUTS.find((carveOut) => selector.startsWith(carveOut.prefix));
+}
+
 /** A rule is part of the effect layer if its selector mentions either of these. */
 function isEffectSelector(selector) {
 	return /\.fx-[a-z-]/.test(selector) || /\[data-fx[\]=]/.test(selector);
@@ -133,12 +158,18 @@ if (sheets.length === 0) {
 }
 
 const violations = [];
+const carvedOut = new Set();
 let effectRules = 0;
 
 for (const sheet of sheets) {
 	const css = await readFile(sheet, 'utf8');
 	for (const { selector, body } of splitRules(css)) {
 		if (!isEffectSelector(selector)) continue;
+		const carveOut = carveOutFor(selector);
+		if (carveOut) {
+			carvedOut.add(carveOut.prefix);
+			continue;
+		}
 		effectRules += 1;
 		const outOfFlow = isOutOfFlow(body);
 
@@ -189,3 +220,19 @@ console.log(
 	`layout-safety OK — ${effectRules} effect rule(s) checked across ${sheets.length} stylesheet(s), ` +
 		'none touch the layout box'
 );
+
+for (const prefix of carvedOut) {
+	const { why } = CARVE_OUTS.find((carveOut) => carveOut.prefix === prefix);
+	console.log(`  carve-out: ${prefix} — ${why}`);
+}
+
+// A carve-out that no longer appears in the stylesheet is a stale exemption, and
+// a stale exemption is how a rule quietly stops covering something.
+const stale = CARVE_OUTS.filter((carveOut) => !carvedOut.has(carveOut.prefix));
+if (stale.length > 0) {
+	console.error(
+		`\nlayout-safety: ${stale.length} carve-out(s) matched nothing and should be removed:\n` +
+			stale.map((carveOut) => `  ${carveOut.prefix}`).join('\n')
+	);
+	process.exit(1);
+}
