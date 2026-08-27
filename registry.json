@@ -385,7 +385,8 @@
 			],
 			"registryDependencies": [
 				"local:theme",
-				"local:field"
+				"local:field",
+				"local:spinner"
 			],
 			"files": [
 				{

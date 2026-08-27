@@ -96,6 +96,7 @@
 	is no swap to conceal. See the note in `select-content.svelte`.
 -->
 <script lang="ts">
+	import { Spinner } from "$lib/components/ui/spinner/index.js";
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { cn } from "$lib/utils.js";
 	import { getFloatingFieldId } from "../field/floating-context.svelte.js";
@@ -208,43 +209,20 @@
 	{@render children?.()}
 	{#if loading}
 		<!--
-			TODO(phase-2): replace with the shared `Spinner` component. §5 schedules
-			it for Phase 2 and it does not exist yet; this is the smallest thing that
-			can stand in for it without inventing a second spinner API that would
-			then have to be unpicked. The rotation is one CSS animation reading
-			`--fx-shimmer-duration` — the loading-loop token — so it stops on its own
-			under `prefers-reduced-motion` with no second code path.
+			Spinner owns the loading-indicator wiring, including A17's rule that the
+			loop *slows* under reduced motion rather than stopping — a parked ring
+			claims the request has finished. It is `aria-hidden` here because the
+			trigger already carries `aria-busy`, and announcing the same fact twice
+			is worse than announcing it once.
 		-->
-		<svg
+		<Spinner
 			data-slot="select-trigger-spinner"
-			class="pointer-events-none size-4 shrink-0 text-muted-foreground"
-			viewBox="0 0 16 16"
-			fill="none"
 			aria-hidden="true"
-		>
-			<circle class="opacity-25" cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" />
-			<path d="M14 8a6 6 0 0 0-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-		</svg>
+			size="sm"
+			class="pointer-events-none shrink-0"
+		/>
 	{:else}
 		<ChevronDownIcon class="size-4 text-muted-foreground pointer-events-none" />
 	{/if}
 </SelectPrimitive.Trigger>
 
-<style>
-	/*
-	 * Scoped rather than a Tailwind utility because a keyframe is not expressible
-	 * as one, and `animate-spin` would hardcode Tailwind's own 1s. The duration is
-	 * a token reference, so the reduced-motion override in `tokens.css` (which
-	 * takes `--fx-shimmer-duration` to 0ms) stops the loop without this file
-	 * carrying its own media query.
-	 */
-	@keyframes select-trigger-spin {
-		to {
-			rotate: 360deg;
-		}
-	}
-
-	[data-slot='select-trigger-spinner'] {
-		animation: select-trigger-spin var(--fx-shimmer-duration) linear infinite;
-	}
-</style>
