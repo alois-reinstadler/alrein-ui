@@ -580,10 +580,18 @@ Full reasoning in `SUBSTRATE.md`.
   password-reveal buttons `tabIndex = -1` (mouse-only), never wires the hint through
   `aria-describedby`, and labels with a bare `aria-label`. alrein-ui uses a real `<label>`, real
   focusable buttons, and a real `aria-describedby` chain. Behaviour that bits-ui already owns —
-  the switch's absolute arrow keys, RadioGroup's auto-select on arrow, indeterminate → checked —
-  is left to bits-ui rather than re-implemented (`F14`). **Deferred:** the switch's pointer-drag
+  RadioGroup's auto-select on arrow, indeterminate → checked, and Select's typeahead and arrow
+  navigation — is left to bits-ui rather than re-implemented (`F14`). **Deferred:** the switch's pointer-drag
   gesture. It is not in §5's collapse list and it would mean hand-rolling pointer handling on a
   control bits-ui owns.
+
+  **Correction (verified against `bits-ui@2.19.0`, `dist/bits/switch/switch.svelte.js`):** this
+  amendment originally claimed bits-ui implements the switch's absolute arrow keys
+  (Right = on, Left = off). **It does not** — `SwitchRootState.onkeydown` handles `Enter` and
+  `Space` only. The behaviour is still not implemented here, for a better reason: the ARIA
+  Authoring Practices make arrow keys *optional* for a switch and Enter/Space mandatory, so
+  bits-ui is standards-correct, and hand-rolling keyboard handling on a control bits-ui owns is
+  exactly `F14`. If it is wanted it belongs upstream in bits-ui.
 - **A16 — The floating label is structure, not an effect.** It is a `<fieldset>` with a zero-height
   `<legend>` whose `max-width` animates, cutting a real gap in the top border rather than painting
   an opaque backing. That animates a layout property, and it gets the same carve-out as `collapse`:

@@ -10,7 +10,10 @@ here is **vuesax's own number, given only as a calibration data point** — our 
 press (flat scale), overshoot (two mechanics), and layout animation (banned); this document's job is to
 put every remaining case on the table so it can be declined explicitly rather than by omission.
 
-Source coverage: all thirteen located, six skins each (Spinner has ten, Sidebar six). No gaps.
+Source coverage: all thirteen located, five skins each (Spinner has ten, Sidebar and Tabs six). Two
+gaps, both minor: Accordion imports a shared `vs-fx.*.js` effects module that was **not** captured in
+the archive (its `FX_CSS` and `pressRipple` are referenced but unreadable), and the compiled Vue
+islands were not consulted except to confirm variant names.
 
 ---
 
@@ -820,16 +823,24 @@ the *identical* window-mask refinement. **This is one primitive, and it is `Morp
   Net: **the source's indicators depend on animating size, and the dependency is recoverable.** FLIP
   with a counter-scaled child reproduces every one of them except the pseudo-element shoulders.
 
-**One press primitive, still copy-pasted.** Pagination's nav arrows carry the identical
-`perspective(P) rotateX rotateY scale` formula from Phase 1 (`420/9/7/0.9`), and Accordion headers,
-Chip, Tabs and Avatar all sink on `:active` with a flat scale (0.985 / 0.94 / 0.92 / 0.96). A10 already
-chose the flat scale; Phase 2/3 confirms the source itself uses the flat version more often than the
-tilt.
+**The press primitive is still copy-pasted, and the tilt is more widespread than Phase 1 suggested.**
+Three more components carry the identical `perspective(P) rotateX(−ny·A) rotateY(nx·B) scale(S)`
+formula with the same `1 − 0.2 × min(|nx|,|ny|)` damping: **Avatar** `320/14/10/0.94`, **Breadcrumb**
+`420/12/9/0.93`, **Pagination** `420/9/7/0.9`. That is nine of nineteen components. A10 declined it for
+a structural reason and that reason holds harder here — Avatar and Pagination buttons routinely host
+tooltips. Meanwhile Chip, Tabs, Accordion and Rating sink with a **flat scale** (0.95 / 0.92 / 0.985 /
+0.82), which is what A10 chose, so the flat version is already the source's own majority.
 
 **One ripple emitter, still copy-pasted.** Alert (close button), Avatar, Chip, Rating, Steps, Tabs and
 Pagination all compute `hypot(max(x, w−x), max(y, h−y)) × 2`, spawn at the pointer, remove on
-`animationend`, and bail under reduced motion. Durations drift — 640 / 720 / 780 ms — with no visible
-reason. One attachment, one token.
+`animationend`, cap the pool at **6** (Rating: 3), and bail under reduced motion in JS. Durations drift
+— 640 / 720 / 780 ms — with no visible reason. Tabs alone multiplies the radius by 0.7 and only ripples
+in the `solid` variant. One attachment, one token.
+
+**Proximity-glow radii, as calibration.** The same engine, nine different radii, scaled to the
+element: Rating star **90 px**, Tabs and Pagination **96**, Breadcrumb **120**, Avatar and Chip **160**,
+Timeline **200**, Accordion **220**, Alert **240**, Sidebar **320**. If we ever ship a glow on something
+larger than a Button, `--fx-glow-radius: 180px` is a Button-sized number, not a universal one.
 
 **The 1820 ms water-drop is a third-time pattern.** Checkbox label (Phase 1), Tabs and Breadcrumb all
 clone their own text, paint a double expanding radial ring through `background-clip: text`, and run it
@@ -855,6 +866,14 @@ none / opacity-only at ~120–200 ms — the default, used by Tooltip, Accordion
 indicator asserts something false. (c) **Branch in JS before writing any inline style** — Tabs `chrome`
 skips its spring sampling entirely and just sets the final transform and width. Our §3.2 chain covers
 (a) and (c); **(b) needs to be added as an explicit exception for loading indicators.**
+
+**Only three files guard a transition with a timeout fallback**, and every one of them is animating a
+*measured* value: Sidebar's flyout (380 ms enter / 220 ms leave), Sidebar `classic`'s flyout (500 ms),
+Pagination `compact`'s digit reel (600 ms, filtered on `propertyName === "transform"`). Everywhere the
+animation is a pure class toggle over CSS-declared values — all six accordions, every indicator — there
+is no listener at all, because there is nothing to clean up. That is the honest rule A13 was reaching
+for: **the fallback is needed exactly where a measurement is, and nowhere else.** Correspondingly, only
+`tabs-chrome` uses the Web Animations API, and no component in either phase uses a `MutationObserver`.
 
 **Enter/exit asymmetry is not uniform, and one case inverts.** Steps reverses the *order* of its chain
 rather than the timing. Sidebar's submenu uses anticipation to close and overshoot to open. Tooltip's
@@ -889,7 +908,7 @@ Every place these thirteen animate `width` · `height` · `padding` · `margin` 
 | 6 | **Rating** `bars` skin | `height` of the fill | 240 ms `--ease-out` | Re-express: `scaleY` with `transform-origin: bottom`, or `clip-path` like every other rating skin. |
 | 7 | **Steps** `pills` skin | `flex-grow`, `padding` | 460 ms `(0.34, 1.4, 0.64, 1)` / 300 ms | Decline. |
 | 8 | **Steps** `pills` skin | `max-width: 0 → 240px` (label reveal) | 460 ms `(0.34, 1.4, 0.64, 1)` | Decline, or re-express as opacity + `translateX`. |
-| 9 | **Steps** `bar` skin | `width` of the fill | 520 ms `--ease-out` | Re-express: `scaleX`, `transform-origin: left`. The base component already does exactly this. |
+| 9 | **Steps** `bar` skin | `width` of the fill (%), plus `left` (%) written per node | 520 ms `--ease-out` | Re-express: `scaleX`, `transform-origin: left`. The base component already does exactly this. The per-node `left` is static positioning, not animated — that part is fine. |
 | 10 | **Tabs** base | indicator `width` + mask `width` | 420 ms `(0.34, 1.4, 0.64, 1)` | Re-express: FLIP `scaleX` + counter-scaled inner strip (§15). |
 | 11 | **Tabs** `chrome` | sled `width`, per-keyframe px, WAAPI | two sampled springs, `easing: linear` | Re-express: `translateX` on the leading spring, `scaleX` on the trailing. Naturally FLIP-shaped. |
 | 12 | **Tabs** `gooey` | indicator `width` | 460 ms `(0.5, 1.5, 0.5, 1)` | Re-express as `scaleX`; the stretch is the point and `scaleX` gives it for free. |
@@ -907,12 +926,16 @@ Every place these thirteen animate `width` · `height` · `padding` · `margin` 
 | 24 | **Sidebar** `.sb__hl` | `width`, `height` | 260 ms `--ease-out` | Re-express: MorphIndicator FLIP; in a uniform list both are constant anyway. |
 | 25 | **Sidebar** `rail` `.seg__pill` | `height` | 620 ms `(0.34, 1.8, 0.5, 1)` | Re-express: FLIP vertical. |
 | 26 | **Sidebar** submenus (base, `rail`, `glow`, `gradient`) | `grid-template-rows: 0fr → 1fr` | open 560 ms `(0.34, 1.8, 0.5, 1)`; close 500 ms `(0.5, -0.6, 0.5, 1)` | **A16 carve-out** for the mechanism; decline both the overshoot and the anticipation. |
-| 27 | **Timeline** `gradient` | rail fill `height`; head puck `margin-top` | 620 ms `--ease-out` (both) | Re-express: `scaleY` from the top for the fill, `translateY` for the puck. |
+| 27 | **Timeline** `gradient` | rail fill `height` (px branch via `--fill`, % branch via inline `style.height`); head puck `margin-top` | 620 ms `--ease-out` (both) | Re-express: `scaleY` from the top for the fill, `translateY` for the puck. Keep the measurement (marker centres, interpolated by the fractional part of `progress`) — it is what makes the fill stop *between* dots. |
 | 28 | **Timeline** `alternating` | spine fill `height` | 480 ms `--ease-out` | Re-express: `scaleY`, `transform-origin: top`. |
 
 **Clean — no layout animation anywhere in the component or its skins:** Chip, Spinner, Skeleton,
-Breadcrumb (the collapse reveal is `translateX` + opacity), Timeline base, Tabs `bubble` (fixed 8 px
-dot) and `card`.
+Breadcrumb (the collapse reveal is `translateX` + opacity), Timeline base and its `glow`/`cards`/
+`compact`/`alternating`-entrance paths, Tabs `bubble` (fixed 8 px dot) and `card`, Steps base and its
+`arrow`/`circular`/`timeline` skins, Sidebar `floating` and `minimal` (no collapse at all).
+Note that Pagination `dots` and `segments` do *no JS measurement* but still carry a CSS `width`
+transition, so they are in the table, not here — "no measurement" and "no layout animation" are
+different claims and the source separates them.
 
 **Note on the two carve-outs.** `grid-template-rows: 0fr ↔ 1fr` and the sidebar rail width are both
 cases where the layout change is the animation, exactly like the floating label in A16. They pass, but
