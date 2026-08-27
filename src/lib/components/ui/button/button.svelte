@@ -77,39 +77,56 @@
 	/** Variants that paint a surface, and therefore have something to gradient or glow from. */
 	export type ButtonSurfaceVariant = Exclude<ButtonVariant, "ghost" | "link">;
 
-	interface ButtonEffects {
-		/** Primary emphasis. Accent-derived stops, never a hardcoded pair. Requires a painted variant. */
-		gradient?: boolean;
-		/** "Highest-intent target on this surface." Pointer-tracked. Requires a painted variant. */
-		glow?: boolean;
+	/**
+	 * The effect props Button is allowed, conditioned on whether its variant
+	 * paints a surface.
+	 *
+	 * `ghost + gradient` and `ghost + glow` are contradictions — a transparent
+	 * surface has nothing to paint and nothing to glow from — so SPEC.md §3.5
+	 * requires them to be **type errors, not doc comments**. `link` is included
+	 * for the same reason.
+	 *
+	 * ## Why this is a conditional type and not a discriminated union
+	 *
+	 * The obvious encoding is `Base & ({variant?: Painted} & Effects | {variant:
+	 * "ghost"} & {gradient?: never})`. It works at a direct call site and breaks
+	 * everywhere else: `Omit<ComponentProps<typeof Button>, "href">` — which is
+	 * exactly what shadcn's own `InputGroupButton` does — collapses a union to the
+	 * intersection of its keys, and intersecting two branches with the full
+	 * `HTMLButtonAttributes & HTMLAnchorAttributes` surface produces "union type
+	 * that is too complex to represent".
+	 *
+	 * A wrapper component spreading props into Button is a normal shadcn pattern,
+	 * and §1's "an existing shadcn call site must compile unchanged" is the
+	 * stronger of the two rules. Keying the *effect props alone* off a generic
+	 * keeps the compile error where it is needed and leaves `ComponentProps` a
+	 * plain object that `Omit` and spreads handle without complaint.
+	 */
+	export type ButtonEffects<V extends ButtonVariant> = {
 		/** A finite attention sweep on hover. Not the loading loop — that is Skeleton's. */
 		shimmer?: boolean;
-		/** "A discrete object you can pick up." Needs a reasonable hit area, so size >= default. */
+		/** "A discrete object you can pick up." Needs a real hit area, so size >= default. */
 		tilt?: boolean;
 		/** The unmissable single CTA. `data-fx="expressive"` only, never in chrome, a form or a list. */
 		magnet?: boolean;
-	}
+	} & (V extends "ghost" | "link"
+		? { gradient?: never; glow?: never }
+		: {
+				/** Primary emphasis. Accent-derived stops, never a hardcoded pair. */
+				gradient?: boolean;
+				/** "Highest-intent target on this surface." Pointer-tracked. */
+				glow?: boolean;
+			});
 
 	type ButtonBase = WithElementRef<HTMLButtonAttributes> &
 		WithElementRef<HTMLAnchorAttributes> & { size?: ButtonSize };
 
-	/**
-	 * `ghost + gradient` and `ghost + glow` are contradictions — a transparent
-	 * surface has nothing to paint and nothing to glow from — so SPEC.md §3.5
-	 * requires them to be **type errors, not doc comments**. That is what this
-	 * union does: on `ghost` and `link` the two props are typed `never`.
-	 */
-	export type ButtonProps = ButtonBase &
-		(
-			| ({ variant?: ButtonSurfaceVariant } & ButtonEffects)
-			| ({ variant: "ghost" | "link"; gradient?: never; glow?: never } & Omit<
-					ButtonEffects,
-					"gradient" | "glow"
-			  >)
-		);
+	export type ButtonProps<V extends ButtonVariant = "default"> = ButtonBase & {
+		variant?: V;
+	} & ButtonEffects<V>;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="V extends ButtonVariant = 'default'">
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
 	import { magnet as magnetEffect } from "$lib/fx/magnet.js";
@@ -132,7 +149,7 @@
 		tilt,
 		magnet,
 		...restProps
-	}: ButtonProps = $props();
+	}: ButtonProps<V> = $props();
 
 	const fx = getFxContext();
 

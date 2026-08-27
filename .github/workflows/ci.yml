@@ -60,6 +60,11 @@ jobs:
       - name: Unit tests (SPEC.md §3.2 resolution order)
         run: pnpm test
 
+      # An upstream `shadcn-svelte add` can pull one of our extended components
+      # in as a registry dependency and silently overwrite it. This catches that.
+      - name: Supersets not reverted to upstream
+        run: pnpm supersets:check
+
       - name: Build registry
         run: pnpm registry:build
 

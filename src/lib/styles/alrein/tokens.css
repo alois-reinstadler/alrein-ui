@@ -80,6 +80,41 @@
 }
 
 /*
+ * Semantic state colours.
+ *
+ * shadcn-svelte ships `--destructive` but has no equivalent for "warning" or
+ * "success", and the vuesax form controls carry all three (`danger`, `warn`,
+ * `success`) as first-class states. A9 permits new variables exactly here: where
+ * shadcn has no equivalent. They are registered in the `--color-*` namespace, so
+ * they behave like every other shadcn colour — `text-success`, `bg-warning`,
+ * `border-warning/40` — rather than becoming a parallel system (`F15`).
+ *
+ * `--destructive` is deliberately *not* aliased to a `danger` name. The danger
+ * state uses shadcn's own token; inventing a synonym would be exactly the
+ * parallel-universe mistake.
+ */
+:root {
+	--success: oklch(0.596 0.145 163.2);
+	--success-foreground: oklch(0.985 0 0);
+	--warning: oklch(0.769 0.163 70.08);
+	--warning-foreground: oklch(0.216 0.03 70.08);
+}
+
+.dark {
+	--success: oklch(0.696 0.17 162.48);
+	--success-foreground: oklch(0.195 0.04 162.48);
+	--warning: oklch(0.828 0.189 84.43);
+	--warning-foreground: oklch(0.216 0.03 70.08);
+}
+
+@theme inline {
+	--color-success: var(--success);
+	--color-success-foreground: var(--success-foreground);
+	--color-warning: var(--warning);
+	--color-warning-foreground: var(--warning-foreground);
+}
+
+/*
  * Squircle (§2). Chromium 139+ gets a true superellipse; Safari and Firefox get
  * the plain border-radius that is already there. No SVG clip-path fallback — it
  * kills box-shadow, breaks glow bleed and mangles borders, which is exactly the

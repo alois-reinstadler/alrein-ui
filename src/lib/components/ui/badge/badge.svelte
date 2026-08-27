@@ -48,37 +48,39 @@
 	/** Variants that paint a surface, and therefore have something to gradient or glow from. */
 	export type BadgeSurfaceVariant = Exclude<BadgeVariant, "ghost" | "link" | "outline">;
 
-	interface BadgeEffects {
-		/** Promotional emphasis. Accent-derived stops. Requires a painted variant. */
-		gradient?: boolean;
-		/**
-		 * §3.4 restricts this to status-critical, i.e. `variant="destructive"`.
-		 * A glowing "New" badge is decoration; a glowing "Payment failed" badge is
-		 * a signal, and the matrix only pays for the second one.
-		 */
-		glow?: boolean;
+	/**
+	 * The effect props Badge is allowed, conditioned on whether its variant paints
+	 * a surface. `ghost`, `link` and `outline` have nothing to paint over — and in
+	 * `outline`'s case a gradient would erase the border it exists for — so §3.5
+	 * requires those combinations to be type errors.
+	 *
+	 * A conditional type rather than a discriminated union, for the same reason as
+	 * Button: a union collapses under `Omit<ComponentProps<typeof Badge>, …>`,
+	 * which is what a wrapper component does, and §1 makes not breaking an
+	 * existing call site the stronger rule. See `button.svelte` for the long form.
+	 */
+	export type BadgeEffects<V extends BadgeVariant> = {
 		/** A finite attention sweep on hover. Never the idle loop — that is Skeleton's. */
 		shimmer?: boolean;
-	}
+	} & (V extends "ghost" | "link" | "outline"
+		? { gradient?: never; glow?: never }
+		: {
+				/** Promotional emphasis. Accent-derived stops. */
+				gradient?: boolean;
+				/**
+				 * §3.4 restricts this to status-critical, i.e. `variant="destructive"`.
+				 * A glowing "New" badge is decoration; a glowing "Payment failed" badge
+				 * is a signal, and the matrix only pays for the second one.
+				 */
+				glow?: boolean;
+			});
 
-	type BadgeBase = WithElementRef<HTMLAnchorAttributes>;
-
-	/**
-	 * `ghost + gradient` and `ghost + glow` are contradictions, so §3.5 requires
-	 * them to be type errors. `outline` joins them: it is a bordered transparent
-	 * surface, so painting a gradient over it erases the border it exists for.
-	 */
-	export type BadgeProps = BadgeBase &
-		(
-			| ({ variant?: BadgeSurfaceVariant } & BadgeEffects)
-			| ({ variant: "ghost" | "link" | "outline"; gradient?: never; glow?: never } & Omit<
-					BadgeEffects,
-					"gradient" | "glow"
-			  >)
-		);
+	export type BadgeProps<V extends BadgeVariant = "default"> = WithElementRef<HTMLAnchorAttributes> & {
+		variant?: V;
+	} & BadgeEffects<V>;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="V extends BadgeVariant = 'default'">
 	import { cn, type WithElementRef } from "$lib/utils.js";
 	import type { HTMLAnchorAttributes } from "svelte/elements";
 	import { getFxContext } from "$lib/fx/context.svelte.js";
@@ -96,7 +98,7 @@
 		glow,
 		shimmer,
 		...restProps
-	}: BadgeProps = $props();
+	}: BadgeProps<V> = $props();
 
 	const fx = getFxContext();
 
