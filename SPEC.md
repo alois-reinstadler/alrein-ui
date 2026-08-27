@@ -674,3 +674,25 @@ Full reasoning in `SUBSTRATE.md`.
   `document.fonts.ready`, because text measured against a fallback font is measured wrong and a
   `ResizeObserver` on the *track* does not see it: the track's box often does not change, only the
   item inside it. The source re-measures four ways for exactly this reason.
+
+### Phase 4 dependency decisions (§5 requires these before Phase 4 starts)
+
+- **A26 — ColorPicker uses an internal OKLCH converter, not `culori`.** §5 offered either. The
+  deciding argument is what this project *is*: a registry ships **source into a consumer's
+  repository**, so a dependency here is a dependency every consumer inherits, for one component
+  most of them will not install. The conversions needed — OKLCH ↔ OKLab ↔ linear sRGB ↔ sRGB, plus
+  HSL and hex at the boundary — are well-defined matrix arithmetic, not a judgement call, and they
+  fit in well under 200 lines with the constants written out and cited. `culori` is a good library
+  and the right choice in an application; it is the wrong choice in a registry item.
+  OKLCH stays the internal space, matching Tailwind v4 and shadcn.
+- **A27 — Code and CodeWindow load Shiki lazily, from the web bundle, with a restricted language
+  set and a real `<pre>` fallback.** Shiki is the right highlighter and it is heavy — the full
+  bundle is megabytes of grammars. `shiki/bundle/web` with an explicit language allowlist, imported
+  with a dynamic `import()` only when a `Code` block actually mounts, keeps it off the critical path
+  entirely. **The SSR render is a plain, correctly-escaped `<pre><code>`**, which means the content
+  is readable and selectable before any highlighting arrives and remains so if it never does. Shiki
+  is a `dependencies` entry on those two registry items only, so installing `Button` does not pull a
+  syntax highlighter.
+- **A28 — Tabs `gooey` is optional and must not be the default.** §5 already says so. It needs an
+  SVG `feGaussianBlur` + `feColorMatrix` filter and must degrade to `chrome` under reduced motion.
+  If it ships, `chrome` remains the default variant.
