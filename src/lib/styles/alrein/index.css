@@ -1,0 +1,12 @@
+/**
+ * alrein-ui stylesheet entry point.
+ *
+ * Add one line to your app.css, below the shadcn-svelte imports:
+ *
+ *   @import "./lib/styles/alrein/index.css";
+ *
+ * Everything alrein-ui needs at the CSS level is reachable from here. The
+ * registry adds this import for you when you install any alrein-ui item.
+ */
+
+@import "./tokens.css";
