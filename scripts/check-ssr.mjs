@@ -23,7 +23,7 @@ const ROOT = resolve(import.meta.dirname, '..');
 // Vary the port so a stale server from a previous run cannot answer for us.
 const PORT = 4173 + Number(process.hrtime.bigint() % 200n);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/fx', '/button', '/card', '/badge'];
+const PAGES = ['/', '/fx', '/button', '/card', '/badge', '/input', '/textarea', '/checkbox', '/radio-group', '/switch', '/select', '/field'];
 const LEVELS = ['off', 'calm', 'expressive'];
 
 /** Effects the engine drives from a pointer. A server has none, so must a touch device. */
@@ -46,8 +46,20 @@ function markupOnly(html) {
 	return html.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/g, '');
 }
 
+/**
+ * Elements carrying `className` as a whole class token.
+ *
+ * Comparing tokens rather than pattern-matching inside the attribute, because a
+ * word boundary is not enough: `\bfx-shimmer\b` also matches inside
+ * `[animation-duration:var(--fx-shimmer-duration)]`, which is a *token* the
+ * loading spinner legitimately reads and not the shimmer effect at all.
+ */
 function classedElements(markup, className) {
-	return markup.match(new RegExp(`class="[^"]*\\b${className}\\b`, 'g')) ?? [];
+	const found = [];
+	for (const match of markup.matchAll(/class="([^"]*)"/g)) {
+		if (match[1].split(/\s+/).includes(className)) found.push(match[0]);
+	}
+	return found;
 }
 
 function scopeLevels(markup) {
@@ -113,10 +125,21 @@ try {
 				assert(found.length === 0, `no ${effect} in server markup (there is no pointer)`);
 			}
 
-			// §3.1: press is not opt-in. It stays in the markup at every level and
-			// degrades to colour and opacity in CSS at "off" — the class is the
-			// carrier, so removing it would be the wrong degradation.
-			assert(classedElements(markup, 'fx-press').length > 0, 'press is present at every level');
+			// §3.1: press is not opt-in. Where there is something pressable it stays
+			// in the markup at *every* level, including "off", where it degrades to
+			// colour and opacity in CSS — the class is the carrier, so removing it
+			// would be the wrong degradation.
+			//
+			// Conditional on there being a pressable element at all: a page of form
+			// fields has nothing to press, and Input deliberately has no press
+			// (§3.4 gives form fields no effects).
+			const pressable = (markup.match(/data-slot="(?:button|checkbox-card|radio-card|card)"/g) ?? []).length;
+			if (pressable > 0) {
+				assert(
+					classedElements(markup, 'fx-press').length > 0,
+					`press is present at every level (page has ${pressable} pressable element(s))`
+				);
+			}
 
 			if (level === 'off') {
 				// §3.2 step 1: dead, with no override possible. This is the CSS-only
