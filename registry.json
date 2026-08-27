@@ -784,6 +784,55 @@
 			]
 		},
 		{
+			"name": "steps",
+			"type": "registry:ui",
+			"title": "alrein-ui Steps",
+			"description": "New — shadcn-svelte has no equivalent. §5 collapses vuesax steps and steps-arrow into one component with a variant. Renders an ordered list rather than a row of buttons, because clicking a pending step does nothing and nothing unresponsive belongs in the tab order. §3.4 grants gradient on the active step and nothing else.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:fx"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/steps/index.ts",
+					"type": "registry:ui",
+					"target": "steps/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/steps/steps.svelte",
+					"type": "registry:ui",
+					"target": "steps/steps.svelte"
+				}
+			]
+		},
+		{
+			"name": "timeline",
+			"type": "registry:ui",
+			"title": "alrein-ui Timeline",
+			"description": "New — shadcn-svelte has no equivalent. §5 collapses timeline-compact into a variant. progress is a fractional index, so the rail fill can stop between two markers, which is the only thing worth measuring here. No decorative effects — §3.4 has no row for Timeline.",
+			"dependencies": [
+				"tailwind-variants"
+			],
+			"registryDependencies": [
+				"local:theme"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/timeline/index.ts",
+					"type": "registry:ui",
+					"target": "timeline/index.ts"
+				},
+				{
+					"path": "src/lib/components/ui/timeline/timeline.svelte",
+					"type": "registry:ui",
+					"target": "timeline/timeline.svelte"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",

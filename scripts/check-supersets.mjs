@@ -39,6 +39,8 @@ const SUPERSETS = [
 	'src/lib/components/ui/radio-group/radio-group-item.svelte',
 	'src/lib/components/ui/field/field.svelte',
 	'src/lib/components/ui/spinner/spinner.svelte',
+	'src/lib/components/ui/steps/steps.svelte',
+	'src/lib/components/ui/timeline/timeline.svelte',
 	'src/lib/components/ui/rating/rating.svelte',
 	'src/lib/components/ui/chip/chip.svelte',
 	'src/lib/components/ui/skeleton/skeleton-group.svelte',

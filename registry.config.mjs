@@ -95,6 +95,9 @@ export const registry = {
 		ui('skeleton', 'alrein-ui Skeleton', 'A strict superset of the shadcn-svelte Skeleton. Adds the loading shimmer — the one place the idle loop belongs — and a Group that runs a single light across every bone instead of one per element.'),
 		ui('chip', 'alrein-ui Chip', 'New — shadcn-svelte has no equivalent. Selectable and removable, with a real focusable remove button. §3.4 grants ghost and gradient and nothing else, because chips travel in packs.'),
 		ui('rating', 'alrein-ui Rating', 'New — shadcn-svelte has no equivalent. Built on bits-ui RatingGroup so arrow keys, form association and announcement come for free. Adds variant="emoji", half steps and a value display. No decorative effects.', { fx: false }),
+		// Phase 3 — navigation and structure.
+		ui('steps', 'alrein-ui Steps', 'New — shadcn-svelte has no equivalent. §5 collapses vuesax steps and steps-arrow into one component with a variant. Renders an ordered list rather than a row of buttons, because clicking a pending step does nothing and nothing unresponsive belongs in the tab order. §3.4 grants gradient on the active step and nothing else.'),
+		ui('timeline', 'alrein-ui Timeline', 'New — shadcn-svelte has no equivalent. §5 collapses timeline-compact into a variant. progress is a fractional index, so the rail fill can stop between two markers, which is the only thing worth measuring here. No decorative effects — §3.4 has no row for Timeline.', { fx: false }),
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

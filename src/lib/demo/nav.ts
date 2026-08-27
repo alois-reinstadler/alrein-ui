@@ -48,12 +48,12 @@ export const NAV: NavEntry[] = [
 
 	// Phase 3 — navigation/structure
 	{ slug: 'tabs', name: 'Tabs', phase: 3, status: 'planned', origin: 'extends', summary: 'variant="gooey" | "chrome", beide auf MorphIndicator.' },
-	{ slug: 'steps', name: 'Steps', phase: 3, status: 'planned', origin: 'new', summary: 'variant="line" | "arrow".' },
+	{ slug: 'steps', name: 'Steps', phase: 3, status: 'shipped', origin: 'new', summary: 'variant=\"line\" | \"arrow\", vertikal, mit gestaffelter Choreografie.' },
 	{ slug: 'accordion', name: 'Accordion', phase: 3, status: 'planned', origin: 'extends', summary: 'Gradient nur am Kopf, Glow am Auslöser.' },
 	{ slug: 'breadcrumb', name: 'Breadcrumb', phase: 3, status: 'planned', origin: 'extends', summary: 'Ghost.' },
 	{ slug: 'pagination', name: 'Pagination', phase: 3, status: 'planned', origin: 'extends', summary: 'variant="full" | "compact".' },
 	{ slug: 'sidebar', name: 'Sidebar', phase: 3, status: 'planned', origin: 'extends', summary: 'Ghost, plus MorphIndicator.' },
-	{ slug: 'timeline', name: 'Timeline', phase: 3, status: 'planned', origin: 'new', summary: 'variant="compact".' },
+	{ slug: 'timeline', name: 'Timeline', phase: 3, status: 'shipped', origin: 'new', summary: 'variant=\"compact\", Fortschritt hält zwischen zwei Markierungen.' },
 
 	// Phase 4 — complex
 	{ slug: 'color-picker', name: 'ColorPicker', phase: 4, status: 'planned', origin: 'new', summary: 'Sechs Skins auf einer gemeinsamen ColorState-Klasse.' },

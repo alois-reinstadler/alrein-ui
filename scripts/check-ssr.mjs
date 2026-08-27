@@ -23,7 +23,7 @@ const ROOT = resolve(import.meta.dirname, '..');
 // Vary the port so a stale server from a previous run cannot answer for us.
 const PORT = 4173 + Number(process.hrtime.bigint() % 200n);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/fx', '/button', '/card', '/badge', '/input', '/textarea', '/checkbox', '/radio-group', '/switch', '/select', '/field', '/spinner', '/alert', '/tooltip', '/avatar', '/skeleton', '/chip', '/rating', '/button-group'];
+const PAGES = ['/', '/fx', '/button', '/card', '/badge', '/input', '/textarea', '/checkbox', '/radio-group', '/switch', '/select', '/field', '/spinner', '/alert', '/tooltip', '/avatar', '/skeleton', '/chip', '/rating', '/button-group', '/steps', '/timeline'];
 const LEVELS = ['off', 'calm', 'expressive'];
 
 /** Effects the engine drives from a pointer. A server has none, so must a touch device. */
