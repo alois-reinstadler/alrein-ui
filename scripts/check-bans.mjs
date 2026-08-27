@@ -53,12 +53,24 @@ const TOKENS = "src/lib/styles/alrein/tokens.css";
  * onto one line. Minified script and minified CSS have no string literals to
  * collapse, so they still fire.
  *
- * HARD_LINE_LIMIT is the backstop for the resax case: 700 bytes/line average,
- * individual lines up to 2 996 characters (SPEC.md §8.1 F4). No legitimate
- * Tailwind class list gets near it.
+ * HARD_LINE_LIMIT is the backstop for a line that is long even after its string
+ * literals collapse — i.e. genuinely minified *code*, not a long class list.
+ *
+ * It has to clear the longest verbatim upstream Tailwind string we are required
+ * to ship byte-identical. Measured across the shadcn-svelte components in this
+ * repo: select-trigger 862, checkbox 732, switch 700, radio-group-item 676.
+ * 1200 leaves headroom for a longer upstream string without going anywhere near
+ * minified code — resax peaked at 2,996 characters on a single line and averaged
+ * ~700 across whole files, so both of those still trip.
+ *
+ * The 160-character *code* limit is the rule that actually does the work: after
+ * collapsing string literals, minified script and minified CSS stay long while a
+ * long class list shrinks to almost nothing. CSS gets the tighter raw limit
+ * because a stylesheet has no string literals to collapse.
  */
 const CODE_LINE_LIMIT = 160;
-const HARD_LINE_LIMIT = 700;
+const HARD_LINE_LIMIT = 1200;
+const HARD_LINE_LIMIT_CSS = 400;
 
 /**
  * The rules.
@@ -99,7 +111,14 @@ export const RULES = [
 			"The spring curve is restricted to press feedback and toggle thumbs only " +
 			"(switch thumb, checkbox mark). It overshoots, and overshoot anywhere else reads " +
 			"as slow and drunk in a data-dense screen.",
-		exclude: ["src/lib/fx/press.ts", "src/lib/styles/alrein/press.css", TOKENS],
+		exclude: ["src/lib/fx/press.ts",
+			"src/lib/styles/alrein/press.css",
+			// Toggle thumbs — the second and only other site SPEC.md §2 permits an
+			// overshoot curve on. A switch thumb, a checkbox mark and a radio dot are
+			// the same mechanic: they latch rather than slide.
+			"src/lib/components/ui/switch/switch.svelte",
+			"src/lib/components/ui/checkbox/checkbox.svelte",
+			"src/lib/components/ui/radio-group/radio-group-item.svelte", TOKENS],
 		test: (line) => /ease-fx-spring/.test(line)
 	},
 	{
@@ -168,6 +187,15 @@ export const RULES = [
 			"!important is an admission that the cascade has become unwinnable. Fix the " +
 			"specificity instead; the class prop must always be able to win.",
 		test: (line) => /!important/.test(line)
+	},
+	{
+		id: "F4-minified-css",
+		description:
+			`Stylesheet line longer than ${HARD_LINE_LIMIT_CSS} characters. A stylesheet has no ` +
+			"string literals to collapse, so it gets the tighter limit — resax pasted minified " +
+			"CSS into <style> blocks and that is how 934 hardcoded durations went unnoticed.",
+		include: (ctx) => ctx.ext === ".css",
+		test: (_line, ctx) => ctx.raw.length > HARD_LINE_LIMIT_CSS
 	},
 	{
 		id: "F4-minified",
