@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 
 // The docs site is published to GitHub Pages at /<repo>/, and the registry JSON
 // is served alongside it from static/r/. BASE_PATH is empty for local dev.
-const base = process.env.BASE_PATH ?? '';
+const base = (process.env.BASE_PATH ?? '') as '' | `/${string}`;
 
 export default defineConfig({
 	plugins: [
