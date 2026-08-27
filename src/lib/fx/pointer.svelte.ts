@@ -69,6 +69,12 @@ interface Entry {
 }
 
 const entries = new Set<Entry>();
+/**
+ * Node → entry, so the IntersectionObserver callback is a lookup rather than a
+ * scan of every registered element for every change. With one glow on a page the
+ * difference is nothing; with a table of them it is quadratic.
+ */
+const byNode = new WeakMap<Element, Entry>();
 
 let pointerX = 0;
 let pointerY = 0;
@@ -273,25 +279,47 @@ function onVisibilityChange(): void {
 	if (!document.hidden) return;
 	if (frame) cancelAnimationFrame(frame);
 	frame = 0;
+	// A tab switched away with the pointer mid-hover would otherwise come back
+	// still lit, because no further pointermove will arrive to decay it.
+	restAll();
+}
+
+/**
+ * The pointer left the window.
+ *
+ * Without this, the last frame's values stick: glow stays lit, a tilted card
+ * stays tilted and a magnet stays pulled, with the cursor nowhere near. Nothing
+ * decays them, because decay is driven by `pointermove` and there are no more
+ * of those. `pointerout` with a null `relatedTarget` is the reliable signal —
+ * `mouseleave` on `document` does not fire in every browser.
+ */
+function onPointerOut(event: PointerEvent): void {
+	if (event.relatedTarget !== null) return;
+	pointerKnown = false;
+	restAll();
+}
+
+function restAll(): void {
+	for (const entry of entries) rest(entry);
 }
 
 function start(): void {
 	if (running || typeof document === 'undefined') return;
 	running = true;
 	document.addEventListener('pointermove', onPointerMove, { passive: true });
+	document.addEventListener('pointerout', onPointerOut, { passive: true });
 	document.addEventListener('visibilitychange', onVisibilityChange);
 	// Capture, so a scroll in any nested scroller invalidates too.
 	window.addEventListener('scroll', invalidateRects, { passive: true, capture: true });
 	window.addEventListener('resize', invalidateRects, { passive: true });
 	observer = new IntersectionObserver((changes) => {
 		for (const change of changes) {
-			for (const entry of entries) {
-				if (entry.node !== change.target) continue;
-				entry.visible = change.isIntersecting;
-				// A rect measured while off-screen is stale by the time it matters.
-				if (change.isIntersecting) entry.rect = null;
-				else rest(entry);
-			}
+			const entry = byNode.get(change.target);
+			if (!entry) continue;
+			entry.visible = change.isIntersecting;
+			// A rect measured while off-screen is stale by the time it matters.
+			if (change.isIntersecting) entry.rect = null;
+			else rest(entry);
 		}
 	});
 }
@@ -300,6 +328,7 @@ function stopIfIdle(): void {
 	if (!running || entries.size > 0) return;
 	running = false;
 	document.removeEventListener('pointermove', onPointerMove);
+	document.removeEventListener('pointerout', onPointerOut);
 	document.removeEventListener('visibilitychange', onVisibilityChange);
 	window.removeEventListener('scroll', invalidateRects, { capture: true });
 	window.removeEventListener('resize', invalidateRects);
@@ -337,6 +366,7 @@ export function track(effect: PointerEffect, options: EntryOptions = {}): Attach
 		};
 
 		entries.add(entry);
+		byNode.set(node, entry);
 		start();
 		observer?.observe(node);
 		rest(entry);
@@ -344,6 +374,7 @@ export function track(effect: PointerEffect, options: EntryOptions = {}): Attach
 
 		return () => {
 			entries.delete(entry);
+			byNode.delete(node);
 			observer?.unobserve(node);
 			for (const [property, previous] of restore) {
 				if (previous) node.style.setProperty(property, previous);
