@@ -87,12 +87,11 @@ uses `--spring` on `transform` (480 ms). `neon` runs a 4.4 s conic ring and a 3.
 - **Deterministic identity**: hue is `(hash × 31 + charCode) % 360` over the name; initials are the
   first two characters of a single word, else first-of-first + first-of-last; the count caps at `99+`
   and publishes `--digits`.
-- **A `+N` chip that is also a real popover anchor.** It opens a portalled panel — a detached `<div>`
-  with its own shadow root on `document.body` — holding a `role="menu"` list with its own sliding hover
-  highlight. It flips above on bottom overflow, right-aligns on right overflow, clamps to an 8 px
-  viewport pad, publishes the anchor offset as `--ox`/`--oy` for the transform origin, dismisses via
-  `composedPath()`, and on `Escape` **refocuses the trigger**. Teardown waits on `transitionend` or a
-  380 ms fallback. **None of the five group skins do any of this** — their `+N` is a static chip.
+- **A `+N` chip that is also a real popover anchor.** It portals a panel (a detached `<div>` with its
+  own shadow root on `document.body`) holding a `role="menu"` list with its own sliding hover highlight:
+  flips above on bottom overflow, right-aligns on right overflow, clamps to an 8 px viewport pad,
+  publishes the anchor offset as `--ox`/`--oy`, dismisses via `composedPath()`, and on `Escape`
+  **refocuses the trigger**. **None of the five group skins do any of this** — their `+N` is inert.
 - **Group spread on hover**: items translate by `index × size × 0.16` and lift 2 px; the hovered one
   lifts 5 px and comes forward `translateZ(38px)` through a container `perspective: 620px`. Overlap
   itself is a static negative margin — only the spread animates.
@@ -195,9 +194,7 @@ transform-only. The three loop skins are not overshoot but are idle loops on a *
 animation in ten skins.** Base arc: `rotate(360deg)` **900 ms linear**. `dual` stacks two arcs, one
 linear and one on `(0.65, 0.1, 0.35, 0.9)` at 0.5 opacity, so they beat against each other. `bars`
 scales Y 0.35 → 1 over 1 s with **deliberately non-monotonic delays** (0, 0.18, 0.36, **0.12**) so the
-equaliser does not read as a wave. `dots` bounce staggered `index × 0.16`; `bounce` drops a ball with a
-blurred shadow, both on `−dur/n × index`; `ring`/`wave`/`grid` fade or scale N children on negative
-delays computed from `--i`.
+equaliser does not read as a wave. The rest stagger N children on negative delays from `--i`.
 
 **Overshoot.** None anywhere. Ten skins, zero springs. Loading is the one place vuesax is disciplined.
 
@@ -290,11 +287,10 @@ once. Skins: `bars`, `emoji`, `glow`, `hearts`, `numbers`.
 **Motion character.** Fill moves as a `clip-path` transition, **200 ms `--ease-out`**, so dragging across
 the row sweeps rather than steps. Selection fires `is-pop`: **420 ms `(0.34, 1.56, 0.64, 1)`,
 `scale 0.82 → 1.22 → 0.94 → 1`** — a sink *then* a bounce, with an explicit undershoot at 70 %. Ripple
-per item at 640 ms, pool capped at 3. Skins escalate: `hearts` **620 ms, 1 → 1.28 → 0.94 → 1.16 → 1** (a
-double beat) plus a 620 ms expanding aura; `emoji` **560 ms with rotation**, `scale(0.7) rotate(-8°)` →
-`1.3 rotate(6°)` → `0.92 rotate(-2°)` → `1.04`; `numbers` flips 360° on Y over 520 ms; `bars` rises
-480 ms with a `scaleY` squash; `glow` flashes to 1.32 over 520 ms and **pulses lit stars at 2.4 s
-infinite**.
+per item at 640 ms, pool capped at 3. Skins escalate: `hearts` **620 ms double beat**
+(1 → 1.28 → 0.94 → 1.16 → 1) plus an expanding aura; `emoji` **560 ms with rotation** (0.7/−8° → 1.3/6°
+→ 0.92/−2° → 1.04); `numbers` flips 360° on Y over 520 ms; `bars` rises 480 ms with a `scaleY` squash;
+`glow` flashes to 1.32 and **pulses lit stars at 2.4 s infinite**.
 
 **Overshoot.** Every skin, transform-only: 1.22 base, 1.28/1.16 hearts, 1.30 emoji, 1.32 glow, 1.35
 numbers. The star filling *is* the mark, so one pop at our scale is defensible under the toggle-mark
@@ -747,6 +743,12 @@ window-mask refinement. **This is one primitive, and it is `MorphIndicator`.**
 
   Net: **the source's indicators do depend on animating size, and the dependency is recoverable.** FLIP
   with a counter-scaled child reproduces every one of them except the pseudo-element shoulders.
+
+  Against what we already have: `motion/morph-indicator.svelte` is structurally correct — it places at
+  Last instantly and animates `transform: translate(...) scale(...)` with `transform-origin: top left`,
+  which is precisely the right shape, and it reads `--ease-fx-out` rather than a spring, so none of the
+  source's layout overshoot is inherited. It needs exactly three additions: an optional counter-scaled
+  child animation, an optional `border-radius` track, and the `document.fonts.ready` re-measure.
 
 **Any FLIP indicator needs a fonts hook.** `chrome` re-measures synchronously, on the next rAF, after an
 80 ms timeout **and** on `document.fonts.ready`. A `ResizeObserver` on the track does not reliably catch

@@ -7,8 +7,8 @@ path with a superset** — same import path, same API, plus a disciplined effect
 Design and implementation are governed by [`SPEC.md`](./SPEC.md). Substrate verification and the
 resolved collisions with the real upstream API are in [`SUBSTRATE.md`](./SUBSTRATE.md).
 
-**Status: Phase 1 in progress.** Phase 0 (foundation plus Button, Card and Badge) is complete and
-recorded in [`PHASE0.md`](./PHASE0.md). The docs site lists the full 28-component inventory with
+**Status: Phase 2 in progress.** Phase 0 (foundation plus Button, Card and Badge) is complete and
+recorded in [`ACCEPTANCE.md`](./ACCEPTANCE.md). The docs site lists the full 28-component inventory with
 what has shipped and what has not.
 
 ## Install
