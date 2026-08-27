@@ -7,9 +7,9 @@ path with a superset** — same import path, same API, plus a disciplined effect
 Design and implementation are governed by [`SPEC.md`](./SPEC.md). Substrate verification and the
 resolved collisions with the real upstream API are in [`SUBSTRATE.md`](./SUBSTRATE.md).
 
-**Status: Phase 2 in progress.** Phase 0 (foundation plus Button, Card and Badge) is complete and
-recorded in [`ACCEPTANCE.md`](./ACCEPTANCE.md). The docs site lists the full 28-component inventory with
-what has shipped and what has not.
+**Status: all five phases complete.** 29 components, 31 registry items, 172 files. Per-phase
+acceptance checks against SPEC.md §7 are in [`ACCEPTANCE.md`](./ACCEPTANCE.md), including what is
+*not* verified and why.
 
 ## Install
 
@@ -59,11 +59,11 @@ is opt-in and is the only level where magnet exists at all.
 
 | Guarantee | Check | Command |
 |---|---|---|
-| Types are sound, no `any` | `svelte-check` strict | `pnpm check` |
+| Types are sound, no `any` | `svelte-check` strict, 1135 files | `pnpm check` |
 | The §8 failure patterns cannot return | 14 grep rules over the diff | `pnpm bans:check` |
-| The §3.2 resolution order is correct | 40 unit tests, one per numbered step | `pnpm test` |
+| The §3.2 order, the bezier solver, the OKLCH converter and the upload state | 145 unit tests | `pnpm test` |
 | **Effects never touch the layout box** | parses the built CSS; no effect rule may declare or animate a layout property | `pnpm layout:check` |
-| **The policy resolves correctly at every level** | server-renders 4 pages × 3 levels and asserts what may appear | `pnpm ssr:check` |
+| **The policy resolves correctly at every level** | server-renders 31 pages × 3 levels and asserts what may appear | `pnpm ssr:check` |
 | **An upstream `add` has not reverted a superset** | every extended component still carries its marker | `pnpm supersets:check` |
 | `registry.json` is not stale | regenerates from `registry.config.mjs` and diffs | `pnpm registry:gen --check` |
 | Registry items are internally consistent | paths, targets, `local:` deps, declared deps | `pnpm registry:check` |
