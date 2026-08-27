@@ -182,10 +182,20 @@ export const RULES = [
 	{
 		id: "F13-dom",
 		description:
-			"Imperative DOM construction in library code. document.createElement and innerHTML " +
-			"destroy snippet content, break SSR and open an XSS surface. Render it in Svelte.",
-		include: (ctx) => ctx.path.startsWith("src/lib/"),
-		test: (line) => /document\.createElement|\.innerHTML/.test(line)
+			"document.createElement, .innerHTML or {@html} in a component. The prior attempt " +
+			"built tooltips by copying innerHTML between nodes, which renders every tooltip " +
+			"twice, destroys any event handler inside a snippet and is an XSS surface.\n" +
+			"    {@html} is Svelte's spelling of the same hazard and is banned on the same " +
+			"terms. The one allowlisted use is Code, where the string is a syntax " +
+			"highlighter's own serialised output — highlighting *is* HTML, there is no other " +
+			"shape for it — and the un-highlighted path renders plain `{code}`, which Svelte " +
+			"escapes, so the branch that runs before the highlighter loads is safe by " +
+			"construction rather than by care.",
+		exclude: ["src/lib/components/ui/code/code.svelte"],
+		test: (line) =>
+			/document\s*\.\s*createElement/.test(line) ||
+			/\.\s*innerHTML/.test(line) ||
+			/\{@html\s/.test(line)
 	},
 	{
 		id: "F15-color",

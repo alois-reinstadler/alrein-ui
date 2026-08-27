@@ -45,6 +45,7 @@
 	"packageManager": "pnpm@11.23.0",
 	"dependencies": {
 		"@internationalized/date": "^3.12.3",
-		"bits-ui": "^2.19.0"
+		"bits-ui": "^2.19.0",
+		"shiki": "^4.4.3"
 	}
 }

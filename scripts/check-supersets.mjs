@@ -41,6 +41,8 @@ const SUPERSETS = [
 	'src/lib/components/ui/spinner/spinner.svelte',
 	'src/lib/components/ui/steps/steps.svelte',
 	'src/lib/components/ui/color-picker/color-picker.svelte',
+	'src/lib/components/ui/code/code.svelte',
+	'src/lib/components/ui/code/code-window.svelte',
 	'src/lib/components/ui/timeline/timeline.svelte',
 	'src/lib/components/ui/rating/rating.svelte',
 	'src/lib/components/ui/chip/chip.svelte',
@@ -55,7 +57,20 @@ const SUPERSETS = [
 	'src/lib/components/ui/accordion/accordion.svelte',
 	'src/lib/components/ui/accordion/accordion-item.svelte',
 	'src/lib/components/ui/accordion/accordion-trigger.svelte',
-	'src/lib/components/ui/accordion/accordion-content.svelte'
+	'src/lib/components/ui/accordion/accordion-content.svelte',
+	'src/lib/components/ui/breadcrumb/breadcrumb.svelte',
+	'src/lib/components/ui/breadcrumb/breadcrumb-link.svelte',
+	'src/lib/components/ui/breadcrumb/breadcrumb-page.svelte',
+	'src/lib/components/ui/tabs/tabs.svelte',
+	'src/lib/components/ui/tabs/tabs-list.svelte',
+	'src/lib/components/ui/tabs/tabs-trigger.svelte',
+	'src/lib/components/ui/pagination/pagination.svelte',
+	'src/lib/components/ui/pagination/pagination-link.svelte',
+	'src/lib/components/ui/pagination/pagination-ellipsis.svelte',
+	'src/lib/components/ui/pagination/pagination-previous.svelte',
+	'src/lib/components/ui/pagination/pagination-next.svelte',
+	'src/lib/components/ui/pagination/pagination-prev-button.svelte',
+	'src/lib/components/ui/pagination/pagination-next-button.svelte'
 ];
 
 const missing = [];

@@ -100,6 +100,19 @@ export const registry = {
 		ui('timeline', 'alrein-ui Timeline', 'New — shadcn-svelte has no equivalent. §5 collapses timeline-compact into a variant. progress is a fractional index, so the rail fill can stop between two markers, which is the only thing worth measuring here. No decorative effects — §3.4 has no row for Timeline.', { fx: false }),
 		// Phase 4 — complex.
 		ui('color-picker', 'alrein-ui ColorPicker', 'New — shadcn-svelte has no equivalent. §5 collapses six vuesax pickers into one component with a variant, all sharing one ColorState. OKLCH is the working space and the stored form, with an internal converter rather than a dependency (A26). No decorative effects: a glow over a colour picker is a lie about the value.', { fx: false }),
+		{
+			name: 'code',
+			type: 'registry:ui',
+			title: 'alrein-ui Code',
+			description:
+				'New — shadcn-svelte has no equivalent. Ships Code and CodeWindow. Shiki is loaded lazily from shiki/bundle/web with an explicit language allowlist, so a page with no code block downloads nothing; the server render is a plain escaped <pre> that stays readable, selectable and copyable if the highlighter never arrives (A27). No decorative effects.',
+			dir: 'src/lib/components/ui/code',
+			uiTarget: 'code',
+			// Declared here and nowhere else, so installing Button does not pull a
+			// syntax highlighter (A27).
+			dependencies: ['tailwind-variants', 'shiki'],
+			registryDependencies: ['local:theme', 'local:button']
+		},
 		ui('switch', 'alrein-ui Switch', 'A strict superset of the shadcn-svelte Switch. The thumb gains the toggle-thumb spring and a label snippet renders beside it as part of the same control.')
 	]
 };

@@ -867,6 +867,42 @@
 			]
 		},
 		{
+			"name": "code",
+			"type": "registry:ui",
+			"title": "alrein-ui Code",
+			"description": "New — shadcn-svelte has no equivalent. Ships Code and CodeWindow. Shiki is loaded lazily from shiki/bundle/web with an explicit language allowlist, so a page with no code block downloads nothing; the server render is a plain escaped <pre> that stays readable, selectable and copyable if the highlighter never arrives (A27). No decorative effects.",
+			"dependencies": [
+				"tailwind-variants",
+				"shiki"
+			],
+			"registryDependencies": [
+				"local:theme",
+				"local:button"
+			],
+			"files": [
+				{
+					"path": "src/lib/components/ui/code/code-window.svelte",
+					"type": "registry:ui",
+					"target": "code/code-window.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/code/code.svelte",
+					"type": "registry:ui",
+					"target": "code/code.svelte"
+				},
+				{
+					"path": "src/lib/components/ui/code/highlight.ts",
+					"type": "registry:ui",
+					"target": "code/highlight.ts"
+				},
+				{
+					"path": "src/lib/components/ui/code/index.ts",
+					"type": "registry:ui",
+					"target": "code/index.ts"
+				}
+			]
+		},
+		{
 			"name": "switch",
 			"type": "registry:ui",
 			"title": "alrein-ui Switch",
