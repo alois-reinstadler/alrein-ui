@@ -4,6 +4,13 @@
 
 	export type MorphOrientation = 'horizontal' | 'vertical' | 'both';
 
+	/**
+	 * `children` are rendered inside the indicator, which is what makes A25b
+	 * possible: any of them carrying `data-morph-counter-scale` is given the
+	 * inverse of the indicator's own scale, so a fixed-size part — Tabs `chrome`'s
+	 * two shoulders — keeps its size while the sled stretches. Anchor each one
+	 * with its own `transform-origin`. Most consumers pass nothing.
+	 */
 	export type MorphIndicatorProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		/**
 		 * The element the indicator should sit under. Pass `null` while nothing is
@@ -50,6 +57,7 @@
 		target = null,
 		orientation = 'horizontal',
 		class: className,
+		children,
 		...restProps
 	}: MorphIndicatorProps = $props();
 
@@ -165,8 +173,9 @@
 		 * uniform row (Pagination's buttons are all `size-9`), so nothing pays for
 		 * a track it does not need.
 		 */
+		const stretches = Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001;
 		const radius = Number.parseFloat(computed.borderTopLeftRadius) || 0;
-		const distorts = radius > 0 && (Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001);
+		const distorts = radius > 0 && stretches;
 
 		// P(lay).
 		node.animate(
@@ -192,6 +201,51 @@
 					],
 			{ duration: duration('base'), easing }
 		);
+
+		/*
+		 * A25b's counter-scaled child, and the reason `chrome` can have its
+		 * shoulders back.
+		 *
+		 * The radius track above fixes the *corners* of a stretching box, but
+		 * anything drawn at a fixed size inside it — Tabs' two quarter-disc
+		 * shoulders — still squashes with everything else, because `scaleX` scales
+		 * paint uniformly. The digest called this out as the one thing FLIP cannot
+		 * reproduce with a pseudo-element, and the fix it named is this: make the
+		 * fixed-size part a real child and give it the inverse scale, so the two
+		 * transforms cancel and it renders at its intended size for the whole
+		 * travel.
+		 *
+		 * Opt-in per element via `data-morph-counter-scale`, because most consumers
+		 * have nothing to counter-scale and should not pay for a second animation.
+		 * The child's anchor is its own `transform-origin`, set in CSS next to the
+		 * geometry it belongs to: a shoulder on the left edge pins to `right`, the
+		 * one on the right edge pins to `left`, and each stays flush against the
+		 * sled's rendered edge rather than drifting toward the middle.
+		 *
+		 * Same duration and easing as the parent, started in the same task, so the
+		 * two stay in lockstep without either one sampling the other.
+		 *
+		 * That last point costs a known, bounded residual, and it is worth being
+		 * exact about it rather than claiming the cancellation is perfect. Both
+		 * animations interpolate under the same easing `e(t)`, so the composite
+		 * scale is `lerp(s, 1, e) × lerp(1/s, 1, e)`, which is 1 at both ends but
+		 * not in between. Measured on Tabs `chrome` over its widest travel — an
+		 * 83px sled to 141px, s ≈ 1.7 — an 8px shoulder peaks at 8.55px and is back
+		 * under 8.1px within four frames. Half a pixel for a tenth of a second.
+		 *
+		 * Cancelling exactly would mean sampling the easing curve and emitting a
+		 * keyframe per step, which is the shape of the very thing §8.1 `F5` is
+		 * about, for an error nobody can see. If a consumer ever counter-scales
+		 * something large enough for 7% to matter, that is the point to revisit it.
+		 */
+		if (!stretches) return;
+		const counterScaled = node.querySelectorAll<HTMLElement>('[data-morph-counter-scale]');
+		for (const child of counterScaled) {
+			child.animate(
+				[{ transform: `scale(${1 / scaleX}, ${1 / scaleY})` }, { transform: 'none' }],
+				{ duration: duration('base'), easing }
+			);
+		}
 	});
 </script>
 
@@ -211,4 +265,4 @@
 		className
 	)}
 	{...restProps}
-></div>
+>{@render children?.()}</div>

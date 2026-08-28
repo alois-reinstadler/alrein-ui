@@ -88,8 +88,10 @@
 		<Tabs.Content value="entwurf">
 			<p class="text-sm text-muted-foreground">
 				Die Schulterrundungen der Quelle sind feste Pseudoelemente. Unter <code>scaleX</code>
-				würden sie stauchen, und dagegen hilft nur ein gegenskaliertes echtes Kind — das
-				<code>MorphIndicator</code> nicht anbietet. Der Schlitten fährt deshalb ohne Schultern.
+				würden sie stauchen, und dagegen hilft nur ein gegenskaliertes echtes Kind. Genau das
+				trägt <code>MorphIndicator</code> jetzt: Kinder mit
+				<code>data-morph-counter-scale</code> bekommen den Kehrwert seiner eigenen Skalierung,
+				also behalten die beiden Schultern ihre Größe über die ganze Fahrt.
 			</p>
 		</Tabs.Content>
 		<Tabs.Content value="vorschau">

@@ -46,7 +46,7 @@
 			variant: {
 				default: "rounded-md bg-background shadow-sm dark:border dark:border-input dark:bg-input/30",
 				line: "rounded-none bg-transparent shadow-none after:absolute after:inset-x-0 after:bottom-[-5px] after:h-0.5 after:bg-foreground group-data-[orientation=vertical]/tabs:after:inset-x-auto group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:right-[-4px] group-data-[orientation=vertical]/tabs:after:h-auto group-data-[orientation=vertical]/tabs:after:w-0.5",
-				chrome: "rounded-md rounded-b-none border border-b-0 border-border bg-background shadow-none after:absolute after:inset-x-0 after:bottom-[-1px] after:h-px after:bg-background",
+				chrome: "[--morph-shoulder:0.5rem] rounded-md rounded-b-none border border-b-0 border-border bg-background shadow-none after:absolute after:inset-x-0 after:bottom-[-1px] after:h-px after:bg-background",
 				/*
 				 * Opaque on purpose. The goo works by blurring the alpha channel and then
 				 * thresholding it back — `0 0 0 18 -7` maps alpha a to 18a - 7 — so a
@@ -61,6 +61,48 @@
 			variant: "default"
 		}
 	});
+
+	/**
+	 * A25a: the `chrome` sled's two quarter-disc shoulders, which used to be the
+	 * one thing this port did not reproduce.
+	 *
+	 * A browser tab is widest where it meets the toolbar: the outline leaves the
+	 * sled's side, curves outward and lands on the lip. That flare is a concave
+	 * quarter-disc, and the mask below is the whole of it — a circle centred on
+	 * the shoulder box's *inner-top* corner, with everything inside the circle cut
+	 * away. What survives is the wedge hugging the bottom and inner edges, which
+	 * is the flare.
+	 *
+	 * Two masked layers rather than one, because the sled has a border and the
+	 * flare has to continue it: the element paints `border` and keeps everything
+	 * from radius r outward; its `::before` paints `background` and keeps
+	 * everything from r + 1px outward. The 1px annulus left between them is the
+	 * border, curving from the sled's side down to the lip.
+	 *
+	 * Both carry `data-morph-counter-scale`, so `MorphIndicator` gives them the
+	 * inverse of its own `scaleX` and they keep their size and their curvature for
+	 * the whole travel instead of squashing. `transform-origin` pins each one to
+	 * the sled edge it belongs to — the left shoulder to its right edge, the right
+	 * shoulder to its left — so they stay welded to the sled rather than sliding
+	 * toward the middle as it stretches.
+	 *
+	 * The source clamps the sled's width to `2r` so the two can never overlap. No
+	 * clamp is needed here: the sled is placed at a real tab's measured box and a
+	 * tab narrower than 16px does not exist.
+	 */
+	const CHROME_SHOULDER =
+		"pointer-events-none absolute bottom-[-1px] size-(--morph-shoulder) bg-border " +
+		"before:absolute before:inset-0 before:bg-background before:content-['']";
+
+	const CHROME_SHOULDER_LEFT =
+		"left-[calc(var(--morph-shoulder)*-1)] origin-bottom-right " +
+		"[mask-image:radial-gradient(circle_at_top_left,transparent_calc(var(--morph-shoulder)_-_0.5px),black_var(--morph-shoulder))] " +
+		"before:[mask-image:radial-gradient(circle_at_top_left,transparent_calc(var(--morph-shoulder)_+_0.5px),black_calc(var(--morph-shoulder)_+_1px))]";
+
+	const CHROME_SHOULDER_RIGHT =
+		"right-[calc(var(--morph-shoulder)*-1)] origin-bottom-left " +
+		"[mask-image:radial-gradient(circle_at_top_right,transparent_calc(var(--morph-shoulder)_-_0.5px),black_var(--morph-shoulder))] " +
+		"before:[mask-image:radial-gradient(circle_at_top_right,transparent_calc(var(--morph-shoulder)_+_0.5px),black_calc(var(--morph-shoulder)_+_1px))]";
 
 	export type TabsListVariant = VariantProps<typeof tabsListVariants>["variant"];
 
@@ -112,12 +154,23 @@
 	const orientation = $derived(list.orientation === "vertical" ? "vertical" : "horizontal");
 </script>
 
+<!--
+	Deliberately not named `children`: a snippet of that name shadows the
+	`children` *prop* this component renders below, and the recursion blows the
+	stack without `svelte-check` noticing.
+-->
+{#snippet shoulders()}
+	<span data-morph-counter-scale class={cn(CHROME_SHOULDER, CHROME_SHOULDER_LEFT)}></span>
+	<span data-morph-counter-scale class={cn(CHROME_SHOULDER, CHROME_SHOULDER_RIGHT)}></span>
+{/snippet}
+
 {#snippet indicator()}
 	<MorphIndicator
 		target={list.active}
 		{orientation}
 		data-variant={resolved}
 		class={cn(tabsIndicatorVariants({ variant: resolved }))}
+		children={resolved === "chrome" ? shoulders : undefined}
 	/>
 {/snippet}
 
