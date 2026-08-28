@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import Section from '$lib/demo/section.svelte';
 	import Row from '$lib/demo/row.svelte';
@@ -51,8 +52,8 @@
 	</Row>
 	<Row label="Zustände">
 		<Button disabled>deaktiviert</Button>
-		<Button href="/">als Link</Button>
-		<Button href="/" disabled>Link deaktiviert</Button>
+		<Button href="{base}/">als Link</Button>
+		<Button href="{base}/" disabled>Link deaktiviert</Button>
 	</Row>
 </Section>
 

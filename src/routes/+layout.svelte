@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { page } from '$app/state';
 	import { base } from '$app/paths';
+	import { building } from '$app/environment';
 	import { FxScope } from '$lib/fx/index.js';
 	import type { FxDensity, FxLevel } from '$lib/fx/context.svelte.js';
 	import FxControls from '$lib/demo/fx-controls.svelte';
@@ -19,16 +20,29 @@
 	 * the level checkable without a browser. `pnpm ssr:check` fetches each page at
 	 * each level and asserts what may and may not appear in the markup, which
 	 * covers part of acceptance criterion §7.7 in CI rather than by eye.
+	 *
+	 * The `building` guard is what lets that coexist with prerendering. A
+	 * prerendered page is baked once, without a query string, so SvelteKit throws
+	 * outright on `url.searchParams` while it builds — and it is right to: an
+	 * artefact that silently depended on a query would be served for every value
+	 * of it. `building` is true only during the prerender pass, so the seeding is
+	 * skipped exactly there and is live everywhere it can mean something: the dev
+	 * server `ssr:check` fetches, and the client on hydration.
+	 *
+	 * What the deployed site therefore does with `/button?fx=off` is serve HTML at
+	 * the default level and correct it as it hydrates. That is the same behaviour
+	 * it had as an SPA, where there was no server HTML to be wrong — except now
+	 * the response is a 200 with real content rather than the 404 fallback.
 	 */
 	function initialLevel(): FxLevel {
-		const requested = page.url.searchParams.get('fx');
+		const requested = building ? null : page.url.searchParams.get('fx');
 		return requested === 'off' || requested === 'expressive' || requested === 'calm'
 			? requested
 			: 'calm';
 	}
 
 	function initialDensity(): FxDensity {
-		const requested = page.url.searchParams.get('density');
+		const requested = building ? null : page.url.searchParams.get('density');
 		return requested === 'list' || requested === 'table' ? requested : 'default';
 	}
 

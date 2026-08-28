@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import Section from '$lib/demo/section.svelte';
 	import Row from '$lib/demo/row.svelte';
@@ -24,7 +25,7 @@
 		{/each}
 	</Row>
 	<Row label="Als Link">
-		<Badge href="/">anklickbar</Badge>
+		<Badge href="{base}/">anklickbar</Badge>
 	</Row>
 </Section>
 

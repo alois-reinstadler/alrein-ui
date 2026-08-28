@@ -104,7 +104,7 @@
 									<Sidebar.MenuSub id="sb-projekte" open={projectsOpen}>
 										<Sidebar.MenuSubItem>
 											<Sidebar.MenuSubButton
-												href="#quartalsabschluss"
+												href="#sb-inhalt"
 												isActive={activeProject === 'quartalsabschluss'}
 												onclick={() => (activeProject = 'quartalsabschluss')}
 											>
@@ -113,7 +113,7 @@
 										</Sidebar.MenuSubItem>
 										<Sidebar.MenuSubItem>
 											<Sidebar.MenuSubButton
-												href="#migration"
+												href="#sb-inhalt"
 												isActive={activeProject === 'migration'}
 												onclick={() => (activeProject = 'migration')}
 											>
@@ -152,7 +152,7 @@
 					<Sidebar.Trigger />
 					<span class="text-sm font-medium">Posteingang</span>
 				</header>
-				<div class="p-4 text-sm text-muted-foreground">
+				<div id="sb-inhalt" class="p-4 text-sm text-muted-foreground">
 					Der Inhaltsbereich rückt mit. Beim Einklappen bleibt der eingeklappte Beschriftungstext
 					über den Tooltip der Menüschaltfläche erreichbar — bits-ui, nicht selbst gebaut.
 				</div>

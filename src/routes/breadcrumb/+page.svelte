@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import Section from '$lib/demo/section.svelte';
 	import Row from '$lib/demo/row.svelte';
@@ -23,11 +24,11 @@
 		<Breadcrumb.Root>
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/">Start</Breadcrumb.Link>
+					<Breadcrumb.Link href="{base}/">Start</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/projekte">Projekte</Breadcrumb.Link>
+					<Breadcrumb.Link href="#">Projekte</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
@@ -41,7 +42,7 @@
 		<Breadcrumb.Root>
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/">Start</Breadcrumb.Link>
+					<Breadcrumb.Link href="{base}/">Start</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
@@ -49,7 +50,7 @@
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/projekte">Projekte</Breadcrumb.Link>
+					<Breadcrumb.Link href="#">Projekte</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
@@ -68,15 +69,15 @@
 		<Breadcrumb.Root variant="ghost">
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/">Start</Breadcrumb.Link>
+					<Breadcrumb.Link href="{base}/">Start</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/projekte">Projekte</Breadcrumb.Link>
+					<Breadcrumb.Link href="#">Projekte</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/projekte/2026">2026</Breadcrumb.Link>
+					<Breadcrumb.Link href="#">2026</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator />
 				<Breadcrumb.Item>
