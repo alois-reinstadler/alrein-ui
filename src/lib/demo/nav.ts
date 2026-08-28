@@ -23,7 +23,7 @@ export interface NavEntry {
 
 export const NAV: NavEntry[] = [
 	// Phase 0 — foundation + proof
-	{ slug: 'button', name: 'Button', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle Upstream-Varianten plus Gradient, Glow, Shimmer, Tilt und Magnet.' },
+	{ slug: 'button', name: 'Button', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle Upstream-Varianten plus Gradient, Glow, Shimmer, Tilt, Magnet und Fortschritt.' },
 	{ slug: 'card', name: 'Card', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sieben Teilkomponenten plus hero-Variante, interactive, Glow und Tilt.' },
 	{ slug: 'badge', name: 'Badge', phase: 0, status: 'shipped', origin: 'extends', summary: 'Alle sechs Varianten plus Gradient, Glow bei destructive und Shimmer.' },
 	{ slug: 'button-group', name: 'ButtonGroup', phase: 0, status: 'shipped', origin: 'extends', summary: 'Ghost und Gradient an den Kindern, durchgesetzt als Dichtebereich.' },

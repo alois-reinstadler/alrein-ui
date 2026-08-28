@@ -73,6 +73,26 @@
 	</p>
 </Section>
 
+<Section
+	title="Dieselbe Zustandsmaschine, andere Kleidung"
+	note="Das ist die zweite Hälfte der §5-Zeile: derselbe UploadState, hier als Button-Fortschritt statt als Fläche. Beide lesen dieselben zwei Werte — status und progress — und können deshalb gar nicht uneins darüber werden, was „lädt hoch“ bedeutet. Der Button bleibt anklickbar: einen Upload abzubrechen ist eine berechtigte Handlung, also ist Fortschritt kein deaktivierter Zustand."
+>
+	<div class="flex flex-wrap items-center gap-3">
+		<Button progress={plain.status === 'idle' ? null : plain.progress}>
+			{#if plain.status === 'uploading'}
+				Lädt hoch … {Math.round(plain.progress * 100)} %
+			{:else if plain.status === 'complete'}
+				Hochgeladen
+			{:else if plain.status === 'error'}
+				Fehlgeschlagen
+			{:else}
+				Noch nichts ausgewählt
+			{/if}
+		</Button>
+		<Button variant="outline" size="sm" onclick={() => advance()}>Fortschritt melden (+25 %)</Button>
+	</div>
+</Section>
+
 <Section title="Was ein Typfehler ist">
 	<pre class="overflow-x-auto rounded-lg border bg-muted/40 p-4 text-xs"><code
 			>{`<UploadArea gradient />   ← §3.4 gibt UploadArea keinen Gradient

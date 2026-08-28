@@ -6,6 +6,14 @@
 	const variants = ['default', 'secondary', 'outline', 'destructive', 'ghost', 'link'] as const;
 	const sizes = ['xs', 'sm', 'default', 'lg'] as const;
 	const iconSizes = ['icon-xs', 'icon-sm', 'icon', 'icon-lg'] as const;
+
+	/*
+	 * Advanced by a click rather than a timer — `bans:check` forbids the timer,
+	 * and the design point is the same one UploadArea makes: the component keeps
+	 * the bookkeeping, the caller owns the transport and reports progress in.
+	 */
+	let uploaded = $state(0);
+	const percent = $derived(Math.round(uploaded * 100));
 </script>
 
 <svelte:head><title>Button · alrein-ui</title></svelte:head>
@@ -73,6 +81,32 @@
 	</Row>
 	<Row label="explizit abgeschaltet">
 		<Button glow={false}>glow={'{false}'} schlägt jede Voreinstellung</Button>
+	</Row>
+</Section>
+
+<Section
+	title="Fortschritt"
+	note="§5 verlangt für die Upload-Zeile UploadArea und einen Button-Fortschrittszustand auf einer geteilten UploadState-Klasse. Der Balken ist ein Kind, kein Pseudoelement: ::before gehört dem Glow, ::after dem Druckfeedback, und background-image gehört Gradient und Shimmer. Animiert wird allein die background-size — Malerei, nie der Layoutkasten. Und es ist kein Effekt: „Aus“ schaltet ihn nicht ab, denn §3.5 verbietet, dass ein Zustand an etwas hängt, das sich abschalten lässt."
+>
+	<Row label="determiniert (0–1)">
+		<Button progress={uploaded}>
+			{uploaded >= 1 ? 'Fertig' : `Lädt hoch … ${percent} %`}
+		</Button>
+		<Button variant="outline" progress={uploaded}>outline</Button>
+		<Button variant="secondary" progress={uploaded} size="lg">groß</Button>
+	</Row>
+	<Row label="steuern">
+		<Button variant="outline" size="sm" onclick={() => (uploaded = Math.min(1, uploaded + 0.25))}>
+			+25 %
+		</Button>
+		<Button variant="ghost" size="sm" onclick={() => (uploaded = 0)}>zurücksetzen</Button>
+		<span class="text-sm text-muted-foreground">
+			<code>aria-busy</code> ist gesetzt, der Balken selbst ist <code>aria-hidden</code> — die
+			Prozentzahl steht schon in der Beschriftung, und sie zweimal vorzulesen ist Lärm.
+		</span>
+	</Row>
+	<Row label="mit Glow zusammen">
+		<Button glow progress={uploaded}>Hauptaktion</Button>
 	</Row>
 </Section>
 

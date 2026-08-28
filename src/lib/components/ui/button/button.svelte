@@ -123,7 +123,47 @@
 
 	export type ButtonProps<V extends ButtonVariant = "default"> = ButtonBase & {
 		variant?: V;
+		/**
+		 * Determinate upload/work progress, 0–1. Omit (or pass `null`) for an
+		 * ordinary button.
+		 *
+		 * §5 pairs this with `UploadArea` on one shared `UploadState`: a dropzone
+		 * and a button that uploads are the same state machine wearing different
+		 * clothes. Pass `state.progress` straight through.
+		 *
+		 * It is **not** an effect and does not consult `FxContext`. §3.4 governs
+		 * decoration; this is state, and §3.5 forbids state ever being carried by
+		 * something `data-fx="off"` can switch off. It is also not a disabled
+		 * state — cancelling an upload is a legitimate thing to click — so the
+		 * button stays interactive unless the caller disables it.
+		 */
+		progress?: number | null;
 	} & ButtonEffects<V>;
+
+	/**
+	 * The progress fill. A child element rather than a pseudo-element because
+	 * Button has neither left: `fx-glow` owns `::before` and `fx-press` owns
+	 * `::after`, and `background-image` on the button itself belongs to gradient
+	 * and shimmer.
+	 *
+	 * The fill is a solid gradient image sized to a fraction of the span, so the
+	 * only animated property is `background-size` — paint, never the layout box
+	 * (§1). Sizing it beats `scaleX` here: a scaled box drags its own rounded
+	 * corners with it, whereas a background is clipped by the span's inherited
+	 * radius on the left and ends in a hard vertical edge on the right, which is
+	 * what a progress fill looks like.
+	 *
+	 * `z-index: -1` puts it above the button's background and below the label —
+	 * a positioned child would otherwise paint a wash over the text. That needs
+	 * the button to be a positioned, isolated ancestor, which is why `progress`
+	 * adds `relative isolate`; neither moves anything, so it is not an `F11`
+	 * layout change.
+	 */
+	const BUTTON_PROGRESS_FILL =
+		"pointer-events-none absolute inset-0 z-[-1] rounded-[inherit] bg-no-repeat opacity-20 " +
+		"[background-image:linear-gradient(currentColor,currentColor)] " +
+		"[background-size:calc(var(--button-progress)*100%)_100%] " +
+		"transition-[background-size] duration-base ease-fx-out";
 </script>
 
 <script lang="ts" generics="V extends ButtonVariant = 'default'">
@@ -143,6 +183,7 @@
 		type = "button",
 		disabled,
 		children,
+		progress = null,
 		gradient,
 		glow,
 		shimmer,
@@ -183,8 +224,21 @@
 	const useTilt = $derived(fx.resolve("tilt", tilt, { available: largeEnoughToTilt }));
 	const useMagnet = $derived(fx.resolve("magnet", magnet));
 
+	/*
+	 * Clamped rather than trusted: `UploadState.progress` is a mean over items and
+	 * a caller doing its own bookkeeping can hand over 1.02 or a NaN from a
+	 * division by zero. A fill wider than the button is a rendering bug reported
+	 * as a design bug, and it costs one line to make impossible.
+	 */
+	const fill = $derived(
+		typeof progress === "number" && Number.isFinite(progress)
+			? Math.min(1, Math.max(0, progress))
+			: null
+	);
+
 	const classes = $derived(
 		cn(
+			fill !== null && "relative isolate",
 			buttonVariants({
 				variant,
 				size,
@@ -198,6 +252,20 @@
 		)
 	);
 </script>
+
+<!--
+	Decorative and already announced: the label carries the percentage, so a
+	second reading of the same number is noise. `aria-busy` on the control is the
+	part a screen reader needs.
+-->
+{#snippet progressFill()}
+	<span
+		data-slot="button-progress"
+		aria-hidden="true"
+		class={BUTTON_PROGRESS_FILL}
+		style="--button-progress: {fill}"
+	></span>
+{/snippet}
 
 <!--
 	The attachment lists are duplicated across the two branches rather than
@@ -214,6 +282,7 @@
 		aria-disabled={disabled}
 		role={disabled ? "link" : undefined}
 		tabindex={disabled ? -1 : undefined}
+		aria-busy={fill !== null ? "true" : undefined}
 		{...restProps}
 		{@attach pressEffect({ enabled: () => !disabled })}
 		{@attach useGlow ? glowEffect() : undefined}
@@ -221,6 +290,7 @@
 		{@attach useMagnet ? magnetEffect() : undefined}
 		{@attach useShimmer ? shimmerEffect({ trigger: "hover" }) : undefined}
 	>
+		{#if fill !== null}{@render progressFill()}{/if}
 		{@render children?.()}
 	</a>
 {:else}
@@ -230,6 +300,7 @@
 		class={classes}
 		{type}
 		{disabled}
+		aria-busy={fill !== null ? "true" : undefined}
 		{...restProps}
 		{@attach pressEffect({ enabled: () => !disabled })}
 		{@attach useGlow ? glowEffect() : undefined}
@@ -237,6 +308,7 @@
 		{@attach useMagnet ? magnetEffect() : undefined}
 		{@attach useShimmer ? shimmerEffect({ trigger: "hover" }) : undefined}
 	>
+		{#if fill !== null}{@render progressFill()}{/if}
 		{@render children?.()}
 	</button>
 {/if}
