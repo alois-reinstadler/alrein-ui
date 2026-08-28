@@ -48,14 +48,24 @@ export function press(options: PressOptions = {}): Attachment<HTMLElement> {
 
 		const release = () => node.style.setProperty('--fx-press', '0');
 
+		/*
+		 * The press point, twice: once as a percentage for the radial tint, once as
+		 * a signed -1..1 vector for the 3D press tilt (A10a). Unitless, so how far
+		 * the element tips stays a token rather than a number compiled into here —
+		 * this reports *where*, `press.css` decides *how far*.
+		 */
 		const onPointerDown = (event: PointerEvent) => {
 			if (!read(options.enabled, true)) return;
 			if (read(options.ripple, true)) {
 				// A single measurement per press, on an event that already forces the
 				// browser to have layout available. Not a per-frame cost.
 				const rect = node.getBoundingClientRect();
-				node.style.setProperty('--fx-press-x', `${((event.clientX - rect.left) / rect.width) * 100}%`);
-				node.style.setProperty('--fx-press-y', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+				const horizontal = (event.clientX - rect.left) / rect.width;
+				const vertical = (event.clientY - rect.top) / rect.height;
+				node.style.setProperty('--fx-press-x', `${horizontal * 100}%`);
+				node.style.setProperty('--fx-press-y', `${vertical * 100}%`);
+				node.style.setProperty('--fx-press-nx', `${(horizontal - 0.5) * 2}`);
+				node.style.setProperty('--fx-press-ny', `${(vertical - 0.5) * 2}`);
 			}
 			node.style.setProperty('--fx-press', '1');
 		};
@@ -68,6 +78,10 @@ export function press(options: PressOptions = {}): Attachment<HTMLElement> {
 			if (!read(options.enabled, true)) return;
 			node.style.setProperty('--fx-press-x', '50%');
 			node.style.setProperty('--fx-press-y', '50%');
+			// Centred, so a keyboard press scales and tints but does not tip: there
+			// is no press point to tip toward, and inventing one would be a lie.
+			node.style.setProperty('--fx-press-nx', '0');
+			node.style.setProperty('--fx-press-ny', '0');
 			node.style.setProperty('--fx-press', '1');
 		};
 

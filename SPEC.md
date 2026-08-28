@@ -558,6 +558,33 @@ Full reasoning in `SUBSTRATE.md`.
   transformed ancestor and land in the wrong place. That is the exact hazard §3.5 documents for
   tilt, and it is why tilt is withheld from anything with a trigger. §2 already specifies press as
   "scale down/up", so this follows the spec rather than the source.
+
+  **Superseded in part by A10a.**
+- **A10a — the 3D press tilt, on Button, narrowed until it is safe.** A10 declined the source's
+  signature outright. The maintainer asked for it back on Button, and the hazard A10 named is real
+  but narrower than "always on":
+
+  - **Only while `:active`.** The transform — and therefore the containing block — exists for the
+    length of a press rather than for the life of the element. Nothing is transformed at rest.
+  - **Never on `[aria-haspopup]`.** That excludes exactly the elements A10 was protecting: bits-ui
+    marks every menu, select, popover and dialog trigger with it. Button's own base already carves
+    the same set out of its press nudge (`active:not-aria-[haspopup]:translate-y-px`), so this
+    follows a line the component had already drawn rather than inventing one.
+  - **Opt-in per component**, as `fx-press-tilt`, not folded into always-on `fx-press`. A select
+    trigger or a table row has no business tipping in 3D.
+
+  `press.ts` reports *where* — `--fx-press-nx` / `--fx-press-ny`, a signed −1..1 vector, unitless so
+  the magnitude stays a token — and `press.css` decides *how far*. The tilt rotation is added rather
+  than replaced, so a Button carrying both `fx-tilt` and this composes: at rest `fx-tilt` owns
+  `transform`, during a press the `:active` rule wins and carries both rotations.
+
+  Reduced motion and `data-fx="off"` set `--fx-press-tilt-max: 0deg`, which is how §7.8 and §3.3's
+  "degrades to colour/opacity only" hold — zeroing the angle rather than dropping the rule keeps one
+  code path, because `perspective()` with no rotation renders identically to no transform. A keyboard
+  press is centred and does not tip: there is no press point to tip toward and inventing one is a lie.
+
+  Verified in the browser under a real press: pressing top-left and bottom-right produce mirrored
+  `matrix3d` rotations, and the centre produces perspective with none.
 - **A11 — Overshoot stays at exactly two sites.** The source has a *third*: the checkbox/radio
   **label** springs back over 620ms on an explicit `linear()` damped spring peaking at 1.15. Not
   ported. Extending the allowance from two mechanics to three is precisely the creep that ended in

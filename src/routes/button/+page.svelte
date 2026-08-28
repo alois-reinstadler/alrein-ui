@@ -86,6 +86,19 @@
 </Section>
 
 <Section
+	title="Druckfeedback kippt in 3D"
+	note="A10a. Die Quelle skaliert einen Button beim Druck nicht flach herunter, sondern kippt ihn zum Druckpunkt hin. Immer an, kein Prop — Druckfeedback ist laut §3.1 nie opt-in. Die Perspektive entsteht nur, solange :active gilt, und nie auf [aria-haspopup]: genau die Auslöser, deren Portal sich sonst an einem transformierten Vorfahren verankern würde. Bei „Aus“ und bei reduzierter Bewegung geht der Winkel auf 0°. Mit der Tastatur ausgelöst kippt nichts — es gibt keinen Druckpunkt, zu dem hin gekippt werden könnte."
+>
+	<Row label="in eine Ecke drücken">
+		<Button size="lg">oben links drücken</Button>
+		<Button variant="outline" size="lg">unten rechts drücken</Button>
+	</Row>
+	<Row label="mit Tilt zusammen">
+		<Button tilt size="lg">Hover kippt, Druck kippt weiter</Button>
+	</Row>
+</Section>
+
+<Section
 	title="Fortschritt"
 	note="§5 verlangt für die Upload-Zeile UploadArea und einen Button-Fortschrittszustand auf einer geteilten UploadState-Klasse. Der Balken ist ein Kind, kein Pseudoelement: ::before gehört dem Glow, ::after dem Druckfeedback, und background-image gehört Gradient und Shimmer. Animiert wird allein die background-size — Malerei, nie der Layoutkasten. Und es ist kein Effekt: „Aus“ schaltet ihn nicht ab, denn §3.5 verbietet, dass ein Zustand an etwas hängt, das sich abschalten lässt."
 >

@@ -46,3 +46,40 @@
 		transition: opacity var(--transition-duration-instant) var(--ease-fx-out);
 	}
 }
+
+/**
+ * press, 3D — "I registered your click", and *where* you clicked.
+ *
+ * The vuesax source tips a control toward the press point rather than scaling it
+ * flat: `perspective(P) rotateX(-ny·A) rotateY(nx·B) scale(S)`. A10 declined it
+ * for a real reason — `perspective()` makes the element a containing block for
+ * `position: fixed`, and press is always on, so every trigger that opens a
+ * portal would anchor it to a transformed ancestor and land it in the wrong
+ * place.
+ *
+ * A10a is the narrower version that keeps the signature and the guarantee:
+ *
+ * - **Only while `:active`.** The transform exists for the length of the press
+ *   rather than for the life of the element, so nothing is a containing block at
+ *   rest.
+ * - **Never on a trigger.** `:not([aria-haspopup])` excludes exactly the
+ *   elements A10 was protecting — bits-ui marks every menu, select, popover and
+ *   dialog trigger with it. Button's own base already carves the same set out of
+ *   its press nudge (`active:not-aria-[haspopup]:translate-y-px`), so this
+ *   follows a line the component had already drawn.
+ * - **Opt-in per component**, not folded into `fx-press`. Press is always on;
+ *   tipping in 3D is not, and a select trigger or a table row has no business
+ *   doing it.
+ *
+ * The tilt rotation is added in rather than replaced, so a Button carrying both
+ * `fx-tilt` and this composes: at rest `fx-tilt` owns `transform`, and during a
+ * press this rule wins and carries both rotations. Without `fx-tilt` the two
+ * variables are 0deg from their `@property` initial values and it costs nothing.
+ */
+@utility fx-press-tilt {
+	&:active:not([aria-haspopup]) {
+		transform: perspective(var(--fx-press-perspective))
+			rotateX(calc(var(--fx-tilt-x) - var(--fx-press-ny) * var(--fx-press-tilt-max)))
+			rotateY(calc(var(--fx-tilt-y) + var(--fx-press-nx) * var(--fx-press-tilt-max)));
+	}
+}

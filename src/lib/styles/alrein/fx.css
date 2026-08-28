@@ -58,6 +58,22 @@
 	inherits: false;
 	initial-value: 50%;
 }
+/*
+ * The press point as a signed vector, -1 to 1 from the centre. Unitless rather
+ * than an angle so the magnitude stays a token — `press.ts` reports *where* the
+ * press landed and the stylesheet decides how far that tips the element, which
+ * is the same split every other effect here uses.
+ */
+@property --fx-press-nx {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 0;
+}
+@property --fx-press-ny {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 0;
+}
 @property --fx-tilt-x {
 	syntax: '<angle>';
 	inherits: false;
@@ -96,6 +112,14 @@
 @media (prefers-reduced-motion: reduce) {
 	:root {
 		--fx-press-depth: 0;
+		/*
+		 * The press tilt is transform-driven motion, so §7.8 requires it gone here
+		 * rather than merely slowed. Zeroing the angle rather than dropping the
+		 * rule keeps one code path: `perspective()` with no rotation renders
+		 * identically to no transform at all. Base value is in tokens.css with the
+		 * other tilt tokens.
+		 */
+		--fx-press-tilt-max: 0deg;
 	}
 }
 
@@ -108,6 +132,8 @@
  */
 [data-fx='off'] {
 	--fx-press-depth: 0;
+	/* §3.3: press "degrades to colour/opacity only". A 3D tip is neither. */
+	--fx-press-tilt-max: 0deg;
 }
 
 [data-fx='off'] :is(.fx-shimmer-loading, .fx-shimmer) {

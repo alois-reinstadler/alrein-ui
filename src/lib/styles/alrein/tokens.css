@@ -52,6 +52,16 @@
 	--fx-glow-opacity: 0.35;
 	--fx-tilt-max: 6deg;
 	--fx-tilt-perspective: 800px;
+
+	/*
+	 * The press tilt (A10a). Tighter perspective and a larger angle than hover
+	 * tilt, because they say different things: hover tilt is "a discrete object
+	 * you can pick up" and should barely move, press is "I registered your click"
+	 * and is over in 80ms. 420px is the source's own figure for this; the angle is
+	 * pulled in from its 12–18° to sit inside §2's restraint.
+	 */
+	--fx-press-tilt-max: 7deg;
+	--fx-press-perspective: 420px;
 	--fx-magnet-max: 8px;
 	/*
 	 * The loading loop, deliberately separate from the transition scale.

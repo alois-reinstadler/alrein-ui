@@ -14,6 +14,13 @@
 	 *   - `fx-press` on the base. Press is not opt-in (SPEC.md §3.1) — it is the
 	 *     acknowledgement that a click registered. At rest it is visually inert:
 	 *     `scale: 1` and a tint at opacity 0.
+	 *   - `fx-press-tilt` on the base (A10a). The source tips a control *toward*
+	 *     the press point instead of scaling it flat, and that is Button's most
+	 *     recognisable piece of feedback. It applies only while `:active` and
+	 *     never on `[aria-haspopup]`, so the `perspective()` containing block A10
+	 *     was protecting portals from exists for the length of a press and never
+	 *     on a trigger — the same set this base already excludes from its press
+	 *     nudge one line below.
 	 *   - five effect variants, each resolving to Tailwind utility classes so
 	 *     `cn()` still merges and a consumer's `class` still wins (A2).
 	 *
@@ -23,7 +30,7 @@
 	 * exist on components the matrix does not permit them for.
 	 */
 	export const buttonVariants = tv({
-		base: "rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 fx-press",
+		base: "rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 fx-press fx-press-tilt",
 		variants: {
 			variant: {
 				default: "bg-primary text-primary-foreground hover:bg-primary/80",
