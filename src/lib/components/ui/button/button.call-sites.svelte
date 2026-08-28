@@ -26,12 +26,14 @@
 <Button variant={dynamic}>dynamic variant</Button>
 <Button disabled>disabled</Button>
 
-<!-- alrein additions on painted surfaces. -->
-<Button glow>glow</Button>
-<Button gradient tilt>gradient + tilt</Button>
-<Button variant="secondary" glow gradient={false}>secondary glow</Button>
-<Button magnet size="lg">magnet</Button>
+<!-- A31: the three surface treatments are variants, and build on primary. -->
+<Button variant="gradient">gradient</Button>
+<Button variant="glow" size="lg">glow</Button>
+<Button variant="shimmer">shimmer</Button>
 
-<!-- Effects that survive a transparent surface. -->
-<Button variant="ghost" shimmer>ghost + shimmer</Button>
-<Button variant="link" tilt>link + tilt</Button>
+<!-- The one effect prop left, composing with any variant. -->
+<Button magnet size="lg">magnet</Button>
+<Button variant="gradient" magnet>gradient + magnet</Button>
+
+<!-- Not an effect: the §5 progress state (A30). -->
+<Button progress={0.4}>uploading</Button>

@@ -62,6 +62,53 @@ function classedElements(markup, className) {
 	return found;
 }
 
+/**
+ * The whole opening tag around a `class="…"` match.
+ *
+ * Deliberately not `/<[^>]*>/`: a Tailwind class value contains `>` all the
+ * time — `[&>span:last-child]`, `group-data-[orientation=vertical]/tabs:after:…`
+ * — so a `[^>]*` scan ends the tag in the middle of an attribute. This walks
+ * forward from the `<` and only treats `>` as the end when it is outside quotes.
+ */
+function enclosingTag(markup, index) {
+	const start = markup.lastIndexOf('<', index);
+	if (start === -1) return '';
+	let quote = null;
+	for (let i = start; i < markup.length; i += 1) {
+		const char = markup[i];
+		if (quote) {
+			if (char === quote) quote = null;
+		} else if (char === '"' || char === "'") {
+			quote = char;
+		} else if (char === '>') {
+			return markup.slice(start, i + 1);
+		}
+	}
+	return markup.slice(start);
+}
+
+/**
+ * Elements carrying `className`, minus the ones where it is a *variant* rather
+ * than an effect.
+ *
+ * A31 moved Button's `gradient`, `glow` and `shimmer` into its `variant` enum,
+ * so `fx-gradient` and friends are now in Button's markup unconditionally — the
+ * author asked for that surface, and the matrix no longer governs it. They are
+ * still effects on Alert, Card, Badge and the rest, and the guarantees below are
+ * still worth asserting *there*, so the assertions exclude Button by slot rather
+ * than being dropped.
+ */
+function classedEffectElements(markup, className) {
+	const found = [];
+	for (const match of markup.matchAll(/class="([^"]*)"/g)) {
+		if (!match[1].split(/\s+/).includes(className)) continue;
+		const tag = enclosingTag(markup, match.index);
+		if (/data-slot="button"/.test(tag)) continue;
+		found.push(tag);
+	}
+	return found;
+}
+
 function scopeLevels(markup) {
 	return [...markup.matchAll(/<div[^>]*data-slot="fx-scope"[^>]*>/g)].map((match) => {
 		const level = /data-fx="(\w+)"/.exec(match[0]);
@@ -121,8 +168,11 @@ try {
 			// §3.2 steps 2 and 3, and §7.9. A server has no pointer, so these can
 			// never be lit at render time regardless of the level or the prop.
 			for (const effect of POINTER_TRACKED) {
-				const found = classedElements(markup, effect);
-				assert(found.length === 0, `no ${effect} in server markup (there is no pointer)`);
+				const found = classedEffectElements(markup, effect);
+				assert(
+					found.length === 0,
+					`no ${effect} in server markup where it is an effect (there is no pointer)`
+				);
 			}
 
 			// §3.1: press is not opt-in. Where there is something pressable it stays
@@ -149,8 +199,8 @@ try {
 				// path, so it has to hold in the markup and not merely at runtime.
 				for (const effect of STATIC_EFFECTS) {
 					assert(
-						classedElements(markup, effect).length === 0,
-						`no ${effect} anywhere at data-fx="off"`
+						classedEffectElements(markup, effect).length === 0,
+						`no ${effect} where it is an effect at data-fx="off"`
 					);
 				}
 			} else {

@@ -86,7 +86,7 @@
 	<div class="grid gap-4 sm:grid-cols-2">
 		<FxScope level="expressive" class="block rounded-lg border p-4">
 			<p class="mb-3 text-xs font-medium text-muted-foreground">Bereich: ausdrucksstark</p>
-			<Button>Primär — glüht von selbst</Button>
+			<Button magnet size="lg">Magnet — erst hier verfügbar</Button>
 		</FxScope>
 		<FxScope level="off" class="block rounded-lg border p-4">
 			<p class="mb-3 text-xs font-medium text-muted-foreground">
@@ -97,7 +97,7 @@
 			     Inferring nesting from document order was wrong the moment a sibling
 			     scope appeared later on the page. -->
 			<FxScope level="expressive" class="contents" data-ssr-check="sticky-off">
-				<Button glow>bleibt dunkel</Button>
+				<Button magnet size="lg">bleibt ruhig</Button>
 			</FxScope>
 		</FxScope>
 	</div>

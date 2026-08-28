@@ -847,3 +847,58 @@ Full reasoning in `SUBSTRATE.md`.
   the label, and reading the same number twice is noise. The value is clamped to 0–1 rather than
   trusted, because `UploadState.progress` is a mean and a caller doing its own bookkeeping can hand
   over 1.02 or a NaN from a division by zero.
+
+### Amendments from the API review
+
+- **A31 — `gradient`, `glow` and `shimmer` are variants, not effects; cursor tilt belongs to Card.**
+  The maintainer's call, and the right one: a surface treatment an author picks is not a motion the
+  pointer drives, and §3.4 governs the latter. On Button the three fold into the `variant` enum and
+  build on `default` — they are emphasis on the *primary action*, and a gradient CTA that is also
+  secondary is not a thing anyone wants.
+
+  Folding them in deletes a whole class of type gymnastics. `ghost + gradient` was a contradiction
+  §3.5 required to be a type error, enforced by a conditional type keyed on the variant, which
+  existed only to dodge the `Omit<ComponentProps<…>>` union collapse that shadcn's own
+  `InputGroupButton` triggers. Mutually exclusive variants make the contradiction *unrepresentable*
+  rather than merely rejected, and `ButtonProps` stops being generic.
+
+  **Cursor-following `tilt` is now Card's alone.** It came off Button, Avatar, checkbox-card,
+  radio-card and UploadArea. What those press instead is A10a, which is unconditional and needs no
+  prop. Avatar needed no change at all: it deliberately has no press of its own, because an
+  interactive avatar belongs inside a `<Button variant="ghost" size="icon">` — which now tips.
+
+  `magnet` stays a boolean, because it really is an effect: pointer-driven, `expressive`-only, and it
+  composes with whatever variant the button already has.
+
+  **What did not change, and is the one thing left open.** `data-fx="off"` still blanks the
+  decorative paint, because the CSS kill-switch targets `.fx-gradient` / `.fx-glow` / `.fx-shimmer`
+  and those classes are *still effects* on Alert, Card, Badge, Accordion and Chip, which have not
+  been converted. So `variant="gradient"` at `off` renders as plain primary. That is defensible —
+  "off" means nothing decorative, and a variant chooses *which* decoration, not whether — but it is
+  a decision, and it should be revisited when the other components convert.
+
+  `ssr:check` was narrowed rather than dropped: its "no pointer-tracked effect in server markup" and
+  "no static effect at `off`" assertions now exclude `[data-slot="button"]`, so the guarantees still
+  hold everywhere the classes remain effects. Finding the enclosing tag needed a quote-aware scanner
+  rather than `/<[^>]*>/`, because a Tailwind class value contains `>` all the time.
+
+- **A32 — Button owns its `transition`, because three utilities were fighting over it.**
+  Found by measurement, not by reading: the resolved transition on a live Button was
+  `all / 0.15s / cubic-bezier(0.4, 0, 0.2, 1)` — Tailwind's defaults, and **not one value from the
+  motion scale**. Upstream's `transition-all` was beating both `fx-press`'s spring and `fx-tilt`'s
+  transform timing, so the 80ms overshoot §2 reserves for press had never actually run on the
+  library's most-used component, and `bans:check` could not see it because there is no literal
+  duration anywhere — the failure is a cascade collision between an upstream utility and a custom
+  one.
+
+  Only one `transition` declaration can win on an element, so the fix is to write the whole thing
+  once, at the call site, with per-property timing: scale on the spring at `instant`, transform at
+  `instant`, and colour, border and shadow at `fast`. Every value is a token. Verified resolved.
+
+  This diverges from the byte-identical upstream base string, under A24b's rule — §1's promise is
+  about API and appearance, and an animation that silently ignores the whole motion scale is neither
+  API nor the intended appearance.
+
+  `F6-spring` was **widened, not bypassed**: the curve moved to Button because Button now owns the
+  declaration, and this is still press feedback, which is the first of the two sites the rule already
+  permits. The reason is written into the rule's exclude list, as §1 requires.

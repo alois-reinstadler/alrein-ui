@@ -46,25 +46,27 @@ export type CapabilityRow = Partial<Record<FxEffect, Capability>>;
  * Popover and Dialog by design, not by omission.
  */
 export const CAPABILITIES = {
-	button: {
-		gradient: 'primary only',
-		glow: 'primary/accent',
-		shimmer: 'triggered',
-		tilt: 'size ≥ md, standalone',
-		magnet: 'expressive only'
-	},
+	/*
+	 * A31: Button's gradient, glow and shimmer left this table for its `variant`
+	 * enum — they are surface treatments an author picks, not motion the pointer
+	 * drives, and the matrix governs the latter. Its cursor-following `tilt` went
+	 * to Card, which is now the only component with one. What is left is the one
+	 * effect Button still has.
+	 */
+	button: { magnet: 'expressive only' },
 	'button-group': { gradient: true },
+	/* A31: the only cursor-following tilt in the library. */
 	card: { gradient: 'hero variant', glow: 'interactive only', tilt: true },
 	badge: { gradient: true, glow: 'status-critical', shimmer: 'triggered' },
 	chip: { gradient: true },
 	alert: { gradient: true, glow: 'danger/warn', shimmer: 'once on mount' },
 	accordion: { gradient: 'header only', glow: 'trigger' },
-	avatar: { gradient: 'fallback bg', glow: 'presence state', shimmer: true, tilt: 'size ≥ lg' },
+	avatar: { gradient: 'fallback bg', glow: 'presence state', shimmer: true },
 	'avatar-group': { gradient: true, shimmer: true },
-	'checkbox-card': { gradient: 'selected', glow: 'selected', tilt: true },
-	'radio-card': { gradient: 'selected', glow: 'selected', tilt: true },
+	'checkbox-card': { gradient: 'selected', glow: 'selected' },
+	'radio-card': { gradient: 'selected', glow: 'selected' },
 	steps: { gradient: 'active step' },
-	'upload-area': { glow: 'drag-over', shimmer: true, tilt: true },
+	'upload-area': { glow: 'drag-over', shimmer: true },
 	skeleton: { shimmer: true },
 	'table-row': { gradient: true }
 } as const satisfies Record<string, CapabilityRow>;

@@ -37,11 +37,11 @@
 >
 	<div class="flex flex-col gap-4">
 		<Row label="einzeln">
-			<Button gradient shimmer glow>gradient + shimmer + glow</Button>
+			<Button variant="gradient">gradient</Button>
 		</Row>
 		<Row label="dieselben Props, gruppiert">
 			<ButtonGroup.Root>
-				<Button gradient shimmer glow>bleibt gradient</Button>
+				<Button variant="gradient">bleibt gradient</Button>
 				<Button variant="outline">Zweiter</Button>
 			</ButtonGroup.Root>
 		</Row>

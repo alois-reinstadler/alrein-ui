@@ -122,7 +122,8 @@ export const RULES = [
 		description:
 			"The spring curve is restricted to press feedback and toggle thumbs only " +
 			"(switch thumb, checkbox mark). It overshoots, and overshoot anywhere else reads " +
-			"as slow and drunk in a data-dense screen.",
+			"as slow and drunk in a data-dense screen. Allowlisted per file, and the list is " +
+			"the enumeration of those two sites — widening it is a decision, not a bypass.",
 		exclude: [...TEST_FILES, "src/lib/fx/press.ts",
 			"src/lib/styles/alrein/press.css",
 			// Toggle thumbs — the second and only other site SPEC.md §2 permits an
@@ -130,7 +131,17 @@ export const RULES = [
 			// the same mechanic: they latch rather than slide.
 			"src/lib/components/ui/switch/switch.svelte",
 			"src/lib/components/ui/checkbox/checkbox.svelte",
-			"src/lib/components/ui/radio-group/radio-group-item.svelte", TOKENS],
+			"src/lib/components/ui/radio-group/radio-group-item.svelte",
+			// A32. Widened, not bypassed: this *is* press feedback, the first of the
+			// two sites the rule already permits. It moved out of press.css because
+			// only one `transition` declaration can win on an element, and on Button
+			// three utilities wanted it — upstream's `transition-all`, `fx-press`'s
+			// spring and `fx-tilt`'s. `transition-all` was winning, so the spring §2
+			// reserves for press never actually ran there. Owning the whole
+			// declaration at the call site is what fixes that, and it drags the curve
+			// along with it. The rule still catches the spring anywhere it is not
+			// press or a toggle thumb, which is what it is for.
+			"src/lib/components/ui/button/button.svelte", TOKENS],
 		test: (line) => /ease-fx-spring/.test(line)
 	},
 	{

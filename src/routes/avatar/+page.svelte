@@ -53,7 +53,7 @@
 >
 	<Row label="Größen">
 		{#each ['sm', 'default', 'lg', 'xl'] as size (size)}
-			<Avatar.Root size={size as 'lg'} tilt>
+			<Avatar.Root size={size as 'lg'}>
 				<Avatar.Fallback>{size.slice(0, 2).toUpperCase()}</Avatar.Fallback>
 			</Avatar.Root>
 		{/each}

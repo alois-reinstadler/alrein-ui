@@ -7,38 +7,64 @@
  * error, this file fails to compile and the regression is caught here rather
  * than in a review six components later.
  *
+ * ## What A31 changed here
+ *
+ * `gradient`, `glow` and `shimmer` are variants now, not effect props, so the
+ * contradictions this file used to assert are **unrepresentable** rather than
+ * rejected: you cannot pass `variant="ghost"` and `variant="gradient"` at once
+ * because they are the same field. The `@ts-expect-error` cases that policed
+ * `ghost + gradient` are gone with the props they policed — an assertion that a
+ * non-existent prop is rejected tests nothing.
+ *
+ * What is still worth asserting is that the props really are gone, that the
+ * variant union is closed, and that `magnet` survived as a boolean.
+ *
+ * `ButtonProps` is also no longer generic: with one unconditional effect prop
+ * left there is no variant-keyed conditional type to parameterise.
+ *
  * Nothing imports this at runtime; it exists to be type-checked.
  */
 import type { ButtonProps } from './button.svelte';
 
-/*
- * `ButtonProps` is generic in the variant, so a props *object* has to name it —
- * `ButtonProps<'ghost'>`. In markup the generic is inferred from the `variant`
- * attribute and nobody writes it; `button.call-sites.svelte` covers that path,
- * which is the one that actually has to work.
- */
-
 /* Upstream call sites must keep compiling unchanged (SPEC.md §1, §7). */
 const upstreamDefault: ButtonProps = {};
-const upstreamDestructive: ButtonProps<'destructive'> = { variant: 'destructive', size: 'sm' };
-const upstreamGhostIcon: ButtonProps<'ghost'> = { variant: 'ghost', size: 'icon' };
-const upstreamLink: ButtonProps<'link'> = { variant: 'link', href: '/somewhere' };
-const upstreamIconXs: ButtonProps<'outline'> = { variant: 'outline', size: 'icon-xs' };
+const upstreamDestructive: ButtonProps = { variant: 'destructive', size: 'sm' };
+const upstreamGhostIcon: ButtonProps = { variant: 'ghost', size: 'icon' };
+const upstreamLink: ButtonProps = { variant: 'link', href: '/somewhere' };
+const upstreamIconXs: ButtonProps = { variant: 'outline', size: 'icon-xs' };
 
-/* Effects the capability matrix allows. */
-const glowing: ButtonProps = { glow: true };
-const gradientTilt: ButtonProps = { gradient: true, tilt: true };
-const secondaryGlow: ButtonProps<'secondary'> = { variant: 'secondary', glow: true, gradient: false };
-const ghostShimmer: ButtonProps<'ghost'> = { variant: 'ghost', shimmer: true };
+/* A31: the three surface treatments are variants. */
+const gradientCta: ButtonProps = { variant: 'gradient' };
+const glowingCta: ButtonProps = { variant: 'glow', size: 'lg' };
+const shimmeringCta: ButtonProps = { variant: 'shimmer' };
+
+/* The one effect prop left, and it composes with any variant. */
 const magneticCta: ButtonProps = { magnet: true, size: 'lg' };
+const magneticGradient: ButtonProps = { variant: 'gradient', magnet: true };
 
-/* A transparent surface has nothing to paint. */
-// @ts-expect-error ghost + gradient is a contradiction (SPEC.md §3.5)
-const ghostGradient: ButtonProps<'ghost'> = { variant: 'ghost', gradient: true };
-// @ts-expect-error ghost + glow has nothing to glow from (SPEC.md §3.5)
-const ghostGlow: ButtonProps<'ghost'> = { variant: 'ghost', glow: true };
-// @ts-expect-error link is transparent for the same reason as ghost
-const linkGlow: ButtonProps<'link'> = { variant: 'link', glow: true };
+/* The §5 progress state is not an effect and takes a number. */
+const uploading: ButtonProps = { progress: 0.42 };
+
+/*
+ * The contradictions §3.5 named are now structural. `ghost` and `gradient` are
+ * two values of one field, so this is a plain union error rather than a
+ * conditional-type one — but it is still the error, and it still has to fire.
+ */
+// @ts-expect-error a button is one variant, not two
+const ghostAndGradient: ButtonProps = { variant: 'ghost gradient' };
+// @ts-expect-error the variant union is closed
+const inventedVariant: ButtonProps = { variant: 'neon' };
+
+/* The retired props must not quietly come back as `any`. */
+// @ts-expect-error `gradient` is a variant now, not a prop (A31)
+const retiredGradient: ButtonProps = { gradient: true };
+// @ts-expect-error `glow` is a variant now, not a prop (A31)
+const retiredGlow: ButtonProps = { glow: true };
+// @ts-expect-error `shimmer` is a variant now, not a prop (A31)
+const retiredShimmer: ButtonProps = { shimmer: true };
+/* Cursor-following tilt belongs to Card alone; Button tips on press instead. */
+// @ts-expect-error Button has no `tilt` prop (A31, A10a)
+const retiredTilt: ButtonProps = { tilt: true };
 
 /* Effects the matrix does not give Button at all must not exist as props. */
 // @ts-expect-error Button has no `parallax` effect
@@ -51,13 +77,17 @@ export {
 	upstreamGhostIcon,
 	upstreamLink,
 	upstreamIconXs,
-	glowing,
-	gradientTilt,
-	secondaryGlow,
-	ghostShimmer,
+	gradientCta,
+	glowingCta,
+	shimmeringCta,
 	magneticCta,
-	ghostGradient,
-	ghostGlow,
-	linkGlow,
+	magneticGradient,
+	uploading,
+	ghostAndGradient,
+	inventedVariant,
+	retiredGradient,
+	retiredGlow,
+	retiredShimmer,
+	retiredTilt,
 	unknownEffect
 };

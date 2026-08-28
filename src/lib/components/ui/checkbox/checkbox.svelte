@@ -17,8 +17,6 @@
 		gradient?: boolean;
 		/** Pointer-tracked inner highlight on the selected card. Only while checked. */
 		glow?: boolean;
-		/** "A discrete object you can pick up" (§3.1). Allowed unconditionally on cards. */
-		tilt?: boolean;
 	}
 
 	/**
@@ -56,7 +54,6 @@
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
 	import { press as pressEffect } from "$lib/fx/press.js";
-	import { tilt as tiltEffect } from "$lib/fx/tilt.js";
 
 	let {
 		ref = $bindable(null),
@@ -68,7 +65,6 @@
 		description,
 		gradient,
 		glow,
-		tilt,
 		...restProps
 	}: CheckboxProps = $props();
 
@@ -80,7 +76,6 @@
 		fx.resolve("gradient", gradient, { available: isCard && checked === true })
 	);
 	const useGlow = $derived(fx.resolve("glow", glow, { available: isCard && checked === true }));
-	const useTilt = $derived(fx.resolve("tilt", tilt, { available: isCard }));
 
 	const boxClasses = $derived(
 		cn(
@@ -128,15 +123,13 @@
 		data-slot="checkbox-card"
 		data-checked={checked === true ? "" : undefined}
 		class={cn(
-			"flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-4 text-sm text-card-foreground shadow-xs transition-colors duration-fast ease-fx-out has-data-checked:border-primary has-disabled:cursor-not-allowed has-disabled:opacity-50 fx-press",
+			"flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-4 text-sm text-card-foreground shadow-xs transition-colors duration-fast ease-fx-out has-data-checked:border-primary has-disabled:cursor-not-allowed has-disabled:opacity-50 fx-press fx-press-tilt",
 			useGradient && "fx-gradient border-transparent text-primary-foreground",
 			useGlow && "fx-glow",
-			useTilt && "fx-tilt",
 			className
 		)}
 		{@attach pressEffect()}
 		{@attach useGlow ? glowEffect() : undefined}
-		{@attach useTilt ? tiltEffect() : undefined}
 	>
 		{@render box()}
 		{#if label || description}

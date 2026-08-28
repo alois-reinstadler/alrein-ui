@@ -10,12 +10,12 @@ const upstreamDisabled: RadioGroupItemProps = { value: 'b', disabled: true };
 
 /* The card presentation and the effects §3.4 allows on it. */
 const card: RadioGroupItemProps = { value: 'c', variant: 'card' };
-const cardTilt: RadioGroupItemProps = { value: 'd', variant: 'card', tilt: true };
 const cardSelected: RadioGroupItemProps = { value: 'e', variant: 'card', gradient: true, glow: true };
 
-/* A 16px dot has nothing to glow from and nothing to tilt. */
-// @ts-expect-error tilt is a card-only effect (SPEC.md §3.4)
-const bareTilt: RadioGroupItemProps = { value: 'f', tilt: true };
+/* A 16px dot has nothing to glow from. */
+/* A31: cursor-following tilt belongs to Card alone, so the prop is gone entirely. */
+// @ts-expect-error RadioGroupItem has no `tilt` prop (A31)
+const retiredTilt: RadioGroupItemProps = { value: 'f', variant: 'card', tilt: true };
 // @ts-expect-error glow is a card-only effect
 const bareGlow: RadioGroupItemProps = { value: 'g', glow: true };
 // @ts-expect-error the label snippet only has a surface to sit on in card form
@@ -31,9 +31,8 @@ export {
 	upstream,
 	upstreamDisabled,
 	card,
-	cardTilt,
 	cardSelected,
-	bareTilt,
+	retiredTilt,
 	bareGlow,
 	bareLabel,
 	shimmering,

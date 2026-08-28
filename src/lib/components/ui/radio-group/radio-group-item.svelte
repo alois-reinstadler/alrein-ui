@@ -13,7 +13,6 @@
 	interface CardEffects {
 		gradient?: boolean;
 		glow?: boolean;
-		tilt?: boolean;
 	}
 
 	/**
@@ -44,7 +43,6 @@
 	import { getRadioGroupValue } from "./context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
 	import { press as pressEffect } from "$lib/fx/press.js";
-	import { tilt as tiltEffect } from "$lib/fx/tilt.js";
 
 	let {
 		ref = $bindable(null),
@@ -54,7 +52,6 @@
 		description,
 		gradient,
 		glow,
-		tilt,
 		...restProps
 	}: RadioGroupItemProps = $props();
 
@@ -71,7 +68,6 @@
 
 	const useGradient = $derived(fx.resolve("gradient", gradient, { available: isCard && selected }));
 	const useGlow = $derived(fx.resolve("glow", glow, { available: isCard && selected }));
-	const useTilt = $derived(fx.resolve("tilt", tilt, { available: isCard }));
 
 	const dotClasses = $derived(
 		cn(
@@ -103,15 +99,13 @@
 		data-slot="radio-card"
 		data-checked={selected ? "" : undefined}
 		class={cn(
-			"flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-4 text-sm text-card-foreground shadow-xs transition-colors duration-fast ease-fx-out has-data-checked:border-primary has-disabled:cursor-not-allowed has-disabled:opacity-50 fx-press",
+			"flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-4 text-sm text-card-foreground shadow-xs transition-colors duration-fast ease-fx-out has-data-checked:border-primary has-disabled:cursor-not-allowed has-disabled:opacity-50 fx-press fx-press-tilt",
 			useGradient && "fx-gradient border-transparent text-primary-foreground",
 			useGlow && "fx-glow",
-			useTilt && "fx-tilt",
 			className
 		)}
 		{@attach pressEffect()}
 		{@attach useGlow ? glowEffect() : undefined}
-		{@attach useTilt ? tiltEffect() : undefined}
 	>
 		{@render dot()}
 		{#if label || description}

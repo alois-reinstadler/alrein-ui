@@ -32,7 +32,7 @@ const parts = [
 const upstream: Props = {};
 
 /* The effects the matrix grants, with their conditions. */
-const tilted: Props = { size: 'lg', tilt: true };
+const tilted: Props = { size: 'lg',  };
 const present: Props = { presence: 'online', glow: true };
 const loading: Props = { shimmer: true };
 const gradientFallback: Props = { gradient: true };

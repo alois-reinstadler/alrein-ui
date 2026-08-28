@@ -14,12 +14,12 @@ const upstreamIndeterminate: CheckboxProps = { indeterminate: true, disabled: tr
 
 /* The card presentation and the effects §3.4 allows on it. */
 const card: CheckboxProps = { variant: 'card' };
-const cardTilt: CheckboxProps = { variant: 'card', tilt: true };
 const cardSelected: CheckboxProps = { variant: 'card', gradient: true, glow: true };
 
-/* A 16px box has nothing to glow from and nothing to tilt. */
-// @ts-expect-error tilt is a card-only effect (SPEC.md §3.4)
-const bareTilt: CheckboxProps = { tilt: true };
+/* A 16px box has nothing to glow from. */
+/* A31: cursor-following tilt belongs to Card alone, so the prop is gone entirely. */
+// @ts-expect-error Checkbox has no `tilt` prop (A31)
+const retiredTilt: CheckboxProps = { variant: 'card', tilt: true };
 // @ts-expect-error glow is a card-only effect
 const bareGlow: CheckboxProps = { glow: true };
 // @ts-expect-error gradient is a card-only effect
@@ -38,9 +38,8 @@ export {
 	upstreamChecked,
 	upstreamIndeterminate,
 	card,
-	cardTilt,
 	cardSelected,
-	bareTilt,
+	retiredTilt,
 	bareGlow,
 	bareGradient,
 	bareLabel,

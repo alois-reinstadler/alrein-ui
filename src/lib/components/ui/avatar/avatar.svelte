@@ -92,9 +92,6 @@
 			shimmer: {
 				true: "[&_[data-slot=avatar-fallback]]:fx-shimmer-loading",
 			},
-			tilt: {
-				true: "fx-tilt",
-			},
 		},
 	});
 
@@ -158,16 +155,6 @@
 		 * loop to loading only.
 		 */
 		shimmer?: boolean;
-		/**
-		 * "A discrete object you can pick up" (§3.1). `size="lg"` only.
-		 *
-		 * §3.5, and it bites: the `transform` creates a containing block for
-		 * `position: fixed`. **Do not tilt an avatar that anchors a tooltip, a
-		 * popover or a menu** — the portal will anchor to the tilted avatar. This
-		 * is the same hazard A20 declines the 3D press for; tilt is opt-in and
-		 * explicit, so it stays available where nothing floats off it.
-		 */
-		tilt?: boolean;
 	};
 
 	/**
@@ -188,7 +175,6 @@
 	import { cn } from "$lib/utils.js";
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
-	import { tilt as tiltEffect } from "$lib/fx/tilt.js";
 
 	let {
 		ref = $bindable(null),
@@ -202,7 +188,6 @@
 		gradient,
 		glow,
 		shimmer,
-		tilt,
 		...restProps
 	}: AvatarProps = $props();
 
@@ -219,7 +204,6 @@
 	const useGradient = $derived(fx.resolve("gradient", gradient));
 	const useGlow = $derived(fx.resolve("glow", glow, { available: presence !== undefined }));
 	const useShimmer = $derived(fx.resolve("shimmer", shimmer, { available: loadingStatus !== "loaded" }));
-	const useTilt = $derived(fx.resolve("tilt", tilt, { available: size === "lg" }));
 
 	const label = $derived(
 		typing ? TYPING_LABEL : presence ? (presenceLabel ?? PRESENCE_LABELS[presence]) : undefined
@@ -251,13 +235,11 @@
 			gradient: useGradient,
 			glow: useGlow,
 			shimmer: useShimmer,
-			tilt: useTilt,
 		}),
 		className
 	)}
 	{...restProps}
 	{@attach useGlow ? glowEffect() : undefined}
-	{@attach useTilt ? tiltEffect() : undefined}
 >
 	{@render children?.()}
 

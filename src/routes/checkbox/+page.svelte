@@ -57,7 +57,7 @@
 			{#snippet description()}Beide nur, solange gewählt — eine ungewählte Karte verspricht nichts.{/snippet}
 		</Checkbox>
 
-		<Checkbox variant="card" bind:checked={cardTilt} tilt>
+		<Checkbox variant="card" bind:checked={cardTilt}>
 			{#snippet label()}Tilt{/snippet}
 			{#snippet description()}Maximal 6°, aus dem Token --fx-tilt-max.{/snippet}
 		</Checkbox>
@@ -74,7 +74,7 @@
 	note="§3.4 gibt einer nackten Checkbox gar keine dekorativen Effekte — eine 16-px-Box hat nichts, woraus sie glühen könnte, und nichts zum Kippen. Die Props existieren auf der Standardvariante schlicht nicht."
 >
 	<pre class="overflow-x-auto rounded-lg border bg-muted/40 p-4 text-xs"><code
-			>{`<Checkbox tilt />                      ← Kartenexklusiv
+			>{`<Checkbox />                      ← Kartenexklusiv
 <Checkbox glow />                      ← Kartenexklusiv
 <Checkbox variant="card" shimmer />    ← Shimmer gehört zu Ladezuständen
 <Checkbox variant="card" magnet />     ← Magnet nie in einem Formular`}</code

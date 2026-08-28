@@ -297,7 +297,7 @@
 	data-slot="chip"
 	data-selected={isSelected ? "" : undefined}
 	data-disabled={disabled ? "" : undefined}
-	class={cn(styles.root(), interactive && "fx-press", className)}
+	class={cn(styles.root(), interactive && "fx-press fx-press-tilt", className)}
 	{...restProps}
 	{@attach interactive ? pressEffect({ enabled: () => !disabled }) : undefined}
 >

@@ -58,30 +58,28 @@
 </Section>
 
 <Section
-	title="Effekte"
-	note="Jeder Effekt hier ist pro Instanz angefordert. Bei „Ruhig“ gilt genau das Angeforderte; bei „Ausdrucksstark“ glüht der Primärbutton zusätzlich von selbst, und Magnet wird überhaupt erst verfügbar."
+	title="Varianten mit Nachdruck"
+	note="A31. Gradient, Glow und Shimmer waren Effekt-Props und sind jetzt Varianten — es sind Flächenbehandlungen, die man wählt, keine Bewegungen, die der Zeiger treibt. Alle drei bauen auf primär auf: sie sind Nachdruck auf der Hauptaktion, und ein Gradient-CTA, der zugleich sekundär ist, will niemand. Weil sie Varianten sind, schaltet „Aus“ sie nicht ab — was sich weiterhin nach Zeiger und nach reduzierter Bewegung richtet, ist die Bewegung darin: Glow folgt nur dort, wo es einen Zeiger gibt, und der Shimmer-Durchlauf geht bei reduzierter Bewegung auf 0 ms."
 >
-	<Row label="gradient (nur primär)">
-		<Button gradient>Jetzt starten</Button>
-		<Button variant="secondary" gradient>sekundär + gradient</Button>
+	<Row label="variant">
+		<Button variant="gradient">Jetzt starten</Button>
+		<Button variant="glow">Hauptaktion</Button>
+		<Button variant="shimmer">Zeigen</Button>
 	</Row>
-	<Row label="glow (primär/akzent)">
-		<Button glow>Hauptaktion</Button>
-		<Button variant="secondary" glow>sekundär</Button>
+	<Row label="in jeder Größe">
+		<Button variant="gradient" size="sm">klein</Button>
+		<Button variant="glow" size="lg">groß</Button>
+		<Button variant="gradient" size="icon" aria-label="Aktion"><span aria-hidden="true">→</span></Button>
 	</Row>
-	<Row label="shimmer (ausgelöst)">
-		<Button shimmer>Zeigen</Button>
-		<Button variant="ghost" shimmer>ghost + shimmer</Button>
-	</Row>
-	<Row label="tilt (ab Größe md)">
-		<Button tilt size="lg">Kippen</Button>
-		<Button tilt size="sm">zu klein — bleibt aus</Button>
-	</Row>
+</Section>
+
+<Section
+	title="Der einzige Effekt, der übrig ist"
+	note="Magnet bleibt ein Boolean, weil er wirklich ein Effekt ist: zeigergetrieben, nur bei „Ausdrucksstark“ verfügbar, und er kombiniert sich mit jeder Variante. Zeigerverfolgendes Kippen hat Button nicht mehr — das gehört jetzt allein der Card. Was ein Button stattdessen tut, steht im nächsten Abschnitt."
+>
 	<Row label="magnet (nur ausdrucksstark)">
 		<Button magnet size="lg">Unübersehbar</Button>
-	</Row>
-	<Row label="explizit abgeschaltet">
-		<Button glow={false}>glow={'{false}'} schlägt jede Voreinstellung</Button>
+		<Button variant="gradient" magnet size="lg">gradient + magnet</Button>
 	</Row>
 </Section>
 
@@ -93,14 +91,16 @@
 		<Button size="lg">oben links drücken</Button>
 		<Button variant="outline" size="lg">unten rechts drücken</Button>
 	</Row>
-	<Row label="mit Tilt zusammen">
-		<Button tilt size="lg">Hover kippt, Druck kippt weiter</Button>
+	<Row label="in jeder Größe, ohne Prop">
+		<Button size="xs">xs</Button>
+		<Button size="lg" variant="outline">lg</Button>
+		<Button size="icon" aria-label="Kippen"><span aria-hidden="true">→</span></Button>
 	</Row>
 </Section>
 
 <Section
 	title="Fortschritt"
-	note="§5 verlangt für die Upload-Zeile UploadArea und einen Button-Fortschrittszustand auf einer geteilten UploadState-Klasse. Der Balken ist ein Kind, kein Pseudoelement: ::before gehört dem Glow, ::after dem Druckfeedback, und background-image gehört Gradient und Shimmer. Animiert wird allein die background-size — Malerei, nie der Layoutkasten. Und es ist kein Effekt: „Aus“ schaltet ihn nicht ab, denn §3.5 verbietet, dass ein Zustand an etwas hängt, das sich abschalten lässt."
+	note="§5 verlangt für die Upload-Zeile UploadArea und einen Button-Fortschrittszustand auf einer geteilten UploadState-Klasse. Der Balken ist ein Kind, kein Pseudoelement: ::before gehört der Glow-Variante, ::after dem Druckfeedback, und background-image gehört den Gradient- und Shimmer-Varianten. Animiert wird allein die background-size — Malerei, nie der Layoutkasten. Und es ist kein Effekt: „Aus“ schaltet ihn nicht ab, denn §3.5 verbietet, dass ein Zustand an etwas hängt, das sich abschalten lässt."
 >
 	<Row label="determiniert (0–1)">
 		<Button progress={uploaded}>
@@ -119,19 +119,20 @@
 			Prozentzahl steht schon in der Beschriftung, und sie zweimal vorzulesen ist Lärm.
 		</span>
 	</Row>
-	<Row label="mit Glow zusammen">
-		<Button glow progress={uploaded}>Hauptaktion</Button>
+	<Row label="mit der Glow-Variante zusammen">
+		<Button variant="glow" progress={uploaded}>Hauptaktion</Button>
 	</Row>
 </Section>
 
 <Section
 	title="Was ein Typfehler ist"
-	note="§3.5 verlangt, dass widersprüchliche Kombinationen Typfehler sind, keine Kommentare. Diese Zeilen lassen sich nicht schreiben — sie stehen hier als Text, weil sie sich nicht kompilieren ließen."
+	note="§3.5 verlangt, dass widersprüchliche Kombinationen Typfehler sind, keine Kommentare. Seit A31 sind die alten Widersprüche gar nicht mehr darstellbar statt nur zurückgewiesen: „ghost und zugleich gradient“ lässt sich nicht schreiben, weil beides dasselbe Feld ist. Diese Zeilen stehen als Text hier, weil sie sich nicht kompilieren ließen."
 >
 	<pre class="overflow-x-auto rounded-lg border bg-muted/40 p-4 text-xs"><code
-			>{`<Button variant="ghost" gradient />   ← eine transparente Fläche hat nichts zu bemalen
-<Button variant="ghost" glow />       ← und nichts, woraus sie glühen könnte
-<Button variant="link" glow />        ← ebenso
+			>{`<Button gradient />                   ← gradient ist eine Variante, kein Prop (A31)
+<Button glow />                       ← ebenso
+<Button tilt />                       ← Zeiger-Tilt gehört der Card (A31)
+<Button variant="neon" />             ← die Variantenliste ist geschlossen
 <Button parallax />                   ← kein Effekt, den die Matrix vergibt`}</code
 		></pre>
 </Section>

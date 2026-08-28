@@ -40,7 +40,7 @@
 				true: "fx-tilt",
 			},
 			interactive: {
-				true: "fx-press cursor-pointer",
+				true: "fx-press fx-press-tilt cursor-pointer",
 			},
 		},
 		defaultVariants: {

@@ -11,7 +11,7 @@ const upload = new UploadState();
 
 const basic: UploadAreaProps = { upload };
 const restricted: UploadAreaProps = { upload, accept: 'image/*', multiple: false };
-const withEffects: UploadAreaProps = { upload, glow: true, shimmer: true, tilt: true };
+const withEffects: UploadAreaProps = { upload, glow: true, shimmer: true,  };
 const labelled: UploadAreaProps = { upload, label: 'Belege ablegen', hint: 'PDF, höchstens 5 MB' };
 
 // @ts-expect-error §3.4 grants UploadArea no gradient

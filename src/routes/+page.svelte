@@ -81,7 +81,7 @@
 			     Inferring nesting from document order was wrong the moment a sibling
 			     scope appeared later on the page. -->
 			<FxScope level="expressive" class="contents" data-ssr-check="sticky-off">
-				<Button glow>bleibt dunkel</Button>
+				<Button magnet size="lg">bleibt ruhig</Button>
 			</FxScope>
 		</FxScope>
 	</div>

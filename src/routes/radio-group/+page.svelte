@@ -47,7 +47,7 @@
 			{#snippet label()}Pro{/snippet}
 			{#snippet description()}20 € pro Monat. Gradient und Glow nur im gewählten Zustand.{/snippet}
 		</RadioGroupItem>
-		<RadioGroupItem value="team" variant="card" tilt>
+		<RadioGroupItem value="team" variant="card">
 			{#snippet label()}Team{/snippet}
 			{#snippet description()}60 € pro Monat. Mit Tilt.{/snippet}
 		</RadioGroupItem>
@@ -59,10 +59,10 @@
 	note="Tilt ist in §3.4 uneingeschränkt erlaubt und hängt nicht am gewählten Zustand — es signalisiert „ein Gegenstand, den man aufheben kann“, nicht „gewählt“. §3.5: kein Effekt darf alleiniger Träger eines Zustands sein."
 >
 	<RadioGroup bind:value={effects} class="grid gap-3 sm:grid-cols-2">
-		<RadioGroupItem value="glow" variant="card" tilt>
+		<RadioGroupItem value="glow" variant="card">
 			{#snippet label()}Erste{/snippet}
 		</RadioGroupItem>
-		<RadioGroupItem value="tilt" variant="card" tilt>
+		<RadioGroupItem value="tilt" variant="card">
 			{#snippet label()}Zweite{/snippet}
 		</RadioGroupItem>
 	</RadioGroup>

@@ -52,7 +52,7 @@
 	title="Die drei Effekte, die §3.4 erlaubt"
 	note="Jeder trägt ein eigenes Signal. Glow feuert nur, solange eine Datei über der Fläche schwebt — es ist die Antwort auf „passiert etwas, wenn ich jetzt loslasse?“, und das ist der einzige Moment im Leben der Komponente, in dem diese Frage offen ist. Shimmer ist die Ladeschleife, wird bei reduzierter Bewegung also langsamer statt anzuhalten (A17). Tilt ist die ruhende Zusage: „das ist ein Gegenstand, auf den man etwas fallen lassen kann.“ Der Glow benutzt hier 220 px statt der Button-Voreinstellung von 180 (A23)."
 >
-	<UploadArea upload={effects} glow shimmer tilt hint="Eine Datei darüberziehen, um den Glow zu sehen." />
+	<UploadArea upload={effects} glow shimmer hint="Eine Datei darüberziehen, um den Glow zu sehen." />
 </Section>
 
 <Section

@@ -21,16 +21,36 @@
 	 *     was protecting portals from exists for the length of a press and never
 	 *     on a trigger — the same set this base already excludes from its press
 	 *     nudge one line below.
-	 *   - five effect variants, each resolving to Tailwind utility classes so
-	 *     `cn()` still merges and a consumer's `class` still wins (A2).
+	 *   - one explicit transition in place of upstream's `transition-all` (A32).
+	 *     Three utilities wanted to own `transition` on this element — upstream's
+	 *     `transition-all`, `fx-press`'s spring and `fx-tilt`'s — and only one can.
+	 *     `transition-all` was winning, so press ran at Tailwind's 150ms default
+	 *     instead of the 80ms spring §2 reserves for it, and none of the motion
+	 *     scale reached the most-used component in the library. One declaration
+	 *     with per-property timing settles it, and every value is a token.
 	 *
-	 * §3.4 permits Button: gradient (primary only), glow (primary/accent),
-	 * shimmer (triggered), tilt (size >= md, standalone), magnet (expressive
-	 * only). Those conditions are evaluated below; the effect props simply do not
-	 * exist on components the matrix does not permit them for.
+	 * ## Variants, and what is left of the effect props (A31)
+	 *
+	 * `gradient`, `glow` and `shimmer` used to be boolean effect props. They are
+	 * variants now, because that is what they always were: a surface treatment the
+	 * author picks, not a motion the pointer drives. All three build on `default`
+	 * — they are emphasis on the primary action, and a gradient CTA that is also
+	 * secondary is not a thing anyone wants.
+	 *
+	 * Folding them into `variant` also deletes a whole class of type gymnastics.
+	 * `ghost + gradient` was a contradiction §3.5 required to be a type error, and
+	 * enforcing it needed a conditional type keyed on the variant. Mutually
+	 * exclusive variants make the contradiction unrepresentable instead of merely
+	 * rejected, which is the better kind of impossible.
+	 *
+	 * `magnet` stays a boolean effect: it is pointer-driven, `expressive`-only, and
+	 * composes with whatever variant the button already has.
+	 *
+	 * `tilt` is gone. Cursor-following tilt belongs to Card alone now (A31); what a
+	 * button does instead is tip toward the press point, always, at any size (A10a).
 	 */
 	export const buttonVariants = tv({
-		base: "rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 fx-press fx-press-tilt",
+		base: "rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [transition:scale_var(--transition-duration-instant)_var(--ease-fx-spring),transform_var(--transition-duration-instant)_var(--ease-fx-out),color_var(--transition-duration-fast)_var(--ease-fx-out),background-color_var(--transition-duration-fast)_var(--ease-fx-out),border-color_var(--transition-duration-fast)_var(--ease-fx-out),box-shadow_var(--transition-duration-fast)_var(--ease-fx-out)] fx-press fx-press-tilt",
 		variants: {
 			variant: {
 				default: "bg-primary text-primary-foreground hover:bg-primary/80",
@@ -39,6 +59,14 @@
 				ghost: "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
 				destructive: "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
 				link: "text-primary underline-offset-4 hover:underline",
+				/*
+				 * A31. Emphasis on top of `default`, not alternatives to it — each
+				 * repeats primary's own surface so the button still reads as the
+				 * primary action, then adds its treatment.
+				 */
+				gradient: "bg-primary text-primary-foreground hover:bg-primary/80 fx-gradient border-transparent",
+				glow: "bg-primary text-primary-foreground hover:bg-primary/80 fx-glow fx-glow-bloom",
+				shimmer: "bg-primary text-primary-foreground hover:bg-primary/80 fx-shimmer",
 			},
 			size: {
 				default: "h-9 gap-1.5 px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
@@ -51,23 +79,11 @@
 				"icon-lg": "size-10",
 			},
 			/*
-			 * The alrein additions. Each is a plain utility class, not a BEM
-			 * modifier — the prior attempt mapped every variant to `rx-button--x`
-			 * and hand-wrote the CSS, which meant `cn()` could not merge anything
-			 * and a consumer's `class="h-12"` lost to specificity (SPEC.md §8, `F3`).
+			 * The one effect prop left. A plain utility class, not a BEM modifier —
+			 * the prior attempt mapped every variant to `rx-button--x` and hand-wrote
+			 * the CSS, which meant `cn()` could not merge anything and a consumer's
+			 * `class="h-12"` lost to specificity (SPEC.md §8, `F3`).
 			 */
-			gradient: {
-				true: "fx-gradient border-transparent text-primary-foreground",
-			},
-			glow: {
-				true: "fx-glow fx-glow-bloom",
-			},
-			shimmer: {
-				true: "fx-shimmer",
-			},
-			tilt: {
-				true: "fx-tilt",
-			},
 			magnet: {
 				true: "fx-magnet",
 			},
@@ -81,55 +97,32 @@
 	export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 	export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
-	/** Variants that paint a surface, and therefore have something to gradient or glow from. */
-	export type ButtonSurfaceVariant = Exclude<ButtonVariant, "ghost" | "link">;
-
 	/**
-	 * The effect props Button is allowed, conditioned on whether its variant
-	 * paints a surface.
+	 * The one effect prop Button still has (A31).
 	 *
-	 * `ghost + gradient` and `ghost + glow` are contradictions — a transparent
-	 * surface has nothing to paint and nothing to glow from — so SPEC.md §3.5
-	 * requires them to be **type errors, not doc comments**. `link` is included
-	 * for the same reason.
+	 * This used to be a conditional type keyed on the variant, because
+	 * `ghost + gradient` and `ghost + glow` are contradictions §3.5 required to be
+	 * type errors rather than doc comments — a transparent surface has nothing to
+	 * paint and nothing to glow from. Folding those two into `variant` makes the
+	 * contradiction *unrepresentable*: you cannot be `ghost` and `gradient` at once
+	 * because they are the same field.
 	 *
-	 * ## Why this is a conditional type and not a discriminated union
-	 *
-	 * The obvious encoding is `Base & ({variant?: Painted} & Effects | {variant:
-	 * "ghost"} & {gradient?: never})`. It works at a direct call site and breaks
-	 * everywhere else: `Omit<ComponentProps<typeof Button>, "href">` — which is
-	 * exactly what shadcn's own `InputGroupButton` does — collapses a union to the
-	 * intersection of its keys, and intersecting two branches with the full
-	 * `HTMLButtonAttributes & HTMLAnchorAttributes` surface produces "union type
-	 * that is too complex to represent".
-	 *
-	 * A wrapper component spreading props into Button is a normal shadcn pattern,
-	 * and §1's "an existing shadcn call site must compile unchanged" is the
-	 * stronger of the two rules. Keying the *effect props alone* off a generic
-	 * keeps the compile error where it is needed and leaves `ComponentProps` a
-	 * plain object that `Omit` and spreads handle without complaint.
+	 * That also retires a nasty piece of type surgery. The conditional type existed
+	 * to avoid a discriminated union, because `Omit<ComponentProps<typeof Button>,
+	 * "href">` — which shadcn's own `InputGroupButton` does — collapses a union to
+	 * the intersection of its keys and produced "union type that is too complex to
+	 * represent". With one unconditional boolean left there is no union to collapse.
 	 */
-	export type ButtonEffects<V extends ButtonVariant> = {
-		/** A finite attention sweep on hover. Not the loading loop — that is Skeleton's. */
-		shimmer?: boolean;
-		/** "A discrete object you can pick up." Needs a real hit area, so size >= default. */
-		tilt?: boolean;
+	export type ButtonEffects = {
 		/** The unmissable single CTA. `data-fx="expressive"` only, never in chrome, a form or a list. */
 		magnet?: boolean;
-	} & (V extends "ghost" | "link"
-		? { gradient?: never; glow?: never }
-		: {
-				/** Primary emphasis. Accent-derived stops, never a hardcoded pair. */
-				gradient?: boolean;
-				/** "Highest-intent target on this surface." Pointer-tracked. */
-				glow?: boolean;
-			});
+	};
 
 	type ButtonBase = WithElementRef<HTMLButtonAttributes> &
 		WithElementRef<HTMLAnchorAttributes> & { size?: ButtonSize };
 
-	export type ButtonProps<V extends ButtonVariant = "default"> = ButtonBase & {
-		variant?: V;
+	export type ButtonProps = ButtonBase & {
+		variant?: ButtonVariant;
 		/**
 		 * Determinate upload/work progress, 0–1. Omit (or pass `null`) for an
 		 * ordinary button.
@@ -145,7 +138,7 @@
 		 * button stays interactive unless the caller disables it.
 		 */
 		progress?: number | null;
-	} & ButtonEffects<V>;
+	} & ButtonEffects;
 
 	/**
 	 * The progress fill. A child element rather than a pseudo-element because
@@ -173,13 +166,12 @@
 		"transition-[background-size] duration-base ease-fx-out";
 </script>
 
-<script lang="ts" generics="V extends ButtonVariant = 'default'">
+<script lang="ts">
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
 	import { magnet as magnetEffect } from "$lib/fx/magnet.js";
 	import { press as pressEffect } from "$lib/fx/press.js";
 	import { shimmer as shimmerEffect } from "$lib/fx/shimmer.js";
-	import { tilt as tiltEffect } from "$lib/fx/tilt.js";
 
 	let {
 		class: className,
@@ -191,44 +183,27 @@
 		disabled,
 		children,
 		progress = null,
-		gradient,
-		glow,
-		shimmer,
-		tilt,
 		magnet,
 		...restProps
-	}: ButtonProps<V> = $props();
+	}: ButtonProps = $props();
 
 	const fx = getFxContext();
 
 	/*
-	 * The `◐` conditions from §3.4. Only the component can evaluate these, so it
-	 * passes them to `resolve` rather than the context guessing.
-	 */
-	const paintedSurface = $derived(variant !== "ghost" && variant !== "link");
-	const largeEnoughToTilt = $derived(
-		size === "default" || size === "lg" || size === "icon" || size === "icon-lg"
-	);
-
-	/*
-	 * Every effect goes through the same seven-step chain in `FxContext.resolve`
-	 * (§3.2). No component tests `prefers-reduced-motion` or `pointer: coarse`
-	 * itself — the prior attempt copy-pasted those checks into 124 places and
-	 * still missed one (SPEC.md §8, `F8`/`F10`).
+	 * A31: the variants paint themselves. `fx-gradient`, `fx-glow` and `fx-shimmer`
+	 * are on the element the moment the variant is chosen, and no longer ask
+	 * `FxContext` for permission — a variant is what the author asked for, and
+	 * `data-fx` governs effects.
 	 *
-	 * `fxDefault` is what lights up on its own at `data-fx="expressive"`. Only the
-	 * primary button claims one: at expressive, the primary action on a surface
-	 * glows. Everything else stays dark until asked.
+	 * The *motion* inside two of them is still governed, and by the layer that
+	 * should govern it. `glow` follows the pointer, so its attachment runs only
+	 * where there is a pointer to follow; `fx.css` zeroes `--fx-glow` under
+	 * `(pointer: coarse)` as the CSS-only half of the same rule. `shimmer` sweeps
+	 * once, and reduced motion collapses `--fx-shimmer-sweep-duration` to 0ms.
+	 * That is how §7.8 and §7.9 keep holding without `data-fx` being involved.
 	 */
-	const useGradient = $derived(fx.resolve("gradient", gradient, { available: paintedSurface }));
-	const useGlow = $derived(
-		fx.resolve("glow", glow, {
-			available: paintedSurface,
-			fxDefault: variant === "default",
-		})
-	);
-	const useShimmer = $derived(fx.resolve("shimmer", shimmer));
-	const useTilt = $derived(fx.resolve("tilt", tilt, { available: largeEnoughToTilt }));
+	const glowing = $derived(variant === "glow");
+	const shimmering = $derived(variant === "shimmer");
 	const useMagnet = $derived(fx.resolve("magnet", magnet));
 
 	/*
@@ -246,15 +221,7 @@
 	const classes = $derived(
 		cn(
 			fill !== null && "relative isolate",
-			buttonVariants({
-				variant,
-				size,
-				gradient: useGradient,
-				glow: useGlow,
-				shimmer: useShimmer,
-				tilt: useTilt,
-				magnet: useMagnet,
-			}),
+			buttonVariants({ variant, size, magnet: useMagnet }),
 			className
 		)
 	);
@@ -292,10 +259,9 @@
 		aria-busy={fill !== null ? "true" : undefined}
 		{...restProps}
 		{@attach pressEffect({ enabled: () => !disabled })}
-		{@attach useGlow ? glowEffect() : undefined}
-		{@attach useTilt ? tiltEffect() : undefined}
+		{@attach glowing ? glowEffect() : undefined}
 		{@attach useMagnet ? magnetEffect() : undefined}
-		{@attach useShimmer ? shimmerEffect({ trigger: "hover" }) : undefined}
+		{@attach shimmering ? shimmerEffect({ trigger: "hover" }) : undefined}
 	>
 		{#if fill !== null}{@render progressFill()}{/if}
 		{@render children?.()}
@@ -310,10 +276,9 @@
 		aria-busy={fill !== null ? "true" : undefined}
 		{...restProps}
 		{@attach pressEffect({ enabled: () => !disabled })}
-		{@attach useGlow ? glowEffect() : undefined}
-		{@attach useTilt ? tiltEffect() : undefined}
+		{@attach glowing ? glowEffect() : undefined}
 		{@attach useMagnet ? magnetEffect() : undefined}
-		{@attach useShimmer ? shimmerEffect({ trigger: "hover" }) : undefined}
+		{@attach shimmering ? shimmerEffect({ trigger: "hover" }) : undefined}
 	>
 		{#if fill !== null}{@render progressFill()}{/if}
 		{@render children?.()}

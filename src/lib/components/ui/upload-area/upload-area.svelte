@@ -54,8 +54,6 @@
 		glow?: boolean;
 		/** The loading loop while anything is uploading. */
 		shimmer?: boolean;
-		/** "A discrete object you can drop something onto." */
-		tilt?: boolean;
 		label?: string;
 		hint?: string;
 		/** Replaces the default row rendering. */
@@ -70,7 +68,6 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	import { getFxContext } from "$lib/fx/context.svelte.js";
 	import { glow as glowEffect } from "$lib/fx/glow.js";
-	import { tilt as tiltEffect } from "$lib/fx/tilt.js";
 	import { formatBytes } from "./upload.svelte.js";
 
 	let {
@@ -80,7 +77,6 @@
 		multiple = true,
 		glow,
 		shimmer,
-		tilt,
 		label = "Dateien hierher ziehen oder auswählen",
 		hint,
 		item,
@@ -103,7 +99,6 @@
 	const useGlow = $derived(fx.resolve("glow", glow, { available: dragging }));
 	const uploading = $derived(upload.status === "uploading");
 	const useShimmer = $derived(fx.resolve("shimmer", shimmer, { available: uploading }));
-	const useTilt = $derived(fx.resolve("tilt", tilt));
 
 	const classes = $derived(uploadAreaVariants({ dragging }));
 
@@ -128,7 +123,6 @@
 		class={cn(
 			classes.zone(),
 			useGlow && "fx-glow",
-			useTilt && "fx-tilt",
 			useShimmer && "fx-shimmer-loading"
 		)}
 		ondragenter={() => (dragDepth += 1)}
@@ -136,7 +130,6 @@
 		ondragover={(event) => event.preventDefault()}
 		ondrop={onDrop}
 		{@attach useGlow ? glowEffect({ radius: 220 }) : undefined}
-		{@attach useTilt ? tiltEffect() : undefined}
 	>
 		<input
 			data-slot="upload-area-input"
