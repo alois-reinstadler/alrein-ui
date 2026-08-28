@@ -4,12 +4,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { FxScope } from '$lib/fx/index.js';
 	import { CAPABILITIES, type FxEffect } from '$lib/fx/capabilities.js';
-	import { byPhase } from '$lib/demo/nav.js';
+	import { byName } from '$lib/demo/nav.js';
 	import Section from '$lib/demo/section.svelte';
 
 	const effects: FxEffect[] = ['gradient', 'glow', 'shimmer', 'tilt', 'magnet'];
 	const componentNames = Object.keys(CAPABILITIES) as (keyof typeof CAPABILITIES)[];
-	const groups = byPhase();
+	const entries = byName();
 
 	function cell(component: keyof typeof CAPABILITIES, effect: FxEffect): string {
 		const value = (CAPABILITIES[component] as Record<string, unknown>)[effect];
@@ -36,38 +36,31 @@
 
 <Section
 	title="Bestand"
-	note="Was gebaut ist und was noch aussteht. Diese Liste ist die Quelle für die Navigation links, damit eine geplante Komponente sichtbar fehlt statt still zu verschwinden."
+	note="Alle Komponenten alphabetisch. Diese Liste ist die Quelle für die Navigation links, damit eine geplante Komponente sichtbar fehlt statt still zu verschwinden. Nicht nach Phase gruppiert: die Phase sagt, wann etwas gebaut wurde, und das hilft niemandem, der Switch sucht."
 >
-	{#each groups as group (group.phase)}
-		<div>
-			<h3 class="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-				Phase {group.phase} — {group.title}
-			</h3>
-			<ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-				{#each group.entries as entry (entry.slug)}
-					<li class="flex items-start gap-2 rounded-lg border p-3">
-						<div class="min-w-0 flex-1">
-							<div class="flex items-center gap-2">
-								{#if entry.status === 'shipped'}
-									<a href="{base}/{entry.slug}" class="text-sm font-medium hover:underline">
-										{entry.name}
-									</a>
-								{:else}
-									<span class="text-sm font-medium text-muted-foreground">{entry.name}</span>
-								{/if}
-								{#if entry.status === 'planned'}
-									<Badge variant="outline">geplant</Badge>
-								{:else if entry.origin === 'new'}
-									<Badge variant="secondary">neu</Badge>
-								{/if}
-							</div>
-							<p class="mt-1 text-xs text-muted-foreground">{entry.summary}</p>
-						</div>
-					</li>
-				{/each}
-			</ul>
-		</div>
-	{/each}
+	<ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+		{#each entries as entry (entry.slug)}
+			<li class="flex items-start gap-2 rounded-lg border p-3">
+				<div class="min-w-0 flex-1">
+					<div class="flex items-center gap-2">
+						{#if entry.status === 'shipped'}
+							<a href="{base}/{entry.slug}" class="text-sm font-medium hover:underline">
+								{entry.name}
+							</a>
+						{:else}
+							<span class="text-sm font-medium text-muted-foreground">{entry.name}</span>
+						{/if}
+						{#if entry.status === 'planned'}
+							<Badge variant="outline">geplant</Badge>
+						{:else if entry.origin === 'new'}
+							<Badge variant="secondary">neu</Badge>
+						{/if}
+					</div>
+					<p class="mt-1 text-xs text-muted-foreground">{entry.summary}</p>
+				</div>
+			</li>
+		{/each}
+	</ul>
 </Section>
 
 <Section

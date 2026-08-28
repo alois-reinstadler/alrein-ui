@@ -50,8 +50,19 @@
 	before hydration and even if the bundle never arrives.
 
 	`display: contents` by default so a scope adds no box and cannot cause the
-	reflow acceptance criterion §7.10 forbids. Pass a `class` to make it a real
-	element when you want one.
+	reflow acceptance criterion §7.10 forbids.
+
+	To make it a real box, pass a **display utility** — `block`, `flex`, `grid`.
+	Passing spacing or sizing utilities alone does *not*: `cn()` is tailwind-merge,
+	which only drops a class when a later one is in the same group, and `contents`
+	is in the display group while `flex-1`, `min-w-0` and `py-8` are in three other
+	ones. `cn('contents', 'min-w-0 flex-1 py-8')` therefore keeps all four, the
+	element generates no box, and the three layout classes silently do nothing.
+
+	That is not hypothetical. The docs layout wrapped its whole body in
+	`<FxScope class="min-w-0 flex-1 py-8">` inside a `flex` row, so every `<section>`
+	on every page became a flex item of *that* row: the pages rendered as columns
+	side by side, clipped, with a horizontal scrollbar, on the published site.
 
 	**One trap, and it is easy to walk into.** `display: contents` removes an
 	element from the *box tree* but **not** from the *selector tree*. So wrapping

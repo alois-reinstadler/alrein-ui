@@ -78,3 +78,20 @@ export function byPhase(): { phase: 0 | 1 | 2 | 3 | 4; title: string; entries: N
 		entries: NAV.filter((entry) => entry.phase === phase)
 	}));
 }
+
+/**
+ * The whole inventory, A–Z, ungrouped.
+ *
+ * This is what the sidebar and the overview render. `phase` is build history —
+ * it says when a component was written, which is useful to whoever is building
+ * the library and useless to whoever is looking for Switch. Grouping by it also
+ * made the list unscannable: five headings and no alphabetical order anywhere,
+ * so finding a component meant knowing which phase it landed in.
+ *
+ * `de-AT` collation, so Ä sorts with A rather than after Z.
+ */
+const COLLATOR = new Intl.Collator('de-AT');
+
+export function byName(): NavEntry[] {
+	return [...NAV].sort((a, b) => COLLATOR.compare(a.name, b.name));
+}
