@@ -54,8 +54,13 @@ jobs:
       - name: Types (svelte-check)
         run: pnpm check
 
+      # `--all` on a push, the diff on a pull request. On a push to main HEAD *is*
+      # origin/main, so the default diff mode compares the branch against itself,
+      # scans 0 files and reports OK — a green tick that checked nothing, on the
+      # one branch that deploys. Verified: the first CI run said
+      # "scanning 0 file(s): working tree vs origin/main".
       - name: Hard bans (SPEC.md §1, §8.3)
-        run: pnpm bans:check
+        run: pnpm bans:check ${{ github.event_name == 'pull_request' && '' || '--all' }}
 
       - name: Unit tests (SPEC.md §3.2 resolution order)
         run: pnpm test
