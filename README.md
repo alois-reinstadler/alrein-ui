@@ -59,7 +59,7 @@ is opt-in and is the only level where magnet exists at all.
 
 | Guarantee | Check | Command |
 |---|---|---|
-| Types are sound, no `any` | `svelte-check` strict, 1135 files | `pnpm check` |
+| Types are sound, no `any` | `svelte-check` strict, 1136 files | `pnpm check` |
 | The §8 failure patterns cannot return | 14 grep rules over the diff | `pnpm bans:check` |
 | The §3.2 order, the bezier solver, the OKLCH converter and the upload state | 145 unit tests | `pnpm test` |
 | **Effects never touch the layout box** | parses the built CSS; no effect rule may declare or animate a layout property | `pnpm layout:check` |

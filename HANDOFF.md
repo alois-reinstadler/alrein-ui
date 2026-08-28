@@ -6,8 +6,8 @@ Paste this as the first message of a new session.
 
 You are picking up the vuesax → Svelte 5 + shadcn-svelte port at `~/repos/alrein-ui`. It is
 **feature-complete and verified**: all five phases of `SPEC.md` §6 are built, and acceptance
-criteria §7.1–§7.11 all pass. What is left is criterion §7.12 (fidelity against the source) and
-deployment, which is blocked on one question only you can answer.
+criteria §7.1–§7.11 all pass. It is deployed and live. The one criterion still open is §7.12,
+fidelity against the vuesax source.
 
 ## Read first, in this order
 
@@ -24,7 +24,12 @@ deployment, which is blocked on one question only you can answer.
 
 ## State
 
-29 components · 31 registry items · 172 files · clean tree · **no git remote.**
+29 components · 31 registry items · 172 files · clean tree.
+
+**Live at <https://alois-reinstadler.github.io/alrein-ui>**, published from `main` by
+`.github/workflows/ci.yml` on every push. The registry is served from the same artifact
+(`/r/<item>.json`), which is A8's whole point — the site build and the registry build cannot drift
+because they are one build. `origin` is `github.com/alois-reinstadler/alrein-ui`.
 
 Run the gate before you change anything, so you know it was green when you started:
 
@@ -35,7 +40,7 @@ pnpm registry:gen --check && pnpm registry:build && pnpm registry:check
 pnpm exec vite build && pnpm layout:check && pnpm ssr:check
 ```
 
-Expected: 1135 files / 0 errors · 145 tests · 14 ban rules 0 violations · **51** supersets marked ·
+Expected: 1136 files / 0 errors · 145 tests · 14 ban rules 0 violations · **51** supersets marked ·
 31 registry items · 45 effect rules touch no layout · 31 pages × 3 effect levels.
 `pnpm consumer:smoke` also passes but takes minutes — it scaffolds a real SvelteKit app.
 
@@ -56,27 +61,17 @@ Expected: 1135 files / 0 errors · 145 tests · 14 ban rules 0 violations · **5
 
 ## What is actually left
 
-### 1. Deployment — the only thing blocking a release, and it needs your answer
-There is **no git remote**. `registry.json`'s `homepage` is
-`https://alois-reinstadler.github.io/alrein-ui`, which was *inferred* from the prior project and has
-never been confirmed by the maintainer. `.github/workflows/ci.yml` has a Pages job with
-`BASE_PATH=/alrein-ui` that has never run.
-
-Confirm the repo owner and name before publishing anything. If they differ from the guess, the
-`homepage` in `registry.config.mjs` and `BASE_PATH` in the workflow both change, and every built
-registry item under `static/r` has to be regenerated.
-
-### 2. §7.12 — the side-by-side fidelity check against the vuesax source
+### 1. §7.12 — the side-by-side fidelity check against the vuesax source
 The only acceptance criterion still open. It needs the shadow-DOM sources open beside the demo. Note
 that **Phase 4's sources were never digested**: `color-picker`, `code` and `upload-file` were built
 from §5 and the capability matrix alone. If fidelity there matters, digest them the way
 `VUESAX-INTENT.md` and `VUESAX-INTENT-2.md` digest the others, then compare.
 
-### 3. Smaller things
+### 2. Smaller things
 - `consumer:smoke` runs manually / nightly, not per push. That is deliberate (it builds a whole
   app), but it means a registry regression can sit for a day.
-- `src/routes/demo/` is an empty untracked directory left over from something; the dev server 404s
-  on `/demo`. Harmless, but delete it.
+- The local branch was renamed `master` → `main` when the remote was added, because the workflow
+  triggers on `main` and the Pages job is gated on `refs/heads/main`.
 
 ## What the last session did, so you do not redo it
 
@@ -91,6 +86,18 @@ from §5 and the capability matrix alone. If fidelity there matters, digest them
   this as the thing FLIP could not reproduce; it can.
 - **`A30`** — built §5's Button progress state (`progress?: number | null`), on the same
   `UploadState` as `UploadArea`. Demonstrated on both `/button` and `/upload-area`.
+- **Published it.** First push to `github.com/alois-reinstadler/alrein-ui`, CI green, Pages live.
+  Two defects surfaced only once it was actually deployed, and both are fixed:
+  - **Every URL returned HTTP 404.** `adapter-static` had `fallback: '404.html'` and no route was
+    ever marked prerenderable, so the only HTML in `build/` was the fallback. It *looked* fine —
+    the client router booted and rendered the right page — but curl, crawlers and anything without
+    JavaScript saw "not found". `prerender = true` at the root now emits 31 real pages. Getting
+    there needed a `building` guard on the `?fx=` seeding (SvelteKit refuses `url.searchParams`
+    while prerendering, and `ssr:check` depends on that read), and it exposed four demo links that
+    ignored `paths.base` plus two Sidebar anchors pointing at ids that do not exist.
+  - **`bans:check` scanned 0 files in CI.** On a push to `main`, `HEAD` *is* `origin/main`, so the
+    default diff mode compared the branch against itself and reported OK having checked nothing —
+    on the one branch that deploys. It now runs `--all` on push and keeps the diff for PRs.
 - **`A23` was not outstanding.** The previous handoff claimed the per-component glow radii were
   "recorded but unapplied". They were applied in the commits that built each component. Cross the
   nine source radii against §3.4 and only Avatar (160), Accordion (220) and Alert (240) are granted
