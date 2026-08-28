@@ -3,6 +3,13 @@
 One section per phase, against SPEC.md §7. Anything not verified is marked
 **NOT VERIFIED** with the reason, not glossed.
 
+> **Read the phase sections as a dated record.** Each was written in the session that built its
+> phase, and several say criteria 6 and 7 are blocked because no browser automation host existed.
+> That was true then and is not true now: **[the browser pass](#the-browser-pass)** at the end walked
+> all 31 pages at three effect levels in both colour schemes, and the per-phase tables have been
+> updated to its result. The prose explaining *why* they were blocked has been left as written
+> rather than quietly rewritten.
+
 ---
 
 # Phase 0 — foundation, Button, Card, Badge
@@ -17,8 +24,8 @@ Against SPEC.md §7. Twelve criteria, for Button, Card and Badge. Anything not v
 | 3 | Registry item builds and installs cleanly | **PASS** |
 | 4 | Effect props only where §3.4 allows; forbidden combos are type errors | **PASS** |
 | 5 | Keyboard-complete and screen-reader-correct | **PASS (narrow)** |
-| 6 | Focus ring intact and unobscured at every `data-fx` level | **PARTIAL** |
-| 7 | Correct in light and dark, and at off / calm / expressive | **NOT VERIFIED** |
+| 6 | Focus ring intact and unobscured at every `data-fx` level | **PASS** — browser sweep, see below |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PASS** — browser sweep, see below |
 | 8 | `prefers-reduced-motion: reduce` | **PASS (by construction + tests)** |
 | 9 | `(pointer: coarse)` | **PASS (by construction + tests)** |
 | 10 | No layout shift from any effect | **PASS (proven statically)** |
@@ -133,8 +140,8 @@ because two Phase 1 components had `TODO(phase-2)` inline copies of it.
 | 3 | Registry item builds and installs cleanly | **PASS (build + validate); install re-proof pending** |
 | 4 | Effect props only where §3.4 allows; forbidden combos are type errors | **PASS** |
 | 5 | Keyboard-complete and screen-reader-correct | **PASS** |
-| 6 | Focus ring intact and unobscured at every `data-fx` level | **PARTIAL** |
-| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL — levels verified, light/dark not** |
+| 6 | Focus ring intact and unobscured at every `data-fx` level | **PASS** — browser sweep, see below |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PASS** — browser sweep, see below |
 | 8 | `prefers-reduced-motion: reduce` | **PASS** |
 | 9 | `(pointer: coarse)` | **PASS** |
 | 10 | No layout shift from any effect | **PASS (proven statically)** |
@@ -275,8 +282,8 @@ which belongs to Phase 0's Button family and had been missing from the inventory
 | 3 | Registry item builds and installs cleanly | **PASS** |
 | 4 | Effect props only where §3.4 allows; forbidden combos are type errors | **PASS** |
 | 5 | Keyboard-complete and screen-reader-correct | **PASS** |
-| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** — structural, unobserved |
-| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** — levels verified, light/dark not |
+| 6 | Focus ring intact at every `data-fx` level | **PASS** — browser sweep, see below |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PASS** — browser sweep, see below |
 | 8 | `prefers-reduced-motion: reduce` | **PASS** |
 | 9 | `(pointer: coarse)` | **PASS** |
 | 10 | No layout shift from any effect | **PASS (proven statically)** |
@@ -331,8 +338,8 @@ ColorPicker · Code · CodeWindow · UploadArea.
 | 3 | Registry item builds and validates | **PASS** — 26 items, 114 files |
 | 4 | Effect props only where §3.4 allows | **PASS** |
 | 5 | Keyboard-complete and screen-reader-correct | **PASS** |
-| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** |
-| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** |
+| 6 | Focus ring intact at every `data-fx` level | **PASS** — browser sweep, see below |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PASS** — browser sweep, see below |
 | 8 | `prefers-reduced-motion: reduce` | **PASS** |
 | 9 | `(pointer: coarse)` | **PASS** |
 | 10 | No layout shift from any effect | **PASS** |
@@ -391,8 +398,8 @@ Tabs · Steps · Accordion · Breadcrumb · Pagination · Sidebar · Timeline.
 | 3 | Registry item builds and installs cleanly | **PASS** — re-proven at 31 items |
 | 4 | Effect props only where §3.4 allows | **PASS** |
 | 5 | Keyboard-complete and screen-reader-correct | **PASS**, with one upstream bug fixed |
-| 6 | Focus ring intact at every `data-fx` level | **PARTIAL** |
-| 7 | Correct in light and dark, and at off / calm / expressive | **PARTIAL** — levels verified, light/dark not |
+| 6 | Focus ring intact at every `data-fx` level | **PASS** — browser sweep, see below |
+| 7 | Correct in light and dark, and at off / calm / expressive | **PASS** — browser sweep, see below |
 | 8 | `prefers-reduced-motion: reduce` | **PASS** |
 | 9 | `(pointer: coarse)` | **PASS** |
 | 10 | No layout shift from any effect | **PASS** |
@@ -467,16 +474,68 @@ inverted keyframe learned to pre-divide the radius by the scale (A25a).
 | `pnpm check` | 1135 files, 0 errors, 0 warnings |
 | `pnpm test` | 145 tests |
 | `pnpm bans:check` | 14 rules, 0 violations |
-| `pnpm supersets:check` | 48 extended files still marked |
+| `pnpm supersets:check` | 51 extended files still marked |
 | `pnpm registry:gen --check` | 31 items, regenerates identically |
 | `pnpm registry:check` | 31 items validated against disk and build output |
 | `pnpm layout:check` | 45 effect rules, none touch the layout box |
 | `pnpm ssr:check` | 31 pages × 3 effect levels = 93 renders |
 | `pnpm consumer:smoke` | every item installs over real upstream files; consumer builds |
 
-**Still blocked, unchanged since Phase 0:** browser verification. No automation host exists in this
-environment (`preview_status` reports none; CDP on `127.0.0.1:9222` is refused), and per the
-operating rules no browser was started as a workaround. Criteria 6 and 7 remain partial for every
-phase. Everything that can be verified without one has been, and four checks were built specifically
-to narrow the gap — `layout:check`, `ssr:check`, `supersets:check` and `consumer:smoke` — three of
-which caught real bugs that would otherwise have shipped.
+---
+
+# The browser pass
+
+Criteria 6 and 7 were partial for every phase because no automation host existed in the session that
+built the library. One does now — Chrome 152 headed on `:99`, CDP on `127.0.0.1:9222` — so they were
+walked properly. **All 31 pages, three `data-fx` levels, light and dark: 186 page-states.**
+
+| Criterion | Method | Result |
+|---|---|---|
+| 6 — focus ring at every level | keyboard-focus every focusable, read the resolved outline and box-shadow, compare the three levels | **PASS** after one fix |
+| 7 — light and dark | the same sweep in both schemes | **PASS** |
+| 8 — reduced motion | force the media query and count the effect classes actually emitted | **PASS** |
+| 9 — coarse pointer | touch-emulate and count the same | **PASS** |
+| 10 — no layout shift | toggle `data-fx` in one document, diff the layout geometry of every element | **PASS** |
+| console | 93 loads across all pages and levels | 0 errors, 0 warnings |
+
+**What it found.** One real defect, `A29`: shadcn-svelte's `TabsContent` is focusable —
+`role="tabpanel"`, `tabindex="0"`, which the ARIA practices require — and sets `outline-none` with
+nothing added back. The six panels on `/tabs` were the only focusable nodes in the entire library
+with no focus indicator on any side, at any level, in either scheme. WCAG 2.4.7, Level AA. Fixed
+under A24b's rule and re-verified.
+
+**Numbers.** §7.6: 0 elements with no ring after the fix, 0 elements whose ring differs between off,
+calm and expressive. §7.9: glow / bloom / tilt / magnet go 19 / 19 / 1 / 1 at a fine pointer to
+0 / 0 / 0 / 0 under touch, on `/button` at `expressive`. §7.8: the same four go to zero with
+`prefers-reduced-motion: reduce` forced, while gradient and shimmer stay — correct, they are not
+pointer-tracked. §7.10: zero geometry differences on any page, in either scheme.
+
+**Four things that had to be got right for the sweep to mean anything**, each of which produced a
+false result first:
+
+1. **`getBoundingClientRect` is the wrong metric for §7.10.** A transform moves the painted rect —
+   that is the whole point of the effect — so the layout question has to be asked of `offsetLeft` /
+   `offsetTop` / `offsetWidth` / `offsetHeight`. But a transformed ancestor *becomes* the
+   `offsetParent`, so the raw offsets jump too. Summing up the `offsetParent` chain telescopes back
+   to an absolute layout position that no transform can move. Before that correction `/card` showed
+   four "shifts" that were all the same box, measured from a different origin.
+2. **Programmatic `focus()` does not match `:focus-visible`.** Chrome only sets the flag for
+   keyboard-initiated focus — and then, per spec, a programmatic focus *inherits* it from a
+   previously focus-visible element. One real `Tab` keypress at the start of the run makes the
+   whole sweep valid, and the flag survives navigations within the tab. Without it every element
+   looked like it had no ring.
+3. **The ring transitions in.** Button carries `transition-all`, so a computed style read
+   immediately after focusing samples the animation mid-flight and reports a 0-width ring. The
+   sweep injects `transition-duration: 0s` before measuring.
+4. **`:hover` follows the real mouse.** The physical pointer sits wherever it was left and tints
+   whatever is under it, which showed up as border-colour differences between levels on whichever
+   page the cursor happened to be over. §7.6 is about the indicator, so ring and border are compared
+   separately.
+
+**Still not done, and honestly so:** criterion 12, the side-by-side visual check against the vuesax
+shadow-DOM source. The sources are digested in `references/`, and Phase 4's three
+(`color-picker`, `code`, `upload-file`) were never digested at all — those components were built
+from §5 and the capability matrix. That is a fidelity question, not a correctness one.
+
+**Do not add pixel-diff visual regression tests over pointer-tracked or looping effects.** That is
+`F18`. The prior attempt spent its last fifteen commits there.

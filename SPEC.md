@@ -653,6 +653,15 @@ Full reasoning in `SUBSTRATE.md`.
   scales its proximity radius to the element: Rating star 90px, Tabs and Pagination 96, Breadcrumb
   120, Avatar and Chip 160, Timeline 200, Accordion 220, Alert 240, Sidebar 320. Any component
   larger than a Button that is granted glow must pass its own radius rather than inherit the token.
+
+  **Verified applied.** Cross the nine radii against §3.4 and only three of the named components are
+  granted glow at all: Avatar (160), Accordion (220) and Alert (240). All three carry their radius,
+  and have since the commit that built them. Rating, Tabs, Pagination, Breadcrumb, Chip, Timeline
+  and Sidebar are denied glow by the capability matrix, so their source radii are moot rather than
+  missing. Of the rest, UploadArea passes 220 explicitly and Button, Card, Badge and the two card
+  variants inherit the 180 default — Button because 180 *is* its number, the others because the
+  source has no figure for them. So A23 is discharged, and nothing inherits a wrong radius. A
+  handoff note claiming the per-component radii were "recorded but unapplied" was mistaken.
 - **A24 — Accessibility gaps in the source that must not be inherited (Phase 2/3).** Recorded here
   because each one looks like a design choice in the shadow CSS and is not.
   - **Pagination has no keyboard handling at all.** Every page number is a tab stop, and with no
@@ -687,11 +696,25 @@ Full reasoning in `SUBSTRATE.md`.
   the scale unwinds. Paint, not layout, so §1 permits it. Skipped when both scales are 1, which is
   the common case for a uniform row.
 
-  **Still outstanding, and honestly so: `chrome` ships without its shoulders.** The source's sled
-  has two quarter-disc pseudo-elements that would squash under `scaleX`, and reproducing them needs
-  a counter-scaled *child*, which `MorphIndicator` does not render. The digest predicted exactly
-  this as the one thing FLIP cannot reproduce. What ships is a top-rounded sled on a lip, which
-  reads as a browser tab but is not the source's silhouette.
+- **A25b — `MorphIndicator` counter-scales opt-in children, and `chrome` has its shoulders.** A25a
+  fixed the *corners* of a stretching box; anything drawn at a fixed size inside it still squashed,
+  which is why `chrome` shipped as a top-rounded sled rather than the source's silhouette. A child
+  carrying `data-morph-counter-scale` now receives the inverse of the indicator's own scale, with
+  its anchor taken from its own `transform-origin` — the left shoulder pins to `right`, the right
+  shoulder to `left`, so neither drifts toward the middle as the sled stretches. Opt-in, because
+  most consumers have nothing to counter-scale and should not pay for a second animation.
+
+  The shoulders themselves are two masked layers per side: the element paints `border` and keeps
+  everything from radius `r` outward, its `::before` paints `background` and keeps everything from
+  `r + 1px` outward, and the 1px annulus between them is the border curving down to the lip. The
+  mask is a circle centred on the shoulder box's inner-top corner, which is the whole of the
+  concave flare.
+
+  The cancellation is exact at both ends and not in between: both animations run under the same
+  easing, so the composite is `lerp(s, 1, e) × lerp(1/s, 1, e)`. Measured over `chrome`'s widest
+  travel (83px → 141px, s ≈ 1.7) an 8px shoulder peaks at 8.55px and settles within four frames.
+  Cancelling exactly would mean sampling the curve and emitting a keyframe per step — the shape of
+  `F5` — for an error of half a pixel.
 - **A25 — `MorphIndicator` must re-measure on two signals besides selection.** A container resize,
   caught by a `ResizeObserver` on the offset parent — not a `window` resize listener, because the
   container can change without the window and `pointer.svelte.ts` owns window-level listeners. And
@@ -758,3 +781,42 @@ Full reasoning in `SUBSTRATE.md`.
   §1's "never break an existing shadcn call site" is about **API and appearance**. It is not a
   commitment to reproduce a bug, and where the two conflict the user wins. Every such fix is
   recorded here rather than made quietly.
+
+### Amendments from the verification pass
+
+- **A29 — shadcn-svelte's `TabsContent` is focusable and paints no focus indicator.** Found by the
+  §7.6 sweep: bits-ui gives the panel `role="tabpanel"` and `tabindex="0"`, which the ARIA practices
+  require so a keyboard user tabbing out of the tab list reaches content that may hold no focusable
+  element of its own. Upstream then sets `outline-none` and adds nothing back, so focus lands
+  somewhere invisible — a WCAG 2.4.7 (AA) failure, and across all 31 demo pages, all three `data-fx`
+  levels and both colour schemes, the six panels on `/tabs` were the **only** focusable nodes in the
+  library with no indicator on any side.
+
+  Fixed under A24b's rule — a strict superset preserves upstream's API and appearance, not its
+  defects. The addition is the 3px `ring-ring/50` every other focusable here resolves to, not the
+  extra 1px outline `TabsTrigger` carries, which is upstream's own flourish rather than the house
+  indicator. `focus-visible` only, so nothing changes in any state upstream actually paints, and
+  unconditional, because §3.5's accessibility floor does not move with `data-fx`.
+
+- **A30 — §5's Button progress state, built.** The row `upload-file, upload button` asks for
+  `UploadArea` **and** a Button progress state on one shared `UploadState`. `UploadState` shipped
+  with Phase 4 and the Button half did not; `progress?: number | null` is it, and both demos now
+  drive off the same instance.
+
+  It is state, not decoration: it does not consult `FxContext`, and `data-fx="off"` does not switch
+  it off, because §3.5 forbids state hanging on anything that can be switched off. It is also not a
+  disabled state — cancelling an upload is a legitimate thing to click.
+
+  The fill is a **child element**, because Button has no pseudo-element left: `fx-glow` owns
+  `::before`, `fx-press` owns `::after`, and `background-image` on the button itself belongs to
+  gradient and shimmer. It animates `background-size` alone — paint, never the layout box. Sizing a
+  background beats `scaleX` here: a scaled box drags its rounded corners with it, whereas a
+  background is clipped by the inherited radius on the left and ends in a hard vertical edge on the
+  right, which is what a progress fill looks like. `z-index: -1` keeps it above the button's
+  background and below the label, which is why `progress` also adds `relative isolate` — neither
+  moves anything.
+
+  Accessibility: `aria-busy` on the control, `aria-hidden` on the fill. The percentage belongs in
+  the label, and reading the same number twice is noise. The value is clamped to 0–1 rather than
+  trusted, because `UploadState.progress` is a mean and a caller doing its own bookkeeping can hand
+  over 1.02 or a NaN from a division by zero.

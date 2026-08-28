@@ -70,7 +70,7 @@ is opt-in and is the only level where magnet exists at all.
 | `shadcn-svelte add` genuinely works | scaffolds a real consumer, installs over real upstream files, builds | `pnpm consumer:smoke` |
 | Forbidden prop combinations | `@ts-expect-error` in `*.types.ts` and `*.call-sites.svelte` | `pnpm check` |
 
-Three of those exist because eyeballing is not available and would be weaker anyway:
+Three of those are structural checks rather than observations, and are stronger for it:
 
 - **`layout:check`** meets acceptance criterion §7.10. Proving that nothing in the effect layer
   *can* reflow beats toggling `data-fx` and watching.
@@ -80,6 +80,39 @@ Three of those exist because eyeballing is not available and would be weaker any
   during SSR, so every scope rendered its parent's level server-side.
 - **`supersets:check`** exists because `shadcn-svelte add field input-group` once pulled `button` in
   as a registry dependency and silently reverted the entire alrein Button to stock.
+
+### The browser pass
+
+`§7.6`–`§7.10` have since been walked in a real Chrome as well, because a structural proof and an
+observation fail differently and the criteria ask for both. All 31 pages, three `data-fx` levels,
+light and dark:
+
+| Criterion | Result |
+|---|---|
+| §7.6 focus ring intact and unobscured at every level | **pass**, after one fix — see below |
+| §7.7 correct in light and dark | **pass** — every focusable resolves a ring in both schemes |
+| §7.8 `prefers-reduced-motion: reduce` | **pass** — glow, bloom, tilt and magnet are vetoed before the class is emitted |
+| §7.9 `(pointer: coarse)` | **pass** — the same four go 19/19/1/1 → 0/0/0/0 under touch emulation |
+| §7.10 no layout shift from any effect | **pass** — zero change in the layout geometry of every element on every page |
+| console | clean — 0 errors, 0 warnings over 93 page loads |
+
+§7.10 was measured by toggling `data-fx` in one document and diffing the cumulative layout position
+and size of every element in the page. The metric has to be `offsetLeft`/`offsetTop` summed up the
+`offsetParent` chain, not `getBoundingClientRect`: a transform moves the painted rect, which is the
+point of the effect, and it also *changes which ancestor is the offset parent*, which is why the sum
+rather than the raw offset.
+
+The one real defect it found is `A29`: shadcn-svelte's `TabsContent` is focusable (`tabindex="0"`,
+as the ARIA practices require) and paints no focus indicator at all. Six panels on `/tabs` were the
+only focusable nodes in the library with nothing on any side. Fixed.
+
+Two things the sweep flagged and that turned out to be correct: form controls with a floating label
+delegate their ring to the wrapper (`has-focus-visible:ring-*` on `FieldFloating`), and Tabs'
+underline and chrome sled sit *outside* the ring band rather than over it — confirmed by looking at
+them, not by arithmetic.
+
+**Do not add pixel-diff visual regression tests over pointer-tracked or looping effects.** That is
+`F18`, and it is what the prior attempt spent its last fifteen commits on.
 
 ## Layout
 
