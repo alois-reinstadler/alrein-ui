@@ -65,6 +65,7 @@ const SUPERSETS = [
 	'src/lib/components/ui/tabs/tabs.svelte',
 	'src/lib/components/ui/tabs/tabs-list.svelte',
 	'src/lib/components/ui/tabs/tabs-trigger.svelte',
+	'src/lib/components/ui/tabs/tabs-content.svelte',
 	'src/lib/components/ui/pagination/pagination.svelte',
 	'src/lib/components/ui/pagination/pagination-link.svelte',
 	'src/lib/components/ui/pagination/pagination-ellipsis.svelte',
